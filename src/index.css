@@ -1,1 +1,106 @@
+/* ===========================================================
+   1) Load Tailwind v4
+   =========================================================== */
 @import "tailwindcss";
+
+/* ===========================================================
+   2) Theme Configuration - Tailwind v4 Style
+   =========================================================== */
+@theme {
+  /* Brand Colors - Deep Purple + Mint */
+  --color-purple-900: #2a0a42;
+  --color-purple-700: #4b1c77;
+  --color-purple-500: #6c2fb3;
+  --color-purple-300: #a875e0;
+  --color-purple-100: #e9d8f8;
+
+  --color-mint-900: #0b4038;
+  --color-mint-700: #0f6f5f;
+  --color-mint-500: #27bfa8;
+  --color-mint-300: #74e7d7;
+  --color-mint-100: #d8faf5;
+
+  /* Semantic Color Mappings */
+  --color-primary: var(--color-purple-500);
+  --color-primary-light: var(--color-purple-300);
+  --color-primary-dark: var(--color-purple-700);
+
+  --color-accent: var(--color-mint-500);
+  --color-accent-light: var(--color-mint-300);
+  --color-accent-dark: var(--color-mint-700);
+
+  /* Status Colors */
+  --color-danger-500: #ca2d2d;
+  --color-warning-500: #e9a22c;
+  --color-success-500: #2d8f45;
+  --color-info-500: #2c6eda;
+
+  /* Typography */
+  --font-family-sans: "Inter", "Roboto", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ===========================================================
+   3) Component Styles Using @apply
+   =========================================================== */
+
+/* Card */
+.card {
+  @apply bg-white border border-gray-300 rounded-xl shadow-sm p-6;
+}
+
+/* Input */
+.form-input {
+  @apply w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 
+         focus:outline-none focus:ring-2 focus:ring-purple-500;
+}
+
+/* Button Variants */
+.btn {
+  @apply px-4 py-2 rounded-md font-medium transition-colors cursor-pointer;
+}
+
+.btn-primary {
+  @apply bg-purple-500 text-white hover:bg-purple-700;
+}
+
+.btn-accent {
+  @apply bg-mint-500 text-white hover:bg-mint-700;
+}
+
+.btn-outline {
+  @apply border border-purple-500 text-purple-500 hover:bg-purple-100;
+}
+
+.btn-danger {
+  @apply bg-[--color-danger] text-white hover:bg-red-700;
+}
+
+/* Headings */
+.h1 {
+  @apply text-3xl font-bold text-purple-500 mb-4;
+}
+
+.h2 {
+  @apply text-2xl font-semibold text-purple-700 mb-3;
+}
+
+/* Alerts */
+.alert {
+  @apply rounded-lg px-4 py-3 border;
+}
+
+.alert-info {
+  @apply bg-blue-50 border-blue-300 text-blue-700;
+}
+
+.alert-success {
+  @apply bg-green-50 border-green-300 text-green-700;
+}
+
+.alert-warning {
+  @apply bg-yellow-50 border-yellow-300 text-yellow-700;
+}
+
+.alert-danger {
+  @apply bg-red-50 border-red-300 text-red-700;
+}
