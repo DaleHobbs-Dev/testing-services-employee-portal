@@ -1,3 +1,5 @@
+import { Label } from "./Label";
+
 export function FormField({ label, children }) {
   return (
     <div className="mb-4">

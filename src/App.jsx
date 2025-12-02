@@ -1,10 +1,10 @@
 import "./App.css";
-import { Button } from "@/components/ui";
+import DesignSystem from "./pages/DesignSystem.jsx";
 
 function App() {
   return (
     <>
-      <Button>Click me</Button>
+      <DesignSystem />
     </>
   );
 }
