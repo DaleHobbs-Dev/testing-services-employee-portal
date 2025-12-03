@@ -9,3 +9,7 @@ export { Badge } from './Badge';
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './Table';
 export { Modal, ModalHeader, ModalBody, ModalFooter } from './Modal';
 export { Select } from './Select';
+export { Grid } from './Grid';
+export { PageHeader } from './PageHeader';
+export { Section } from './Section';
+export { Container } from './Container';

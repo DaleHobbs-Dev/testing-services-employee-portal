@@ -24,6 +24,10 @@ import {
   TableHead,
   TableCell,
   Select,
+  Grid,
+  PageHeader,
+  Section,
+  Container,
 } from "@/components/ui";
 
 export default function DesignSystem() {
@@ -333,6 +337,34 @@ export default function DesignSystem() {
           </div>
         </div>
       </section>
+
+      {/* Container Example with PageHeader, Section, and Grid */}
+      <Container>
+        <PageHeader
+          title="Scheduled Exams"
+          description="View and manage upcoming examinations"
+          actions={<Button variant="primary">Schedule New Exam</Button>}
+        />
+
+        <Section title="Upcoming Exams">
+          <Grid cols={3}>
+            <Card>
+              <h3>Math Final</h3>
+              <p>December 15, 2024</p>
+            </Card>
+            <Card>
+              <h3>English Midterm</h3>
+              <p>December 18, 2024</p>
+            </Card>
+            <Card>
+              <h3>History Quiz</h3>
+              <p>December 20, 2024</p>
+            </Card>
+          </Grid>
+        </Section>
+
+        <Section title="Past Exams">{/* More cards here */}</Section>
+      </Container>
     </div>
   );
 }
