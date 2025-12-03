@@ -1,11 +1,22 @@
 import "./App.css";
-import DesignSystem from "./pages/DesignSystem.jsx";
+import { Routes, Route } from "react-router-dom";
+import Login from "./components/auth/Login.jsx";
+import Authorized from "./views/Authorized.jsx";
+import ApplicationViews from "./views/ApplicationViews.jsx";
 
 function App() {
   return (
-    <>
-      <DesignSystem />
-    </>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="*"
+        element={
+          <Authorized>
+            <ApplicationViews />
+          </Authorized>
+        }
+      />
+    </Routes>
   );
 }
 
