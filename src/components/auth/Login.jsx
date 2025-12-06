@@ -33,7 +33,12 @@ export default function Login() {
           "testing_services_user",
           JSON.stringify({ id: employee.id })
         );
-        navigate("/");
+        // Navigate based on role
+        if (employee.role === "admin") {
+          navigate("/admin-dashboard");
+        } else {
+          navigate("/");
+        }
       } else {
         setError("Login failed: Employee not found.");
       }
