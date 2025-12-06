@@ -13,3 +13,6 @@ export { Grid } from './Grid';
 export { PageHeader } from './PageHeader';
 export { Section } from './Section';
 export { Container } from './Container';
+export { Navbar } from '../layout/Navbar';
+export { Footer } from '../layout/Footer';
+export { Layout } from '../layout/Layout';
