@@ -40,18 +40,98 @@
 }
 
 /* ===========================================================
+   Subtle Wave Background (Deep Purple + Mint)
+   =========================================================== */
+
+@layer base {
+  body {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: 
+      /* Purple wave - top left to bottom right */ radial-gradient(
+        ellipse 80% 40% at 20% 10%,
+        rgba(168, 117, 224, 0.12),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 70% 50% at 40% 35%,
+        rgba(168, 117, 224, 0.08),
+        transparent 65%
+      ),
+      /* Mint wave - bottom left to top right */
+        radial-gradient(
+          ellipse 75% 45% at 10% 80%,
+          rgba(116, 231, 215, 0.1),
+          transparent 60%
+        ),
+      radial-gradient(
+        ellipse 85% 40% at 70% 70%,
+        rgba(116, 231, 215, 0.12),
+        transparent 65%
+      ),
+      /* Very subtle accent in middle */
+        radial-gradient(
+          ellipse 60% 35% at 50% 50%,
+          rgba(168, 117, 224, 0.05),
+          transparent 70%
+        ),
+      #f9fafb;
+  }
+
+  /* Subtle noise texture overlay for depth */
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Add subtle glass effect to white backgrounds */
+  .card,
+  .bg-white {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* ===========================================================
    3) Component Styles Using @apply
    =========================================================== */
 
-/* Card */
+/* Card - enhanced with subtle glass effect */
 .card {
-  @apply bg-white border border-gray-300 rounded-xl shadow-sm p-6;
+  @apply rounded-xl shadow-sm p-6 border border-gray-300;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
 /* Input */
 .form-input {
   @apply w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 
-         focus:outline-none focus:ring-2 focus:ring-purple-500;
+         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent;
 }
 
 /* Button Variants */
@@ -103,4 +183,188 @@
 
 .alert-danger {
   @apply bg-red-50 border-red-300 text-red-700;
+}
+
+/* ===================================================================
+   Focus Ring Utilities (WCAG-Compliant for Purple+Mint Theme)
+   =================================================================== */
+
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark;
+}
+
+/* High-visibility alt version (for low-vision users) */
+.focus-ring-strong {
+  @apply focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-accent-dark;
+}
+
+/* Inverse (for dark backgrounds) */
+.focus-ring-inverse {
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light;
+}
+
+/* Smooth transitions everywhere */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle parallax effect on scroll (optional) */
+@media (prefers-reduced-motion: no-preference) {
+  body::before {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
+/* Improve text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ===========================================================
+   Visual Enhancement Utilities
+   =========================================================== */
+
+/* Original glass (keep for special cases on colored backgrounds) */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(107, 47, 179, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(168, 117, 224, 0.2);
+}
+
+/* Purple glass - visible on light backgrounds */
+.glass-purple {
+  background: rgba(168, 117, 224, 0.08);
+  backdrop-filter: blur(10px) saturate(180%);
+  border: 1px solid rgba(168, 117, 224, 0.15);
+  box-shadow: 0 4px 6px -1px rgba(107, 47, 179, 0.08),
+    0 2px 4px -1px rgba(107, 47, 179, 0.05),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Mint glass - visible on light backgrounds */
+.glass-mint {
+  background: rgba(116, 231, 215, 0.08);
+  backdrop-filter: blur(10px) saturate(180%);
+  border: 1px solid rgba(116, 231, 215, 0.15);
+  box-shadow: 0 4px 6px -1px rgba(39, 191, 168, 0.08),
+    0 2px 4px -1px rgba(39, 191, 168, 0.05),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Stronger colored glass variants */
+.glass-purple-strong {
+  background: rgba(168, 117, 224, 0.12);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(168, 117, 224, 0.25);
+  box-shadow: 0 8px 16px -4px rgba(107, 47, 179, 0.12),
+    0 4px 8px -2px rgba(107, 47, 179, 0.08),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+.glass-mint-strong {
+  background: rgba(116, 231, 215, 0.12);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(116, 231, 215, 0.25);
+  box-shadow: 0 8px 16px -4px rgba(39, 191, 168, 0.12),
+    0 4px 8px -2px rgba(39, 191, 168, 0.08),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+/* White glass with subtle tint (best for cards on your gradient bg) */
+.glass-white {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Hover states for glass effects */
+.glass-purple:hover {
+  background: rgba(168, 117, 224, 0.12);
+  border-color: rgba(168, 117, 224, 0.25);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.glass-mint:hover {
+  background: rgba(116, 231, 215, 0.12);
+  border-color: rgba(116, 231, 215, 0.25);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* Subtle gradient borders */
+.gradient-border {
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box,
+    linear-gradient(135deg, var(--color-purple-500), var(--color-mint-500))
+      border-box;
+}
+
+/* Elevated shadow with color tint */
+.shadow-purple {
+  box-shadow: 0 4px 6px -1px rgba(107, 47, 179, 0.1),
+    0 2px 4px -1px rgba(107, 47, 179, 0.06);
+}
+
+.shadow-mint {
+  box-shadow: 0 4px 6px -1px rgba(39, 191, 168, 0.1),
+    0 2px 4px -1px rgba(39, 191, 168, 0.06);
+}
+
+/* Hover glow effects */
+.hover-glow-purple {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow-purple:hover {
+  box-shadow: 0 0 20px rgba(107, 47, 179, 0.15),
+    0 4px 6px -1px rgba(107, 47, 179, 0.1);
+}
+
+.hover-glow-mint {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow-mint:hover {
+  box-shadow: 0 0 20px rgba(39, 191, 168, 0.15),
+    0 4px 6px -1px rgba(39, 191, 168, 0.1);
+}
+
+/* Subtle animated gradient for headers/highlights */
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-animate {
+  background: linear-gradient(
+    135deg,
+    var(--color-purple-500),
+    var(--color-mint-500),
+    var(--color-purple-500)
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Frosted glass effect for modals */
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  background: rgba(15, 15, 16, 0.4);
 }

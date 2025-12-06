@@ -365,6 +365,48 @@ export default function DesignSystem() {
 
         <Section title="Past Exams">{/* More cards here */}</Section>
       </Container>
+
+      <Container className="mt-12">
+        <H2>Glassmorphism Examples</H2>
+        {/* Standard card - already has subtle glass */}
+        <Card>
+          <CardTitle>Exam Schedule</CardTitle>
+        </Card>
+        {/* Purple-tinted glass card */}
+        <Card className="glass-purple">
+          <CardTitle>Admin Actions</CardTitle>
+        </Card>
+        {/* Mint-tinted glass card */}
+        <Card className="glass-mint">
+          <CardTitle>Active Appointments</CardTitle>
+        </Card>
+        {/* Strong colored glass for emphasis */}
+        <div className="glass-purple-strong p-6 rounded-xl">
+          <h3>Important Notice</h3>
+          <p>Remember to arrive 15 minutes early</p>
+        </div>
+        {/* Navbar or modals */}
+        <nav className="glass-white">{/* Navigation content */}</nav>
+      </Container>
+
+      <Container>
+        {/* Main content - standard cards */}
+        <Grid cols={3}>
+          <Card>Regular exam card</Card>
+          <Card>Regular exam card</Card>
+
+          {/* Featured/priority item - colored glass */}
+          <Card className="glass-purple-strong">
+            <Badge variant="primary">Urgent</Badge>
+            <CardTitle>Priority Exam</CardTitle>
+          </Card>
+        </Grid>
+
+        {/* Info panel - mint glass */}
+        <div className="glass-mint p-4 rounded-lg mt-6">
+          <p>Today's appointments: 12 scheduled</p>
+        </div>
+      </Container>
     </div>
   );
 }

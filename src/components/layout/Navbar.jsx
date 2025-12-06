@@ -38,6 +38,12 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <Link
+              to="/design-system"
+              className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
+            >
+              Design System
+            </Link>
+            <Link
               to="/"
               className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
             >
@@ -134,7 +140,7 @@ export function Navbar() {
             <div className="flex flex-col gap-3">
               <Link
                 to="/"
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                className="px-4 py-2 text-gray-700 hover:  rounded-md"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Dashboard
@@ -144,21 +150,21 @@ export function Navbar() {
                 <>
                   <Link
                     to="/admin-dashboard"
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                    className="px-4 py-2 text-gray-700 hover:  rounded-md"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Admin Dashboard
                   </Link>
                   <Link
                     to="/manage-employees"
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                    className="px-4 py-2 text-gray-700 hover:  rounded-md"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Manage Employees
                   </Link>
                   <Link
                     to="/manage-exams"
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                    className="px-4 py-2 text-gray-700 hover:  rounded-md"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Manage Exams
@@ -168,14 +174,14 @@ export function Navbar() {
 
               <Link
                 to="/new-appointment"
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                className="px-4 py-2 text-gray-700 hover:  rounded-md"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 New Appointment
               </Link>
               <Link
                 to="/proctoring"
-                className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                className="px-4 py-2 text-gray-700 hover:  rounded-md"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Daily Proctoring
