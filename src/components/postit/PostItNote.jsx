@@ -1,12 +1,12 @@
 import "./PostItNote.css";
 import { useState, useEffect, useMemo } from "react";
-import { getAllEmployees } from "../../services/employeeService";
+import { getAllActiveEmployees } from "../../services/employeeService";
 
 export const PostItNote = () => {
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
-    getAllEmployees().then((data) => setEmployees(data));
+    getAllActiveEmployees().then((data) => setEmployees(data));
   }, []);
 
   // Calculate random emails directly when component mounts or employees load
