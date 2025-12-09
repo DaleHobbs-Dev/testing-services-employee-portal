@@ -11,6 +11,7 @@
     "api": "json-server -p 8088 -w api/database.json"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.0"

@@ -9,7 +9,7 @@ export function Table({ children, className = "" }) {
 }
 
 export function TableHeader({ children }) {
-  return <thead className="bg-gray-50">{children}</thead>;
+  return <thead className=" ">{children}</thead>;
 }
 
 export function TableBody({ children }) {

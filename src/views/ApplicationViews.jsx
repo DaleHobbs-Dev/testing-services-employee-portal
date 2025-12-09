@@ -5,6 +5,10 @@ import AdminRoute from "../routes/AdminRoute.jsx";
 import AdminDashboard from "../components/dashboard/AdminDashboard.jsx";
 import EmployeeDashboard from "../components/dashboard/EmployeeDashboard.jsx";
 import { Layout } from "@/components/layout/Layout";
+import NewAppointment from "../components/appointments/NewAppointment.jsx";
+import DailyProctoringDashboard from "../components/dashboard/DailyProctoringDashboard.jsx";
+import EmployeeList from "../components/employees/EmployeeList.jsx";
+import ExamList from "../components/exams/ExamList.jsx";
 
 export default function ApplicationViews() {
   const { currentUser } = useCurrentUser();
@@ -22,11 +26,24 @@ export default function ApplicationViews() {
           element={<AdminRoute currentEmployee={currentUser} />}
         >
           <Route index element={<AdminDashboard />} />
+          <Route path="new-testing-appointment" element={<NewAppointment />} />
+          <Route
+            path="daily-proctoring-dashboard"
+            element={<DailyProctoringDashboard />}
+          />
+          <Route path="employee-list" element={<EmployeeList />} />
+          <Route path="exam-list" element={<ExamList />} />
         </Route>
 
         {/* Regular employee routes */}
         <Route index element={<EmployeeDashboard />} />
         <Route path="design-system" element={<DesignSystem />} />
+        <Route path="employee-dashboard" element={<EmployeeDashboard />} />
+        <Route path="new-testing-appointment" element={<NewAppointment />} />
+        <Route
+          path="daily-proctoring-dashboard"
+          element={<DailyProctoringDashboard />}
+        />
 
         {/* Add more routes here as needed */}
       </Routes>
