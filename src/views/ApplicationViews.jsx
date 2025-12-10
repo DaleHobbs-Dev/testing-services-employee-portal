@@ -9,6 +9,8 @@ import NewAppointment from "../components/appointments/NewAppointment.jsx";
 import DailyProctoringDashboard from "../components/dashboard/DailyProctoringDashboard.jsx";
 import EmployeeList from "../components/employees/EmployeeList.jsx";
 import ExamList from "../components/exams/ExamList.jsx";
+import NewEmployee from "../components/employees/NewEmployee.jsx";
+import EditEmployee from "../components/employees/EditEmployee.jsx";
 
 export default function ApplicationViews() {
   const { currentUser } = useCurrentUser();
@@ -32,6 +34,11 @@ export default function ApplicationViews() {
             element={<DailyProctoringDashboard />}
           />
           <Route path="employee-list" element={<EmployeeList />} />
+          <Route path="employee-list/new" element={<NewEmployee />} />
+          <Route
+            path="employee-list/edit/:employeeId"
+            element={<EditEmployee />}
+          />
           <Route path="exam-list" element={<ExamList />} />
         </Route>
 
@@ -39,7 +46,7 @@ export default function ApplicationViews() {
         <Route index element={<EmployeeDashboard />} />
         <Route path="design-system" element={<DesignSystem />} />
         <Route path="employee-dashboard" element={<EmployeeDashboard />} />
-        <Route path="new-testing-appointment" element={<NewAppointment />} />
+        <Route path="new-appointment" element={<NewAppointment />} />
         <Route
           path="daily-proctoring-dashboard"
           element={<DailyProctoringDashboard />}

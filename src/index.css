@@ -322,6 +322,10 @@ body {
     0 2px 4px -1px rgba(39, 191, 168, 0.06);
 }
 
+.hover-glow {
+  box-shadow: 0 0 8px rgba(39, 191, 168, 0.35);
+}
+
 /* Hover glow effects */
 .hover-glow-purple {
   transition: box-shadow 0.3s ease;
@@ -339,6 +343,10 @@ body {
 .hover-glow-mint:hover {
   box-shadow: 0 0 20px rgba(39, 191, 168, 0.15),
     0 4px 6px -1px rgba(39, 191, 168, 0.1);
+}
+
+.section-header {
+  @apply text-sm font-semibold text-gray-700 mb-2 pb-2 border-b border-gray-200;
 }
 
 /* Subtle animated gradient for headers/highlights */

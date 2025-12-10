@@ -6,7 +6,7 @@
 // Wrap your app with <CurrentUserProvider> in src/main.jsx after importing it.
 import { CurrentUserContext } from "./CurrentUserContext.js";
 import { useState, useEffect } from "react";
-import { getEmployeeByEmployeeId } from "../services/employeeService.js";
+import { getEmployeeById } from "../services/employeeService.js";
 
 export function CurrentUserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
@@ -17,7 +17,7 @@ export function CurrentUserProvider({ children }) {
     if (localUser) {
       // Fetch full employee data from API
       const userObject = JSON.parse(localUser);
-      getEmployeeByEmployeeId(userObject.id)
+      getEmployeeById(userObject.id)
         .then((user) => setCurrentUser(user))
         .catch((error) => {
           console.error("Failed to fetch user data:", error);

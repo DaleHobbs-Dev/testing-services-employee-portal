@@ -14,9 +14,13 @@ export function H2({ children, className = "" }) {
   );
 }
 
-export function H3({ children, className = "" }) {
+export function H3({ children, className = "", underline = false }) {
   return (
-    <h3 className={`text-xl font-semibold text-purple-700 mb-3 ${className}`}>
+    <h3
+      className={`text-xl font-semibold text-purple-700 mb-3 ${
+        underline ? "border-b border-gray-200 pb-2" : ""
+      } ${className}`}
+    >
       {children}
     </h3>
   );
