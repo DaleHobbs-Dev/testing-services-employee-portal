@@ -67,7 +67,7 @@ export function Navbar() {
                 New Appointment
               </Button>
 
-              <Button variant="nav" to="/proctoring">
+              <Button variant="nav" to="/proctoring-dashboard">
                 Proctoring
               </Button>
             </div>

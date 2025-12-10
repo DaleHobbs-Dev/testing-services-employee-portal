@@ -62,6 +62,7 @@ export default function Login() {
             title="Employee Login"
             description="Please enter your email to log in."
             className="center-text"
+            center
           />
           {error && (
             <Alert variant="danger" className="mb-4">

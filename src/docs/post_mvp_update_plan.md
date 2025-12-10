@@ -185,6 +185,10 @@ Add a profile view for employees to see their profile information (details card,
 
 Add a theme toggle button to the navbar for quick switching between dark and light modes.
 
+### **31. Make Modal Responsive and WCAG Compliant**
+
+Ensure modals are responsive and accessible, with proper focus management and ARIA attributes.
+
 ## **Feature Name**
 
 **Category:** (Scheduling / UX / Admin / Data / Visual / Code Quality)
