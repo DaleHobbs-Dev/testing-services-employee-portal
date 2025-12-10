@@ -17,6 +17,7 @@ export function Badge({
     proctor: "bg-blue-100 text-blue-700",
     technician: "bg-orange-100 text-orange-700",
     checkin: "bg-indigo-100 text-indigo-700",
+    frontdesk: "bg-teal-100 text-teal-700",
     scheduler: "bg-emerald-100 text-emerald-700",
     clerk: "bg-gray-300 text-gray-800",
     restricted: "bg-yellow-100 text-yellow-800",

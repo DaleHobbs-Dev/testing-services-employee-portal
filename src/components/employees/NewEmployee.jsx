@@ -75,6 +75,7 @@ export default function NewEmployee() {
         <PageHeader
           title="Add New Employee"
           description="Create a new staff member with role, permissions, and certification details."
+          center
         />
 
         {error && (

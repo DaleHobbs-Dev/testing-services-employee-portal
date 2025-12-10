@@ -33,10 +33,12 @@ export default function ApplicationViews() {
             path="daily-proctoring-dashboard"
             element={<DailyProctoringDashboard />}
           />
-          <Route path="employee-list" element={<EmployeeList />}>
-            <Route path="new" element={<NewEmployee />} />
-            <Route path="edit/:employeeId" element={<EditEmployee />} />
-          </Route>
+          <Route path="employee-list" element={<EmployeeList />} />
+          <Route path="employee-list/new" element={<NewEmployee />} />
+          <Route
+            path="employee-list/edit/:employeeId"
+            element={<EditEmployee />}
+          />
           <Route path="exam-list" element={<ExamList />} />
         </Route>
 

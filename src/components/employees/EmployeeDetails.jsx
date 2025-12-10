@@ -41,7 +41,10 @@ export default function EmployeeDetails({ employee, onClose, isOpen }) {
       <ModalBody>
         {/* Status */}
         <div className="mb-4">
-          <Badge variant={employee.status}>
+          <Badge
+            size="xl"
+            variant={employee.status === "active" ? "success" : employee.status}
+          >
             {employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
           </Badge>
         </div>
@@ -49,7 +52,9 @@ export default function EmployeeDetails({ employee, onClose, isOpen }) {
         {/* Role */}
         <div className="mb-6">
           <H3 underline>Role</H3>
-          <p className="text-gray-800">{employee.role}</p>
+          <Badge size="lg" variant={employee.role}>
+            {employee.role.charAt(0).toUpperCase() + employee.role.slice(1)}
+          </Badge>
         </div>
 
         {/* Phone */}

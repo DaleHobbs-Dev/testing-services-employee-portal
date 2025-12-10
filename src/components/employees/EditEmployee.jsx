@@ -19,7 +19,7 @@ import {
 } from "@/services";
 
 export default function EditEmployee() {
-  const { id } = useParams();
+  const { employeeId } = useParams();
   const navigate = useNavigate();
 
   const [employee, setEmployee] = useState(null);
@@ -34,7 +34,7 @@ export default function EditEmployee() {
   // -------------------------------
   useEffect(() => {
     Promise.all([
-      getEmployeeById(id),
+      getEmployeeById(employeeId),
       getAllEmployees(),
       getAllCertifications(),
       getAllPermissions(),
@@ -51,14 +51,14 @@ export default function EditEmployee() {
         setError("Could not load employee data.");
         setLoading(false);
       });
-  }, [id]);
+  }, [employeeId]);
 
   // -------------------------------
   // Submit updated employee data
   // -------------------------------
   const handleSubmit = async (formData) => {
     try {
-      await updateEmployee(id, formData);
+      await updateEmployee(employeeId, formData);
       navigate("/admin-dashboard/employee-list");
     } catch (err) {
       console.error(err);
@@ -82,6 +82,7 @@ export default function EditEmployee() {
         <PageHeader
           title="Edit Employee"
           description="Update role, certifications, permissions, or contact details."
+          center
         />
 
         {error && (
@@ -96,7 +97,7 @@ export default function EditEmployee() {
           </div>
         ) : (
           <EmployeeForm
-            initialData={employee}
+            employee={employee}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             certifications={certifications}

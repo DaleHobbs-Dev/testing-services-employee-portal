@@ -64,7 +64,10 @@ export default function EmployeeList() {
 
               <CardContent>
                 <p className="text-sm text-gray-600">
-                  <span className="font-medium">Role:</span> {emp.role}
+                  <span className="font-medium">Role:</span>{" "}
+                  <Badge size="lg" variant={emp.role}>
+                    {emp.role.charAt(0).toUpperCase() + emp.role.slice(1)}
+                  </Badge>
                 </p>
                 <p className="text-sm text-gray-600">
                   <span className="font-medium">Email:</span> {emp.email}
@@ -72,7 +75,10 @@ export default function EmployeeList() {
 
                 {/* Status Badge */}
                 <div className="mt-3">
-                  <Badge size="xl" variant={emp.status}>
+                  <Badge
+                    size="xl"
+                    variant={emp.status === "active" ? "success" : emp.status}
+                  >
                     {emp.status.charAt(0).toUpperCase() + emp.status.slice(1)}
                   </Badge>
                 </div>

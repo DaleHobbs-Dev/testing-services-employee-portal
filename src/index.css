@@ -322,6 +322,10 @@ body {
     0 2px 4px -1px rgba(39, 191, 168, 0.06);
 }
 
+.hover-glow {
+  box-shadow: 0 0 8px rgba(39, 191, 168, 0.35);
+}
+
 /* Hover glow effects */
 .hover-glow-purple {
   transition: box-shadow 0.3s ease;
