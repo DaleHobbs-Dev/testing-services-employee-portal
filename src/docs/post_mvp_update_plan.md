@@ -177,6 +177,14 @@ Add `<KpiCard />` UI components to display key performance indicators on the das
 Add `<DashboardKpis />` grid layout for displaying multiple KPIs.
 KPIs for exams, proctors, and employees for the current day.
 
+### **29. Add Profile View**
+
+Add a profile view for employees to see their profile information (details card, certifications, permissions, contact info, photo placeholder, etc.).
+
+### **30. Add Darkmode Toggle to Navbar**
+
+Add a theme toggle button to the navbar for quick switching between dark and light modes.
+
 ## **Feature Name**
 
 **Category:** (Scheduling / UX / Admin / Data / Visual / Code Quality)
