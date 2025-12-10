@@ -11,6 +11,8 @@ import EmployeeList from "../components/employees/EmployeeList.jsx";
 import ExamList from "../components/exams/ExamList.jsx";
 import NewEmployee from "../components/employees/NewEmployee.jsx";
 import EditEmployee from "../components/employees/EditEmployee.jsx";
+import NewExam from "../components/exams/NewExam.jsx";
+import EditExam from "../components/exams/EditExam.jsx";
 
 export default function ApplicationViews() {
   const { currentUser } = useCurrentUser();
@@ -33,13 +35,19 @@ export default function ApplicationViews() {
             path="daily-proctoring-dashboard"
             element={<DailyProctoringDashboard />}
           />
+
+          {/* Employee Management Routes */}
           <Route path="employee-list" element={<EmployeeList />} />
           <Route path="employee-list/new" element={<NewEmployee />} />
           <Route
             path="employee-list/edit/:employeeId"
             element={<EditEmployee />}
           />
+
+          {/* Exam Management Routes */}
           <Route path="exam-list" element={<ExamList />} />
+          <Route path="exam-list/new" element={<NewExam />} />
+          <Route path="exam-list/edit/:examId" element={<EditExam />} />
         </Route>
 
         {/* Regular employee routes */}

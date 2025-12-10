@@ -52,7 +52,7 @@ export default function EmployeeList() {
               className="p-4 shadow-sm hover:shadow-md transition cursor-pointer group"
               onClick={() => openDetails(emp)}
             >
-              <CardHeader className="flex items-center mb-3 p-2 rounded-lg bg-primary-light/20 text-primary">
+              <CardHeader className="flex items-center mb-3 p-2 rounded-lg bg-primary-light/30 text-primary">
                 <div className="bg-purple-100 p-2 rounded-full shrink-0">
                   <UserIcon className="h-6 w-6 text-purple-700" />
                 </div>
