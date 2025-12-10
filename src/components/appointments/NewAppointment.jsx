@@ -29,6 +29,16 @@ import {
   createExaminee,
   createNote,
 } from "@/services";
+import {
+  MagnifyingGlassIcon,
+  UserPlusIcon,
+  CalendarIcon,
+  ClipboardDocumentListIcon,
+  UserCircleIcon,
+  ComputerDesktopIcon,
+  DocumentTextIcon,
+  CheckCircleIcon,
+} from "@heroicons/react/24/outline";
 
 export default function NewAppointment() {
   const navigate = useNavigate();
@@ -120,7 +130,7 @@ export default function NewAppointment() {
   // ===========================
   const handleSubmit = async () => {
     if (!selectedExaminee) return alert("Please select or create an examinee.");
-    if (!selectedFamilyId) return alert("Please choose a test family.");
+    if (!selectedFamilyId) return alert("Please choose a test type.");
     if (!appointmentDate) return alert("Please choose a date.");
     if (!selectedProctorId) return alert("Please select a proctor.");
     if (!selectedWorkstationId) return alert("Please select a workstation.");
@@ -182,7 +192,12 @@ export default function NewAppointment() {
         />
 
         <Card className="p-8 shadow-md">
-          <H2 className="mb-4">Examinee Information</H2>
+          <H2 className="mb-4">
+            <div className="p-2 flex items-center gap-3 rounded-lg bg-primary-light/20 text-primary">
+              <UserCircleIcon className="w-8 h-8 text-primary" />
+              Examinee Information
+            </div>
+          </H2>
 
           {/* LOOKUP EXISTING */}
           <div className="mb-6">
@@ -193,21 +208,26 @@ export default function NewAppointment() {
                 onChange={(e) => setEmailSearch(e.target.value)}
                 placeholder="Enter examinee email"
               />
-              <Button onClick={handleSearchByEmail}>Search</Button>
+              <Button onClick={handleSearchByEmail}>
+                <MagnifyingGlassIcon className="w-5 h-5 mr-2 inline" />
+                Search
+              </Button>
             </div>
           </div>
 
           {/* SHOW SELECTED EXAMINEE */}
           {selectedExaminee && (
             <Alert className="bg-green-50 border-green-300 text-green-700 mb-6 flex justify-between items-center">
-              <div>
-                Selected Examinee:{" "}
-                <strong>
-                  {selectedExaminee.firstName} {selectedExaminee.lastName}
-                </strong>{" "}
-                ({selectedExaminee.email})
+              <div className="flex items-center gap-2">
+                <CheckCircleIcon className="w-5 h-5 shrink-0" />
+                <span>
+                  Selected Examinee:{" "}
+                  <strong>
+                    {selectedExaminee.firstName} {selectedExaminee.lastName}
+                  </strong>{" "}
+                  ({selectedExaminee.email})
+                </span>
               </div>
-
               <Button
                 variant="outline"
                 className="ml-4"
@@ -226,11 +246,17 @@ export default function NewAppointment() {
             className="mb-8"
             onClick={() => setShowAddExamineeModal(true)}
           >
+            <UserPlusIcon className="w-5 h-5 mr-2 inline" />
             Add New Examinee
           </Button>
 
           {/* DATE PICKER */}
-          <H2 className="my-4">Appointment Date</H2>
+          <H2 className="my-4">
+            <div className="p-2 flex items-center gap-3 rounded-lg bg-primary-light/20 text-primary">
+              <CalendarIcon className="w-8 h-8 text-primary" />
+              Appointment Date & Time
+            </div>
+          </H2>
           <Input
             type="datetime-local"
             step="900" // 900 seconds = 15 min increments
@@ -238,10 +264,15 @@ export default function NewAppointment() {
             onChange={(e) => setAppointmentDate(e.target.value)}
           />
 
-          {/* TEST FAMILY */}
-          <H2 className="mt-8 mb-4">Test Information</H2>
+          {/* TEST TYPE */}
+          <H2 className="mt-8 mb-4">
+            <div className="p-2 flex items-center gap-3 rounded-lg bg-primary-light/20 text-primary">
+              <ClipboardDocumentListIcon className="w-8 h-8 text-primary" />
+              Test Information
+            </div>
+          </H2>
 
-          <Label>Test Family</Label>
+          <Label>Test Type</Label>
           <Select
             value={selectedFamilyId || ""}
             onChange={(e) => {
@@ -250,7 +281,7 @@ export default function NewAppointment() {
               setMultiVariantIds([]);
             }}
           >
-            <option value="">Select Test Family</option>
+            <option value="">Select Test Type</option>
             {testFamilies.map((family) => (
               <option key={family.id} value={family.id}>
                 {family.name}
@@ -344,7 +375,12 @@ export default function NewAppointment() {
           )}
 
           {/* PROCTOR */}
-          <H2 className="mt-8 mb-4">Proctor</H2>
+          <H2 className="mt-8 mb-4">
+            <div className="p-2 flex items-center gap-3 rounded-lg bg-primary-light/20 text-primary">
+              <UserCircleIcon className="w-8 h-8 text-primary" />
+              Proctor
+            </div>
+          </H2>
           <Select
             value={selectedProctorId || ""}
             onChange={(e) => setSelectedProctorId(e.target.value)}
@@ -361,7 +397,12 @@ export default function NewAppointment() {
           </Select>
 
           {/* WORKSTATION */}
-          <H2 className="mt-8 mb-4">Workstation</H2>
+          <H2 className="mt-8 mb-4">
+            <div className="p-2 flex items-center gap-3 rounded-lg bg-primary-light/20 text-primary">
+              <ComputerDesktopIcon className="w-8 h-8 text-primary" />
+              Workstation
+            </div>
+          </H2>
           <Select
             value={selectedWorkstationId || ""}
             onChange={(e) => setSelectedWorkstationId(e.target.value)}
@@ -375,7 +416,12 @@ export default function NewAppointment() {
           </Select>
 
           {/* NOTES */}
-          <H2 className="mt-8 mb-3">Optional Notes</H2>
+          <H2 className="mt-8 mb-3">
+            <div className="p-2 flex items-center gap-3 rounded-lg bg-primary-light/20 text-primary">
+              <DocumentTextIcon className="w-8 h-8 text-primary" />
+              Optional Exam Notes
+            </div>
+          </H2>
           <Textarea
             placeholder="Add special instructions..."
             value={noteMessage}
@@ -384,7 +430,10 @@ export default function NewAppointment() {
 
           {/* SUBMIT */}
           <Button className="mt-10" variant="primary" onClick={handleSubmit}>
-            Create Appointment
+            <div className="p-2 flex items-center gap-3 rounded-lg bg-primary text-white">
+              <CheckCircleIcon className="w-5 h-5 mr-2 inline" />
+              Create Appointment
+            </div>
           </Button>
         </Card>
       </Section>

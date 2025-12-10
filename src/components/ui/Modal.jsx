@@ -16,14 +16,14 @@ export function Modal({ isOpen, onClose, children, className = "" }) {
   );
 }
 
-export function ModalHeader({ children, onClose }) {
+export function ModalHeader({ children, onClose, className = "" }) {
   return (
-    <div className="flex items-center justify-between mb-4">
-      <h2 className="text-2xl font-semibold text-purple-700">{children}</h2>
+    <div className={`flex items-center justify-between mb-4 ${className}`}>
+      <div className="flex-1">{children}</div>
       {onClose && (
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+          className="text-gray-400 hover:text-gray-600 text-2xl leading-none ml-4"
         >
           ×
         </button>

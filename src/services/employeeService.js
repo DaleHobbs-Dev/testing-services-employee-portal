@@ -1,4 +1,4 @@
-import { fetchJson } from "./apiSettings";
+import { fetchJson, postJson, putJson } from "./apiSettings";
 
 export const getAllEmployees = async () => {
     return fetchJson("/employees");
@@ -8,7 +8,7 @@ export const getEmployeeByEmail = async (email) => {
     return fetchJson(`/employees?email=${encodeURIComponent(email)}`);
 };
 
-export const getEmployeeByEmployeeId = async (employeeId) => {
+export const getEmployeeById = async (employeeId) => {
     return fetchJson(`/employees/${employeeId}`);
 };
 
@@ -22,4 +22,12 @@ export const getAllInactiveEmployees = async () => {
 
 export const getEmployeeSchedules = async (employeeId) => {
     return fetchJson(`/employeeSchedules/${employeeId}`);
-}
+};
+
+export const createEmployee = async (employeeData) => {
+    return postJson("/employees", employeeData);
+};
+
+export const updateEmployee = async (employeeId, employeeData) => {
+    return putJson(`/employees/${employeeId}`, employeeData);
+};

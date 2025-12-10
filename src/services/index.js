@@ -2,7 +2,7 @@
 export { getAllExaminees, getExamineeByEmail, createExaminee } from "./examineeService";
 
 // Employees
-export { getAllEmployees, getEmployeeByEmail, getEmployeeByEmployeeId } from "./employeeService";
+export { getAllEmployees, getEmployeeByEmail, getEmployeeById, createEmployee, updateEmployee } from "./employeeService";
 
 // Test Families
 export { getAllTestFamilies, getTestFamilyById } from "./testFamilyService";
@@ -18,3 +18,9 @@ export { getAllNotes, getNoteByExamScheduleId, createNote } from "./noteService"
 
 // Workstations
 export { getAllWorkstations, getWorkstationById } from "./workstationService";
+
+// Certifications
+export { getAllCertifications } from "./certificationService";
+
+// Permissions
+export { getAllPermissions } from "./permissionService";
