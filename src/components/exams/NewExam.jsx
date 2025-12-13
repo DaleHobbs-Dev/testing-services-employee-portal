@@ -24,10 +24,10 @@ export default function NewExam() {
       });
     }
 
-    navigate("/admin-dashboard/exam-list");
+    navigate("/exam-list");
   };
 
-  const handleCancel = () => navigate("/admin-dashboard/exam-list");
+  const handleCancel = () => navigate("/exam-list");
 
   if (loading) {
     return (

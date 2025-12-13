@@ -76,7 +76,7 @@ export default function ExamList() {
 
                 <div className="flex justify-end">
                   <Button
-                    to={`/admin-dashboard/exam-list/edit/${family.id}`}
+                    to={`/exam-list/edit/${family.id}`}
                     variant="primary"
                     className="focus-ring"
                   >

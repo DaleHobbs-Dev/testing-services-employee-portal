@@ -22,7 +22,7 @@ export function Layout({ children }) {
       <main id="main-content" className="flex-1 container mx-auto px-4 py-6">
         {children}
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
   getAllCertifications,
   getAllPermissions,
   createEmployee,
+  createEmployeeSchedule,
 } from "@/services";
 
 export default function NewEmployee() {
@@ -51,8 +52,16 @@ export default function NewEmployee() {
   // ---------------------------
   const handleSubmit = async (formData) => {
     try {
-      await createEmployee(formData);
-      navigate("/admin-dashboard/employee-list");
+      const newEmployee = await createEmployee(formData);
+
+      await createEmployeeSchedule({
+        employeeId: newEmployee.id,
+        workDays: [],
+        startTime: "",
+        endTime: "",
+      });
+
+      navigate("/employee-list");
     } catch (error) {
       setError("Failed to create employee. Please try again.");
       console.error("Error creating employee:", error);
@@ -63,7 +72,7 @@ export default function NewEmployee() {
   // Cancel handler
   // ---------------------------
   const handleCancel = () => {
-    navigate("/admin-dashboard/employee-list");
+    navigate("/ employee-list");
   };
 
   // ---------------------------

@@ -38,7 +38,7 @@ export default function EmployeeList() {
         />
 
         <div className="flex justify-end mb-6">
-          <Link to="/admin-dashboard/employee-list/new">
+          <Link to="/employee-list/new">
             <Button variant="accent" className="focus-ring">
               Add New Employee
             </Button>
@@ -86,7 +86,7 @@ export default function EmployeeList() {
                 {/* Edit Button */}
                 <div className="mt-4 flex justify-end">
                   <Link
-                    to={`/admin-dashboard/employee-list/edit/${emp.id}`}
+                    to={`/ employee-list/edit/${emp.id}`}
                     onClick={(e) => e.stopPropagation()} // Prevents modal from opening
                   >
                     <Button variant="primary" className="focus-ring">

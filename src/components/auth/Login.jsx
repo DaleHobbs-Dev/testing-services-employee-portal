@@ -34,12 +34,7 @@ export default function Login() {
           "testing_services_user",
           JSON.stringify({ id: employee.id })
         );
-        // Navigate based on role
-        if (employee.role === "admin") {
-          navigate("/admin-dashboard");
-        } else {
-          navigate("/");
-        }
+        navigate("/");
       } else {
         setError("Login failed: Employee not found.");
       }
@@ -54,7 +49,7 @@ export default function Login() {
   return (
     <Container className="mt-20 max-w-4xl">
       <div className="flex gap-6 mt-6">
-        <Card className="p-6 flex-shrink-0">
+        <Card className="p-6 shrink-0">
           <PostItNote />
         </Card>
         <Card className="p-6 flex-1">
@@ -62,6 +57,7 @@ export default function Login() {
             title="Employee Login"
             description="Please enter your email to log in."
             className="center-text"
+            center
           />
           {error && (
             <Alert variant="danger" className="mb-4">
