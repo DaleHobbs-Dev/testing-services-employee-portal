@@ -59,7 +59,7 @@ export default function EditEmployee() {
   const handleSubmit = async (formData) => {
     try {
       await updateEmployee(employeeId, formData);
-      navigate("/admin-dashboard/employee-list");
+      navigate("/employee-list");
     } catch (err) {
       console.error(err);
       setError("Failed to update employee. Please try again.");
@@ -70,7 +70,7 @@ export default function EditEmployee() {
   // Cancel → return to list
   // -------------------------------
   const handleCancel = () => {
-    navigate("/admin-dashboard/employee-list");
+    navigate("/ employee-list");
   };
 
   // -------------------------------

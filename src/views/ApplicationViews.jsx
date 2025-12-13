@@ -6,6 +6,7 @@ import { Layout } from "@/components/layout/Layout";
 import NewAppointment from "../components/appointments/NewAppointment.jsx";
 import ProctoringDashboard from "../components/dashboard/ProctoringDashboard.jsx";
 import EmployeeList from "../components/employees/EmployeeList.jsx";
+import EmployeeSchedules from "../components/schedules/EmployeeSchedules.jsx";
 import ExamList from "../components/exams/ExamList.jsx";
 import NewEmployee from "../components/employees/NewEmployee.jsx";
 import EditEmployee from "../components/employees/EditEmployee.jsx";
@@ -23,20 +24,15 @@ export default function ApplicationViews() {
   return (
     <Layout>
       <Routes>
-        {/* Regular employee routes */}
+        {/* employee routes */}
         <Route index element={<TestingServicesDashboard />} />
         <Route path="design-system" element={<DesignSystem />} />
         <Route path="new-appointment" element={<NewAppointment />} />
         <Route path="proctoring-dashboard" element={<ProctoringDashboard />} />
 
-        {/* Admin protected routes */}
-        <Route
-          path="admin-dashboard"
-          element={<AdminRoute currentEmployee={currentUser} />}
-        >
-          <Route index element={<TestingServicesDashboard />} />
-
-          {/* Employee Management Routes */}
+        {/* admin protected routes */}
+        <Route element={<AdminRoute currentEmployee={currentUser} />}>
+          {/* Employee Management */}
           <Route path="employee-list" element={<EmployeeList />} />
           <Route path="employee-list/new" element={<NewEmployee />} />
           <Route
@@ -44,7 +40,10 @@ export default function ApplicationViews() {
             element={<EditEmployee />}
           />
 
-          {/* Exam Management Routes */}
+          {/* Employee Schedule Management */}
+          <Route path="employee-schedules" element={<EmployeeSchedules />} />
+
+          {/* Exam Management */}
           <Route path="exam-list" element={<ExamList />} />
           <Route path="exam-list/new" element={<NewExam />} />
           <Route path="exam-list/edit/:examId" element={<EditExam />} />

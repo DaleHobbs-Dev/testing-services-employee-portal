@@ -6,11 +6,11 @@ import {
   Spinner,
   Alert,
 } from "@/components/ui";
-
 import { useCurrentUser } from "@/context/CurrentUserContext";
-
 import AppointmentDatePicker from "@/components/appointments/AppointmentDatePicker";
 import AppointmentTableGroup from "@/components/appointments/AppointmentTableGroup";
+import EmployeeFilter from "../filters/EmployeeFilter";
+import ExamineeFilter from "../filters/ExamineeFilter";
 
 import {
   getAllExamSchedules,
@@ -42,13 +42,10 @@ export default function ProctoringDashboard() {
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState([]);
   const [familyLookup, setFamilyLookup] = useState({});
-  const [employeeLookup, setEmployeeLookup] = useState({});
-  const [variantLookup, setVariantLookup] = useState({});
-  const [examineeLookup, setExamineeLookup] = useState({});
+  const [proctors, setProctors] = useState([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [examineeQuery, setExamineeQuery] = useState("");
 
-  // =========================
-  // LOAD ALL SUPPORTING DATA
-  // =========================
   useEffect(() => {
     async function loadAll() {
       setLoading(true);
@@ -69,9 +66,11 @@ export default function ProctoringDashboard() {
       const exaMap = Object.fromEntries(examinees.map((x) => [x.id, x]));
 
       setFamilyLookup(famMap);
-      setEmployeeLookup(empMap);
-      setVariantLookup(varMap);
-      setExamineeLookup(exaMap);
+
+      const proctors = employees.filter(
+        (e) => e.role === "proctor" && e.status === "active"
+      );
+      setProctors(proctors);
 
       // Filter schedules by selected date
       const selectedStr = selectedDate.toISOString().slice(0, 10);
@@ -83,11 +82,20 @@ export default function ProctoringDashboard() {
 
       // Normalize appointments into a consistent object
       const normalized = filteredSchedules.map((s) => {
-        const variant = varMap[s.testVariantId] || null;
+        const variantIds =
+          s.selectedTestVariantIds ??
+          (s.testVariantId ? [s.testVariantId] : []);
+
+        const variants = variantIds.map((id) => varMap[id]).filter(Boolean);
+
+        const familyId = variants[0]?.familyId;
+        const familyName = famMap[familyId] || "Unknown Family";
+
         return {
           id: s.id,
-          familyId: variant?.familyId,
-          familyName: famMap[variant?.familyId] || "Unknown Family",
+
+          familyId,
+          familyName,
 
           startTime: s.startTime,
           endTime: s.endTime,
@@ -98,17 +106,24 @@ export default function ProctoringDashboard() {
           proctorId: s.employeeId,
           proctorName: empMap[s.employeeId]?.name || "Unknown",
 
-          variantTitle: variant?.title || "Unknown Variant",
-
           examineeId: s.examineeId,
-          examineeName: exaMap[s.examineeId]?.firstName
+          examineeName: exaMap[s.examineeId]
             ? `${exaMap[s.examineeId].firstName} ${
                 exaMap[s.examineeId].lastName
               }`
             : "Unknown Examinee",
 
+          // 👇 NEW
+          variantCount: variants.length,
+          variantTitles: variants.map((v) => v.title),
+
+          // 👇 Computed note
+          note:
+            variants.length > 1
+              ? `Includes subtests: ${variants.map((v) => v.title).join(", ")}`
+              : variants[0]?.title ?? "Unknown Variant",
+
           status: s.status || "scheduled",
-          note: s.note || "",
         };
       });
 
@@ -128,8 +143,25 @@ export default function ProctoringDashboard() {
       ? appointments
       : appointments.filter((a) => a.proctorId === currentUser?.id);
 
+  const filteredAppointments = visibleAppointments.filter((appt) => {
+    // Admin-only: filter by proctor
+    if (selectedEmployeeId && appt.proctorId !== selectedEmployeeId) {
+      return false;
+    }
+
+    // Examinee name search (case-insensitive)
+    if (examineeQuery) {
+      const q = examineeQuery.toLowerCase();
+      if (!appt.examineeName.toLowerCase().includes(q)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   // Group appointments by test family
-  const grouped = groupByFamily(visibleAppointments);
+  const grouped = groupByFamily(filteredAppointments);
 
   return (
     <Container>
@@ -151,11 +183,25 @@ export default function ProctoringDashboard() {
         )}
 
         {/* EMPTY STATE */}
-        {!loading && visibleAppointments.length === 0 && (
+        {!loading && filteredAppointments.length === 0 && (
           <Alert variant="info" className="mt-6">
-            No appointments scheduled for this date.
+            No appointments match the selected filters.
           </Alert>
         )}
+
+        <div className="flex flex-wrap gap-4 mb-6">
+          {/* Admin-only employee filter */}
+          {currentUser.role === "admin" && (
+            <EmployeeFilter
+              employees={proctors}
+              value={selectedEmployeeId}
+              onChange={setSelectedEmployeeId}
+            />
+          )}
+
+          {/* Everyone gets examinee search */}
+          <ExamineeFilter value={examineeQuery} onChange={setExamineeQuery} />
+        </div>
 
         {/* TABLE GROUPS */}
         {!loading &&

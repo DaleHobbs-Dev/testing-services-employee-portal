@@ -23,7 +23,10 @@ export default function AppointmentTable({ appointments }) {
 
       <TableBody>
         {appointments.map((appt) => (
-          <AppointmentTableRow key={appt.id} appointment={appt} />
+          <AppointmentTableRow
+            key={`sched-${appt.id}-var-${appt.testVariantId}`}
+            appointment={appt}
+          />
         ))}
       </TableBody>
     </Table>

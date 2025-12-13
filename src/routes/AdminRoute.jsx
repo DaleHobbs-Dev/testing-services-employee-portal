@@ -6,14 +6,10 @@ export default function AdminRoute({ currentEmployee }) {
   if (currentEmployee === null || currentEmployee === undefined) {
     return <div>Loading...</div>;
   }
-
-  // Check if the current employee is an admin
-  if (currentEmployee.role !== "admin") {
-    // In the case they are not admin, redirect them to the access denied page
-    // the replace prop prevents adding a new entry to the history stack
-    return <Navigate to="/access-denied" replace />;
+  // Redirect non-admin users to home page
+  if (!currentEmployee || currentEmployee.role !== "admin") {
+    return <Navigate to="/" replace />;
   }
 
-  // If the user is an admin, render the child routes
   return <Outlet />;
 }

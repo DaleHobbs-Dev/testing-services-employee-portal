@@ -64,6 +64,7 @@ export default function ExamForm({
     onSubmit({
       ...initialData,
       name: familyName,
+      // eslint-disable-next-line no-unused-vars
       variants: variantList.map(({ open: _unused, ...clean }) => clean),
     });
   };

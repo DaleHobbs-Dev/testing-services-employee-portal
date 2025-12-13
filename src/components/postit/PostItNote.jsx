@@ -19,7 +19,7 @@ export const PostItNote = () => {
     }
 
     const adminEmployees = employees.filter((emp) => emp.role === "admin");
-    const nonAdminEmployees = employees.filter((emp) => emp.role !== "admin");
+    const proctorEmployees = employees.filter((emp) => emp.role === "proctor");
 
     const randomAdmin =
       adminEmployees.length > 0
@@ -28,16 +28,16 @@ export const PostItNote = () => {
         : null;
 
     const randomNonAdmin =
-      nonAdminEmployees.length > 0
-        ? nonAdminEmployees[
+      proctorEmployees.length > 0
+        ? proctorEmployees[
             // eslint-disable-next-line react-hooks/purity
-            Math.floor(Math.random() * nonAdminEmployees.length)
+            Math.floor(Math.random() * proctorEmployees.length)
           ]
         : null;
 
     return {
       adminEmail: randomAdmin?.email || "No admin found",
-      nonAdminEmail: randomNonAdmin?.email || "No employee found",
+      nonAdminEmail: randomNonAdmin?.email || "No proctors found",
     };
   }, [employees]);
 
@@ -53,7 +53,7 @@ export const PostItNote = () => {
           {adminEmail}
           <br />
           <br />
-          <strong>Employee:</strong>
+          <strong>Proctor:</strong>
           <br />
           {nonAdminEmail}
         </p>

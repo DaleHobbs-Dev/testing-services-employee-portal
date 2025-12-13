@@ -120,7 +120,7 @@ export default function EmployeeDetails({ employee, onClose, isOpen }) {
           Close
         </Button>
 
-        <Link to={`/admin-dashboard/employee-list/edit/${employee.id}`}>
+        <Link to={`/employee-list/edit/${employee.id}`}>
           <Button variant="primary" className="focus-ring">
             Edit Employee
           </Button>

@@ -16,7 +16,15 @@ export default function AppointmentTableRow({ appointment }) {
           {appointment.status}
         </Badge>
       </TableCell>
-      <TableCell>{appointment.note || "—"}</TableCell>
+      <TableCell>
+        {appointment.variantCount > 1 ? (
+          <span className="italic text-gray-600">
+            Multiple tests ({appointment.variantCount})
+          </span>
+        ) : (
+          appointment.note
+        )}
+      </TableCell>
     </TableRow>
   );
 }

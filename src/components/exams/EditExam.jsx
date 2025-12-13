@@ -63,10 +63,10 @@ export default function EditExam() {
     // const deleted = originalVariantIds.filter((id) => !updatedIds.includes(id));
     // for (const id of deleted) await deleteTestVariant(id);
 
-    navigate("/admin-dashboard/exam-list");
+    navigate("/exam-list");
   };
 
-  const handleCancel = () => navigate("/admin-dashboard/exam-list");
+  const handleCancel = () => navigate("/exam-list");
 
   return (
     <Container>

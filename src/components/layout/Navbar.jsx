@@ -46,18 +46,15 @@ export function Navbar() {
               </Button>
 
               {/* <Button variant="nav" to="/design-system">
-              Design System
-            </Button> */}
+                Design System
+              </Button> */}
 
               {isAdmin && (
                 <>
-                  <Button variant="nav" to="/admin-dashboard">
-                    Admin
-                  </Button>
-                  <Button variant="nav" to="/manage-employees">
+                  <Button variant="nav" to="/employee-list">
                     Employees
                   </Button>
-                  <Button variant="nav" to="/manage-exams">
+                  <Button variant="nav" to="/exam-list">
                     Exams
                   </Button>
                 </>

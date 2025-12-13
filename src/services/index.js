@@ -24,3 +24,6 @@ export { getAllCertifications } from "./certificationService";
 
 // Permissions
 export { getAllPermissions } from "./permissionService";
+
+// Employee Schedules
+export { getAllEmployeeSchedules, updateEmployeeSchedule, createEmployeeSchedule } from "./employeeScheduleService";

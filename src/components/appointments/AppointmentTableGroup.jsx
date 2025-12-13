@@ -9,7 +9,6 @@ import {
 import AppointmentTable from "./AppointmentTable";
 
 export default function AppointmentTableGroup({
-  familyId,
   familyName, // ← pass this from parent
   appointments,
 }) {

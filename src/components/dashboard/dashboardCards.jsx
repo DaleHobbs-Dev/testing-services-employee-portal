@@ -31,11 +31,19 @@ export const dashboardCards = [
     to: "/manage-employees",
   },
   {
+    id: "employee-schedule-management",
+    roles: ["admin", "scheduler"],
+    title: "Employee Schedule Management",
+    description: "Add, edit, or remove testing center employee schedules.",
+    icon: <UsersIcon className="w-8 h-8 text-primary" />,
+    to: "/employee-schedules",
+  },
+  {
     id: "exam-management",
     roles: ["admin"],
     title: "Exam Management",
     description: "Maintain exam offerings and configuration.",
     icon: <BookOpenIcon className="w-8 h-8 text-primary" />,
-    to: "/manage-exams",
+    to: "/exam-list",
   },
 ];
