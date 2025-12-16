@@ -23,6 +23,12 @@ export default function ExamForm({
   onCancel,
 }) {
   const [familyName, setFamilyName] = useState(initialData?.name || "");
+  const [description, setDescription] = useState(
+    initialData?.description || ""
+  );
+  const [allowsMultipleVariants, setAllowsMultipleVariants] = useState(
+    initialData?.allowsMultipleVariants ?? false
+  );
   const [variantList, setVariantList] = useState(
     variants?.map((v) => ({ ...v, open: false })) || []
   );
@@ -45,10 +51,11 @@ export default function ExamForm({
 
   const addVariant = () => {
     const newVariant = {
-      id: Date.now(), // temp ID for JSON-Server
+      id: Date.now(),
       familyId: initialData?.id || null,
       title: "",
       duration: 60,
+      active: true,
       open: true,
     };
 
@@ -64,6 +71,9 @@ export default function ExamForm({
     onSubmit({
       ...initialData,
       name: familyName,
+      description,
+      allowsMultipleVariants,
+      active: true,
       // eslint-disable-next-line no-unused-vars
       variants: variantList.map(({ open: _unused, ...clean }) => clean),
     });
@@ -85,6 +95,34 @@ export default function ExamForm({
                 onChange={(e) => setFamilyName(e.target.value)}
                 required
               />
+            </FormField>
+
+            {/* DESCRIPTION */}
+            <FormField label="Description">
+              <Input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief description of this test type"
+              />
+            </FormField>
+
+            <FormField label="Multiple Variants Per Session">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="allowsMultiple"
+                  checked={allowsMultipleVariants}
+                  onChange={(e) => setAllowsMultipleVariants(e.target.checked)}
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="allowsMultiple"
+                  className="text-sm text-gray-700"
+                >
+                  Allow examinees to take multiple test variants in a single
+                  session
+                </label>
+              </div>
             </FormField>
 
             <hr className="border-gray-300" />

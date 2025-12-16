@@ -10,17 +10,31 @@ import {
   PageHeader,
   Section,
   Container,
+  Alert,
 } from "@/components/ui";
-import { getAllTestFamilies, getAllTestVariants } from "@/services";
-import { FolderIcon } from "@heroicons/react/24/outline";
+import {
+  getAllTestFamilies,
+  getAllTestVariants,
+  deleteTestFamily,
+} from "@/services";
+import { FolderIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default function ExamList() {
   const [families, setFamilies] = useState([]);
   const [variants, setVariants] = useState([]);
+  const [deleting, setDeleting] = useState(null);
+  const [error, setError] = useState(null);
+
+  const loadData = () => {
+    getAllTestFamilies().then((data) => {
+      // Filter to only show active families
+      setFamilies(data.filter((f) => f.active !== false));
+    });
+    getAllTestVariants().then(setVariants);
+  };
 
   useEffect(() => {
-    getAllTestFamilies().then(setFamilies);
-    getAllTestVariants().then(setVariants);
+    loadData();
   }, []);
 
   // Pre-calc variant counts
@@ -28,6 +42,28 @@ export default function ExamList() {
     map[v.familyId] = (map[v.familyId] || 0) + 1;
     return map;
   }, {});
+
+  const handleDelete = async (familyId, familyName) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${familyName}"? This will hide it and all its variants from the system.`
+    );
+
+    if (!confirmed) return;
+
+    setDeleting(familyId);
+    setError(null);
+
+    try {
+      await deleteTestFamily(familyId);
+      // Reload the list to remove the deleted family
+      loadData();
+    } catch (err) {
+      console.error("Failed to delete test family:", err);
+      setError("Failed to delete test family. Please try again.");
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   return (
     <Container>
@@ -37,6 +73,12 @@ export default function ExamList() {
           description="Manage test types and their associated variants."
           center
         />
+
+        {error && (
+          <Alert variant="error" className="mb-6">
+            {error}
+          </Alert>
+        )}
 
         {/* Add New Button */}
         <div className="flex justify-end mb-6">
@@ -74,13 +116,28 @@ export default function ExamList() {
                   </Badge>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
                   <Button
                     to={`/exam-list/edit/${family.id}`}
                     variant="primary"
                     className="focus-ring"
                   >
                     Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDelete(family.id, family.name)}
+                    disabled={deleting === family.id}
+                    className="focus-ring flex items-center gap-1"
+                  >
+                    {deleting === family.id ? (
+                      "Deleting..."
+                    ) : (
+                      <>
+                        <TrashIcon className="h-4 w-4" />
+                        Delete
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>

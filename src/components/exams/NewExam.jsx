@@ -11,20 +11,33 @@ export default function NewExam() {
   const handleSubmit = async (data) => {
     setLoading(true);
 
-    // 1) Create family
-    const newFamily = await createTestFamily({
-      name: data.name,
-    });
-
-    // 2) Create each variant with new familyId
-    for (const variant of data.variants) {
-      await createTestVariant({
-        ...variant,
-        familyId: newFamily.id,
+    try {
+      // Create family with all fields
+      const newFamily = await createTestFamily({
+        name: data.name,
+        description: data.description || "",
+        allowsMultipleVariants: data.allowsMultipleVariants ?? false,
+        active: true,
       });
-    }
 
-    navigate("/exam-list");
+      // Create each variant with new familyId and active flag
+      for (const variant of data.variants) {
+        await createTestVariant({
+          ...variant,
+          familyId: newFamily.id,
+          active: true,
+        });
+      }
+
+      navigate("/exam-list");
+    } catch (error) {
+      console.error("Failed to create test family:", error);
+      alert(
+        "An error occurred while creating the test type. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => navigate("/exam-list");
@@ -49,7 +62,7 @@ export default function NewExam() {
 
       <ExamForm
         initialData={{}}
-        variants={[]}
+        variants={[]} // No variants initially
         onSubmit={handleSubmit}
         onCancel={handleCancel}
       />

@@ -8,7 +8,7 @@ export default function AdminRoute({ currentEmployee }) {
   }
   // Redirect non-admin users to home page
   if (!currentEmployee || currentEmployee.role !== "admin") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/access-denied" replace />;
   }
 
   return <Outlet />;

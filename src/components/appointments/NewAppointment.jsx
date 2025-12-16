@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCurrentUser } from "../../context/CurrentUserContext.js";
 import {
   Button,
   Input,
@@ -42,19 +41,13 @@ import {
 
 export default function NewAppointment() {
   const navigate = useNavigate();
-  const { currentUser } = useCurrentUser();
-  // ===========================
-  // DATA STATE
-  // ===========================
+
   const [examinees, setExaminees] = useState([]);
   const [testFamilies, setTestFamilies] = useState([]);
   const [testVariants, setTestVariants] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [workstations, setWorkstations] = useState([]);
 
-  // ===========================
-  // FORM STATE
-  // ===========================
   const [selectedExaminee, setSelectedExaminee] = useState(null);
   const [emailSearch, setEmailSearch] = useState("");
   const [newExamineeData, setNewExamineeData] = useState({
@@ -87,7 +80,9 @@ export default function NewAppointment() {
   // ===========================
   useEffect(() => {
     getAllExaminees().then(setExaminees);
-    getAllTestFamilies().then(setTestFamilies);
+    getAllTestFamilies().then((data) =>
+      setTestFamilies(data.filter((f) => f.active !== false))
+    );
     getAllTestVariants().then(setTestVariants);
     getAllEmployees().then(setEmployees);
     getAllWorkstations().then(setWorkstations);
@@ -125,9 +120,6 @@ export default function NewAppointment() {
 
   const isFacultyTest = selectedFamily?.name === "Faculty Test";
 
-  // ===========================
-  // SUBMISSION
-  // ===========================
   const handleSubmit = async () => {
     if (!selectedExaminee) return alert("Please select or create an examinee.");
     if (!selectedFamilyId) return alert("Please choose a test type.");
@@ -140,9 +132,9 @@ export default function NewAppointment() {
       examineeId: selectedExaminee.id,
       employeeId: Number(selectedProctorId),
       workstationId: Number(selectedWorkstationId),
-      startTime: appointmentDate, // You may add time selection later
-      endTime: appointmentDate, // Placeholder until time UI added
-      room: "Room A", // Hardcoded; you can add UI for this
+      startTime: appointmentDate,
+      endTime: appointmentDate,
+      room: "Room A",
     };
 
     // test variants
@@ -172,16 +164,9 @@ export default function NewAppointment() {
 
     alert("Appointment created successfully!");
 
-    if (currentUser.role === "admin") {
-      navigate("/admin-dashboard");
-    } else {
-      navigate("/employee-dashboard");
-    }
+    navigate("/");
   };
 
-  // ===========================
-  // UI
-  // ===========================
   return (
     <Container>
       <Section className="max-w-4xl mx-auto px-4 py-6">

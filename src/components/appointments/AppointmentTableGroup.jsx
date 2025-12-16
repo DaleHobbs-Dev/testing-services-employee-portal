@@ -8,10 +8,8 @@ import {
 
 import AppointmentTable from "./AppointmentTable";
 
-export default function AppointmentTableGroup({
-  familyName, // ← pass this from parent
-  appointments,
-}) {
+// Component to display a group of appointments under a test family
+export default function AppointmentTableGroup({ familyName, appointments }) {
   return (
     <Card className="mb-10">
       <CardHeader className="flex justify-between items-center">
