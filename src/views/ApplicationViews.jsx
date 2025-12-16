@@ -14,6 +14,7 @@ import NewExam from "../components/exams/NewExam.jsx";
 import EditExam from "../components/exams/EditExam.jsx";
 import TestingServicesDashboard from "../components/dashboards/TestingServicesDashboard.jsx";
 import AccessDenied from "../components/errors/AccessDenied.jsx";
+import ExamDetails from "../components/exams/ExamDetails.jsx";
 
 export default function ApplicationViews() {
   const { currentUser } = useCurrentUser();
@@ -31,6 +32,7 @@ export default function ApplicationViews() {
         <Route path="new-appointment" element={<NewAppointment />} />
         <Route path="proctoring-dashboard" element={<ProctoringDashboard />} />
         <Route path="access-denied" element={<AccessDenied />} />
+        <Route path="exam-details/:scheduleId" element={<ExamDetails />} />
 
         {/* admin protected routes */}
         <Route element={<AdminRoute currentEmployee={currentUser} />}>

@@ -1,9 +1,21 @@
 import { TableRow, TableCell, Badge } from "@/components/ui";
+import { useNavigate } from "react-router-dom";
 
-// Component to display a single appointment row in the table
 export default function AppointmentTableRow({ appointment }) {
+  const navigate = useNavigate();
+
+  const handleRowClick = (e) => {
+    console.log("ROW CLICKED", appointment.id);
+    console.log("Event target:", e.target);
+    console.log("Event currentTarget:", e.currentTarget);
+    navigate(`/exam-details/${appointment.id}`);
+  };
+
   return (
-    <TableRow>
+    <TableRow
+      className="hover:bg-purple-50 cursor-pointer"
+      onClick={handleRowClick}
+    >
       <TableCell>
         {formatTimeRange(appointment.startTime, appointment.endTime)}
       </TableCell>

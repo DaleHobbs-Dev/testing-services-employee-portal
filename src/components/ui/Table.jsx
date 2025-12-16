@@ -18,8 +18,12 @@ export function TableBody({ children }) {
   );
 }
 
-export function TableRow({ children, className = "" }) {
-  return <tr className={className}>{children}</tr>;
+export function TableRow({ children, className = "", onClick, ...props }) {
+  return (
+    <tr className={className} onClick={onClick} {...props}>
+      {children}
+    </tr>
+  );
 }
 
 export function TableHead({ children, className = "" }) {
