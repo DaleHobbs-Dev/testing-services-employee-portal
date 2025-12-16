@@ -72,7 +72,7 @@ export default function NewEmployee() {
   // Cancel handler
   // ---------------------------
   const handleCancel = () => {
-    navigate("/ employee-list");
+    navigate("/employee-list");
   };
 
   // ---------------------------

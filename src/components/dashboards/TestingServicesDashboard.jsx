@@ -8,7 +8,7 @@ import {
   Container,
 } from "@/components/ui";
 import { dashboardCards } from "./dashboardCards";
-import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { DashboardCard } from "@/components/dashboards/DashboardCard";
 import { useCurrentUser } from "@/context/CurrentUserContext";
 
 export default function TestingServicesDashboard() {

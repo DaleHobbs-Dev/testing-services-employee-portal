@@ -26,10 +26,13 @@ export default function EditExam() {
   useEffect(() => {
     getTestFamilyById(examId).then(setFamily);
     getTestVariantsByFamilyId(examId).then((data) => {
-      setVariants(data);
-      setOriginalVariantIds(data.map((v) => v.id));
+      // ✅ Filter to only show active variants
+      const activeVariants = data.filter((v) => v.active !== false);
+      setVariants(activeVariants);
+      setOriginalVariantIds(activeVariants.map((v) => v.id));
     });
   }, [examId]);
+
   if (!family || !variants) {
     return (
       <div className="text-center py-12">
@@ -39,8 +42,13 @@ export default function EditExam() {
   }
 
   const handleSubmit = async (data) => {
-    // 1) Update test family name
-    await updateTestFamily(examId, { name: data.name });
+    // 1) Update test family with all fields
+    await updateTestFamily(examId, {
+      name: data.name,
+      description: data.description || "",
+      allowsMultipleVariants: data.allowsMultipleVariants ?? false,
+      active: true,
+    });
 
     const updatedIds = [];
 
@@ -48,20 +56,27 @@ export default function EditExam() {
       if (originalVariantIds.includes(variant.id)) {
         // Existing variant → update
         updatedIds.push(variant.id);
-        await updateTestVariant(variant.id, variant);
+        await updateTestVariant(variant.id, {
+          ...variant,
+          active: true,
+        });
       } else {
         // New variant → create
         const body = {
           ...variant,
           familyId: Number(examId),
+          active: true,
         };
         await createTestVariant(body);
       }
     }
 
-    // OPTIONAL: detect deleted variants
-    // const deleted = originalVariantIds.filter((id) => !updatedIds.includes(id));
-    // for (const id of deleted) await deleteTestVariant(id);
+    const deletedIds = originalVariantIds.filter(
+      (id) => !updatedIds.includes(id)
+    );
+    for (const id of deletedIds) {
+      await updateTestVariant(id, { active: false });
+    }
 
     navigate("/exam-list");
   };

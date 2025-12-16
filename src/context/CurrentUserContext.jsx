@@ -6,29 +6,40 @@
 // Wrap your app with <CurrentUserProvider> in src/main.jsx after importing it.
 import { CurrentUserContext } from "./CurrentUserContext.js";
 import { useState, useEffect } from "react";
-import { getEmployeeById } from "../services/employeeService.js";
+import { getEmployeeById } from "@/services";
 
 export function CurrentUserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
 
-  // On app load, check localStorage for logged-in user email
+  // Initialize isLoading based on whether there's a user in localStorage
+  const [isLoading, setIsLoading] = useState(() => {
+    return localStorage.getItem("testing_services_user") !== null;
+  });
+
   useEffect(() => {
     const localUser = localStorage.getItem("testing_services_user");
+
     if (localUser) {
-      // Fetch full employee data from API
       const userObject = JSON.parse(localUser);
       getEmployeeById(userObject.id)
-        .then((user) => setCurrentUser(user))
+        .then((user) => {
+          setCurrentUser(user);
+        })
         .catch((error) => {
           console.error("Failed to fetch user data:", error);
           setCurrentUser(null);
           localStorage.removeItem("testing_services_user");
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
   }, []);
 
   return (
-    <CurrentUserContext.Provider value={{ currentUser, setCurrentUser }}>
+    <CurrentUserContext.Provider
+      value={{ currentUser, setCurrentUser, isLoading }}
+    >
       {children}
     </CurrentUserContext.Provider>
   );

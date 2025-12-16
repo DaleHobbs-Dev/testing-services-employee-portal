@@ -7,6 +7,7 @@ import {
 } from "@/components/ui";
 import AppointmentTableRow from "./AppointmentTableRow";
 
+// Component to display a table of appointments
 export default function AppointmentTable({ appointments }) {
   return (
     <Table>

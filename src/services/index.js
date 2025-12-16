@@ -5,7 +5,7 @@ export { getAllExaminees, getExamineeByEmail, createExaminee } from "./examineeS
 export { getAllEmployees, getEmployeeByEmail, getEmployeeById, createEmployee, updateEmployee } from "./employeeService";
 
 // Test Families
-export { getAllTestFamilies, getTestFamilyById, updateTestFamily, createTestFamily } from "./testFamilyService";
+export { getAllTestFamilies, getTestFamilyById, updateTestFamily, createTestFamily, deleteTestFamily } from "./testFamilyService";
 
 // Test Variants
 export { getAllTestVariants, getTestVariantById, getTestVariantsExpandedByFamilyId, updateTestVariant, getTestVariantsByFamilyId, createTestVariant } from "./testVariantService";

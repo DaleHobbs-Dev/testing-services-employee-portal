@@ -1,5 +1,6 @@
 import { TableRow, TableCell, Badge } from "@/components/ui";
 
+// Component to display a single appointment row in the table
 export default function AppointmentTableRow({ appointment }) {
   return (
     <TableRow>
@@ -18,11 +19,16 @@ export default function AppointmentTableRow({ appointment }) {
       </TableCell>
       <TableCell>
         {appointment.variantCount > 1 ? (
-          <span className="italic text-gray-600">
-            Multiple tests ({appointment.variantCount})
-          </span>
+          <div className="text-sm">
+            <span className="font-medium text-gray-700">
+              {appointment.variantCount} subtests:
+            </span>
+            <span className="italic text-gray-600 ml-1">
+              {appointment.variantTitles.join(", ")}
+            </span>
+          </div>
         ) : (
-          appointment.note
+          <span className="text-gray-600">{appointment.note}</span>
         )}
       </TableCell>
     </TableRow>

@@ -70,7 +70,7 @@ export default function EditEmployee() {
   // Cancel → return to list
   // -------------------------------
   const handleCancel = () => {
-    navigate("/ employee-list");
+    navigate("/employee-list");
   };
 
   // -------------------------------

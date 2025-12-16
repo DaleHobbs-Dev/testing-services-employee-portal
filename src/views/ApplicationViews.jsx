@@ -4,7 +4,7 @@ import DesignSystem from "../pages/DesignSystem.jsx";
 import AdminRoute from "../routes/AdminRoute.jsx";
 import { Layout } from "@/components/layout/Layout";
 import NewAppointment from "../components/appointments/NewAppointment.jsx";
-import ProctoringDashboard from "../components/dashboard/ProctoringDashboard.jsx";
+import ProctoringDashboard from "../components/dashboards/ProctoringDashboard.jsx";
 import EmployeeList from "../components/employees/EmployeeList.jsx";
 import EmployeeSchedules from "../components/schedules/EmployeeSchedules.jsx";
 import ExamList from "../components/exams/ExamList.jsx";
@@ -12,7 +12,8 @@ import NewEmployee from "../components/employees/NewEmployee.jsx";
 import EditEmployee from "../components/employees/EditEmployee.jsx";
 import NewExam from "../components/exams/NewExam.jsx";
 import EditExam from "../components/exams/EditExam.jsx";
-import TestingServicesDashboard from "../components/dashboard/TestingServicesDashboard.jsx";
+import TestingServicesDashboard from "../components/dashboards/TestingServicesDashboard.jsx";
+import AccessDenied from "../components/errors/AccessDenied.jsx";
 
 export default function ApplicationViews() {
   const { currentUser } = useCurrentUser();
@@ -29,6 +30,7 @@ export default function ApplicationViews() {
         <Route path="design-system" element={<DesignSystem />} />
         <Route path="new-appointment" element={<NewAppointment />} />
         <Route path="proctoring-dashboard" element={<ProctoringDashboard />} />
+        <Route path="access-denied" element={<AccessDenied />} />
 
         {/* admin protected routes */}
         <Route element={<AdminRoute currentEmployee={currentUser} />}>

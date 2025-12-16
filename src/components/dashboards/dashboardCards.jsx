@@ -1,3 +1,5 @@
+// This file defines the configuration for dashboard cards, including their titles, descriptions, icons, and access roles.
+// Each card object contains an id, roles array, title, description, icon component, and navigation path.
 import {
   CalendarIcon,
   ClipboardDocumentCheckIcon,
@@ -28,7 +30,7 @@ export const dashboardCards = [
     title: "Employee Management",
     description: "Add, edit, or remove testing center employees.",
     icon: <UsersIcon className="w-8 h-8 text-primary" />,
-    to: "/manage-employees",
+    to: "/employee-list",
   },
   {
     id: "employee-schedule-management",
