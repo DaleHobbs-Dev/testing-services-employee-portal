@@ -54,10 +54,10 @@ export default function EmployeeList() {
     return {
       ...selectedEmployee,
       certifications: (selectedEmployee.certificationIds || [])
-        .map((id) => certifications.find((c) => c.id === id)?.name)
+        .map((id) => certifications.find((c) => c.id === id)?.label)
         .filter(Boolean),
       permissions: (selectedEmployee.permissionIds || [])
-        .map((id) => permissions.find((p) => p.id === id)?.name)
+        .map((id) => permissions.find((p) => p.id === id)?.label)
         .filter(Boolean),
     };
   }, [selectedEmployee, certifications, permissions]);
