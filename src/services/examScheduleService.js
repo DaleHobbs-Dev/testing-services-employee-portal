@@ -1,4 +1,4 @@
-import { fetchJson, postJson } from "./apiSettings";
+import { fetchJson, postJson, putJson } from "./apiSettings";
 
 export const getAllExamSchedules = async () => {
     return fetchJson("/examSchedules");
@@ -14,4 +14,8 @@ export const getExamSchedulesByDate = async (date) => {
 
 export const createExamSchedule = async (examScheduleData) => {
     return postJson("/examSchedules", examScheduleData);
+};
+
+export const updateExamSchedule = async (scheduleId, examScheduleData) => {
+    return putJson(`/examSchedules/${scheduleId}`, examScheduleData);
 };

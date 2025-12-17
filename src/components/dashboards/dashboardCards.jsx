@@ -10,7 +10,14 @@ import {
 export const dashboardCards = [
   {
     id: "new-appointment",
-    roles: ["admin", "proctor", "scheduler", "checkin", "technician"],
+    roles: [
+      "admin",
+      "proctor",
+      "scheduler",
+      "checkin",
+      "technician",
+      "frontdesk",
+    ],
     title: "New Testing Appointment",
     description: "Schedule a new testing appointment for any student.",
     icon: <CalendarIcon className="w-8 h-8 text-primary" />,
@@ -26,7 +33,7 @@ export const dashboardCards = [
   },
   {
     id: "employee-management",
-    roles: ["admin"],
+    roles: ["admin", "technician"],
     title: "Employee Management",
     description: "Add, edit, or remove testing center employees.",
     icon: <UsersIcon className="w-8 h-8 text-primary" />,
@@ -42,7 +49,7 @@ export const dashboardCards = [
   },
   {
     id: "exam-management",
-    roles: ["admin"],
+    roles: ["admin", "technician"],
     title: "Exam Management",
     description: "Maintain exam offerings and configuration.",
     icon: <BookOpenIcon className="w-8 h-8 text-primary" />,

@@ -11,7 +11,7 @@ export { getAllTestFamilies, getTestFamilyById, updateTestFamily, createTestFami
 export { getAllTestVariants, getTestVariantById, getTestVariantsExpandedByFamilyId, updateTestVariant, getTestVariantsByFamilyId, createTestVariant } from "./testVariantService";
 
 // Exam Schedules
-export { getAllExamSchedules, getExamScheduleById, getExamSchedulesByDate, createExamSchedule } from "./examScheduleService";
+export { getAllExamSchedules, getExamScheduleById, getExamSchedulesByDate, createExamSchedule, updateExamSchedule } from "./examScheduleService";
 
 // Notes
 export { getAllNotes, getNoteByExamScheduleId, createNote } from "./noteService";
@@ -27,3 +27,12 @@ export { getAllPermissions } from "./permissionService";
 
 // Employee Schedules
 export { getAllEmployeeSchedules, updateEmployeeSchedule, createEmployeeSchedule } from "./employeeScheduleService";
+
+// Locations
+export { getAllLocations, getLocationById, createLocation, updateLocation } from "./locationService";
+
+// Employee Certifications
+export { getAllEmployeeCertifications, getEmployeeCertificationsByEmployeeId, updateEmployeeCertification, createEmployeeCertification } from "./employeeCertificationService";
+
+// Employee Permissions
+export { getAllEmployeePermissions, getEmployeePermissionsByEmployeeId, updateEmployeePermission, createEmployeePermission } from "./employeePermissionService";

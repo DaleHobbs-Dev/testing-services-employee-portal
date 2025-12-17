@@ -1,32 +1,135 @@
-Table Users {
+Table employees {
   id int [pk, increment]
-  name varchar(50) [not null]
+  name varchar(100) [not null]
   email varchar(100) [unique, not null]
-  cohort varchar(20)
+  role varchar(50) [not null, note: 'admin, proctor, scheduler, checkin, frontdesk, technician, clerk']
+  status varchar(50) [not null, default: 'active', note: 'active, inactive, restricted']
+  phone varchar(20)
+  notes text
+  employeeCode varchar(20) [unique]
+  locationId int [not null, ref: > locations.id]
   created_at timestamp [default: `CURRENT_TIMESTAMP`]
 }
 
-Table Posts {
+Table certifications {
   id int [pk, increment]
-  user_id int [not null, ref: > Users.id]
-  topic_id int [not null, ref: > Topics.id]
-  title varchar(150) [not null]
-  body text [not null]
-  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  key varchar(50) [unique, not null]
+  label varchar(100) [not null]
 }
 
-Table UserPostLikes {
-  user_id int [not null, ref: > Users.id]
-  post_id int [not null, ref: > Posts.id]
-  liked_at timestamp [default: `CURRENT_TIMESTAMP`]
+Table permissions {
+  id int [pk, increment]
+  key varchar(50) [unique, not null]
+  label varchar(100) [not null]
+}
 
+Table employeeCertifications {
+  employeeId int [not null, ref: > employees.id]
+  certificationId int [not null, ref: > certifications.id]
+  
   indexes {
-    (user_id, post_id) [pk]
+    (employeeId, certificationId) [pk]
   }
 }
 
-Table Topics {
+Table employeePermissions {
+  employeeId int [not null, ref: > employees.id]
+  permissionId int [not null, ref: > permissions.id]
+  
+  indexes {
+    (employeeId, permissionId) [pk]
+  }
+}
+
+Table testFamilies {
   id int [pk, increment]
-  name varchar(100) [unique, not null]
+  name varchar(100) [not null]
   description text
+  allowsMultipleVariants boolean [default: false]
+  active boolean [default: true]
+}
+
+Table testVariants {
+  id int [pk, increment]
+  familyId int [not null, ref: > testFamilies.id]
+  title varchar(150) [not null]
+  subtest varchar(100) [note: 'For HiSET/Accuplacer']
+  facultyName varchar(100) [note: 'For Faculty Tests']
+  course varchar(100) [note: 'For Faculty Tests']
+  duration int [not null, note: 'Duration in minutes']
+  active boolean [default: true]
+}
+
+Table workstations {
+  id int [pk, increment]
+  label varchar(50) [not null]
+  room varchar(50) [not null]
+  notes text
+  locationId int [not null, ref: > locations.id]
+}
+
+Table examinees {
+  id int [pk, increment]
+  firstName varchar(50) [not null]
+  lastName varchar(50) [not null]
+  email varchar(100) [unique, not null]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table examSchedules {
+  id int [pk, increment]
+  examineeId int [not null, ref: > examinees.id]
+  testVariantId int [ref: > testVariants.id, note: 'Single variant exams']
+  selectedTestVariantIds json [note: 'Multiple variant exams (array of variant IDs)']
+  employeeId int [not null, ref: > employees.id, note: 'Proctor']
+  locationId int [not null, ref: > locations.id]
+  workstationId int [not null, ref: > workstations.id]
+  startTime timestamp [not null]
+  endTime timestamp [not null]
+  room varchar(50)
+  status varchar(50) [default: 'scheduled', note: 'scheduled, checked-in, in-progress, completed, cancelled']
+  notes text [note: 'DEPRECATED - use notes table instead']
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table locations {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  code varchar(10) [unique, not null]
+  building varchar(100)
+  room varchar(50)
+  addressLine1 varchar(150)
+  addressLine2 varchar(150)
+  city varchar(100)
+  state varchar(2)
+  zip varchar(10)
+  phone varchar(20)
+  notes text
+}
+
+Table employeeSchedules {
+  id int [pk, increment]
+  employeeId int [unique, not null, ref: > employees.id]
+  workDays json [not null, note: 'Array of days: Monday, Tuesday, etc.']
+  startTime time
+  endTime time
+}
+
+Table notes {
+  id int [pk, increment]
+  examScheduleId int [not null, ref: > examSchedules.id]
+  message text [not null]
+  createdAt timestamp [default: `CURRENT_TIMESTAMP`]
+  updatedAt timestamp [default: `CURRENT_TIMESTAMP`]
+  createdBy int [ref: > employees.id]
+  updatedBy int [ref: > employees.id]
+  noteTypeId int [note: 'Future: reference to noteTypes table']
+  isInternal boolean [default: false, note: 'Internal notes vs student-visible']
+  isImportant boolean [default: false]
+}
+
+Table examArchives {
+  id int [pk, increment]
+  examId int [note: 'Reference to archived exam schedule']
+  archivedAt timestamp [default: `CURRENT_TIMESTAMP`]
 }

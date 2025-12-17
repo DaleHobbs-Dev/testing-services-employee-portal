@@ -9,31 +9,44 @@ import {
 } from "@/components/ui";
 
 export default function EmployeeForm({
-  employee = null, // if editing, employee object will be passed in
-  onSubmit, // function to call with final form data
-  onCancel, // navigate back or close modal
-  certifications = [], // array from /certifications endpoint
-  permissions = [], // array from /permissions endpoint
-  allEmployees = [], // optional: to validate unique employeeCode
+  employee = null,
+  onSubmit,
+  onCancel,
+  certifications = [],
+  permissions = [],
+  allEmployees = [],
+  employeeCertifications = [], // ✅ NEW: junction table data
+  employeePermissions = [], // ✅ NEW: junction table data
 }) {
-  // ------------------------------------------
-  // 1. Form State (controlled inputs)
-  // ------------------------------------------
-  const [formData, setFormData] = useState({
-    name: employee?.name || "",
-    email: employee?.email || "",
-    role: employee?.role || "",
-    status: employee?.status || "active",
-    phone: employee?.phone || "",
-    notes: employee?.notes || "",
-    employeeCode: employee?.employeeCode || "",
-    certificationIds: employee?.certificationIds || [],
-    permissionIds: employee?.permissionIds || [],
+  // Form State (controlled inputs)
+  const [formData, setFormData] = useState(() => {
+    // Initialize certifications and permissions from junction tables
+    let certificationIds = [];
+    let permissionIds = [];
+
+    if (employee?.id) {
+      certificationIds = employeeCertifications
+        .filter((ec) => ec.employeeId === employee.id)
+        .map((ec) => ec.certificationId);
+
+      permissionIds = employeePermissions
+        .filter((ep) => ep.employeeId === employee.id)
+        .map((ep) => ep.permissionId);
+    }
+
+    return {
+      name: employee?.name || "",
+      email: employee?.email || "",
+      role: employee?.role || "",
+      status: employee?.status || "active",
+      phone: employee?.phone || "",
+      notes: employee?.notes || "",
+      employeeCode: employee?.employeeCode || "",
+      certificationIds,
+      permissionIds,
+    };
   });
 
-  // ------------------------------------------
-  // 2. Handle simple input changes
-  // ------------------------------------------
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -43,9 +56,6 @@ export default function EmployeeForm({
     }));
   };
 
-  // ------------------------------------------
-  // 3. Handle checkbox groups
-  // ------------------------------------------
   const toggleIdInList = (listName, id) => {
     setFormData((prev) => {
       const list = prev[listName];
@@ -57,9 +67,7 @@ export default function EmployeeForm({
     });
   };
 
-  // ------------------------------------------
-  // 4. Validate employee code uniqueness
-  // ------------------------------------------
+  // Validate employee code uniqueness
   const codeError = useMemo(() => {
     if (!formData.employeeCode) {
       return "";
@@ -72,9 +80,6 @@ export default function EmployeeForm({
     return duplicate ? "This employee code is already in use." : "";
   }, [formData.employeeCode, allEmployees, employee?.id]);
 
-  // ------------------------------------------
-  // 5. Handle Submit
-  // ------------------------------------------
   const handleSubmit = (e) => {
     e.preventDefault();
 
