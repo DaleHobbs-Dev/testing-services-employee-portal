@@ -22,6 +22,7 @@ export default function ProctoringDashboard() {
     return today;
   });
 
+  // Custom hook to fetch appointment data
   const { loading, appointments, familyLookup, proctors } = useAppointmentData(
     selectedDate,
     currentUser?.id,

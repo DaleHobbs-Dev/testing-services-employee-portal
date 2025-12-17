@@ -1,5 +1,4 @@
 // Custom hook to filter and group appointments
-
 import { useState, useMemo } from "react";
 
 // Helper function to group appointments by test family
@@ -12,6 +11,7 @@ function groupByFamily(appointments) {
     return result;
 }
 
+// Custom hook to filter and group appointments
 export function useAppointmentFilters(appointments) {
     const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
     const [examineeQuery, setExamineeQuery] = useState("");

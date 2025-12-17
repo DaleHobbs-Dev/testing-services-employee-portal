@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import {
     getAllExamSchedules,
-    getAllExamScheduleVariants, // ✅ NEW
+    getAllExamScheduleVariants,
     getAllTestVariants,
     getAllExaminees,
     getAllEmployees,
     getAllTestFamilies,
 } from "@/services";
 
+// custom hook to fetch and manage appointment data
+// accepts selected date, current user ID and role for filtering
 export function useAppointmentData(selectedDate, currentUserId, currentUserRole) {
     const [loading, setLoading] = useState(true);
     const [appointments, setAppointments] = useState([]);
@@ -21,17 +23,20 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
             const [schedules, scheduleVariants, variants, examinees, employees, families] =
                 await Promise.all([
                     getAllExamSchedules(),
-                    getAllExamScheduleVariants(), // ✅ NEW: Get junction table data
+                    getAllExamScheduleVariants(),
                     getAllTestVariants(),
                     getAllExaminees(),
                     getAllEmployees(),
                     getAllTestFamilies(),
                 ]);
 
+            // ✅ Filter to only active variants
+            const activeVariants = variants.filter(v => v.active !== false);
+
             // Build lookup maps
             const famMap = Object.fromEntries(families.map((f) => [f.id, f.name]));
             const empMap = Object.fromEntries(employees.map((e) => [e.id, e]));
-            const varMap = Object.fromEntries(variants.map((v) => [v.id, v]));
+            const varMap = Object.fromEntries(activeVariants.map((v) => [v.id, v])); // ✅ UPDATED: Only active
             const exaMap = Object.fromEntries(examinees.map((x) => [x.id, x]));
 
             setFamilyLookup(famMap);
@@ -49,7 +54,7 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
                 return start === selectedStr;
             });
 
-            // ✅ UPDATED: Build variant lookup by schedule ID
+            // Build variant lookup by schedule ID
             const variantsBySchedule = scheduleVariants.reduce((acc, sv) => {
                 if (!acc[sv.examScheduleId]) {
                     acc[sv.examScheduleId] = [];
@@ -60,18 +65,18 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
 
             // Normalize appointments into a consistent object
             const normalized = filteredSchedules.map((s) => {
-                // ✅ UPDATED: Get variants from junction table
+                // Get variants from junction table
                 const scheduleVariantsForThisSchedule = variantsBySchedule[s.id] || [];
 
                 // Sort by sequence order
                 scheduleVariantsForThisSchedule.sort((a, b) => a.sequenceOrder - b.sequenceOrder);
 
-                // Get the actual variant objects
+                // Get the actual variant objects (will automatically exclude inactive due to varMap)
                 const examVariants = scheduleVariantsForThisSchedule
                     .map(sv => varMap[sv.testVariantId])
-                    .filter(Boolean);
+                    .filter(Boolean); // Removes undefined if variant was deleted
 
-                // ✅ UPDATED: Get family ID directly from schedule
+                // Get family ID directly from schedule
                 const familyId = s.testFamilyId;
                 const familyName = famMap[familyId] || "Unknown Family";
 

@@ -17,15 +17,15 @@ import {
   getAllLocations,
   getExamScheduleById,
   updateExamSchedule,
-  getExamScheduleVariantsByScheduleId, // ✅ NEW
-  createExamScheduleVariant, // ✅ NEW
-  updateExamScheduleVariant, // ✅ NEW
-  deleteExamScheduleVariant, // ✅ NEW (or soft delete)
-  getNotesByScheduleId, // ✅ NEW (optional - to load existing notes)
+  getExamScheduleVariantsByScheduleId,
+  createExamScheduleVariant,
+  updateExamScheduleVariant,
+  deleteExamScheduleVariant,
+  getNotesByScheduleId,
 } from "@/services";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import AppointmentForm from "@/components/appointments/AppointmentForm";
-import { isFacultyTest } from "@/utils/testFamilyHelpers"; // ✅ NEW
+import { isFacultyTest } from "@/utils/testFamilyHelpers";
 
 export default function EditAppointment() {
   const { scheduleId } = useParams();
@@ -38,7 +38,7 @@ export default function EditAppointment() {
   const [locations, setLocations] = useState([]);
   const [workstations, setWorkstations] = useState([]);
   const [initialData, setInitialData] = useState(null);
-  const [existingVariants, setExistingVariants] = useState([]); // ✅ NEW
+  const [existingVariants, setExistingVariants] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,8 +50,8 @@ export default function EditAppointment() {
       getAllLocations(),
       getAllWorkstations(),
       getExamScheduleById(scheduleId),
-      getExamScheduleVariantsByScheduleId(scheduleId), // ✅ NEW - Load junction data
-      getNotesByScheduleId(scheduleId), // ✅ NEW (optional)
+      getExamScheduleVariantsByScheduleId(scheduleId),
+      getNotesByScheduleId(scheduleId),
     ]).then(
       ([
         examData,
@@ -72,24 +72,24 @@ export default function EditAppointment() {
         setWorkstations(wsData);
         setExistingVariants(scheduleVariants); // ✅ Store existing variants
 
-        // ✅ UPDATED: Get variant IDs from junction table
+        // Get variant IDs from junction table
         const variantIds = scheduleVariants.map((sv) => sv.testVariantId);
 
-        // ✅ UPDATED: Get family ID from schedule (now stored directly)
+        // Get family ID from schedule (now stored directly)
         const familyId = schedule.testFamilyId;
 
         // Transform schedule data for form
         const examinee = examData.find((e) => e.id === schedule.examineeId);
 
-        // ✅ UPDATED: Check if this is multi-variant based on count
+        // Check if this is multi-variant based on count
         const isMultiVariant = variantIds.length > 1;
 
         setInitialData({
           examinee,
           appointmentDate: schedule.startTime,
-          familyId: familyId, // ✅ From schedule, not variant
-          variantId: isMultiVariant ? null : variantIds[0], // ✅ Single variant
-          multiVariantIds: isMultiVariant ? variantIds : [], // ✅ Multiple variants
+          familyId: familyId,
+          variantId: isMultiVariant ? null : variantIds[0],
+          multiVariantIds: isMultiVariant ? variantIds : [],
           facultyData: {
             title: schedule.facultyTitle || "",
             facultyName: schedule.facultyName || "",
@@ -99,7 +99,7 @@ export default function EditAppointment() {
           proctorId: schedule.employeeId,
           locationId: schedule.locationId,
           workstationId: schedule.workstationId,
-          note: notes?.[0]?.message || "", // ✅ Load first note if exists
+          note: notes?.[0]?.message || "",
         });
 
         setLoading(false);
@@ -137,7 +137,7 @@ export default function EditAppointment() {
       // Step 1: ✅ Update the exam schedule (without variant data)
       const scheduleData = {
         examineeId: formData.selectedExaminee.id,
-        testFamilyId: Number(formData.selectedFamilyId), // ✅ Update family ID
+        testFamilyId: Number(formData.selectedFamilyId),
         employeeId: Number(formData.selectedProctorId),
         locationId: Number(formData.selectedLocationId),
         workstationId: Number(formData.selectedWorkstationId),
