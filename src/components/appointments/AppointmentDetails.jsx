@@ -16,11 +16,11 @@ import {
   H3,
 } from "@/components/ui";
 import {
-  getExamScheduleById, // ✅ CHANGED: Get single schedule
-  getExamScheduleVariantsByScheduleId, // ✅ NEW: Get variants from junction table
+  getExamScheduleById,
+  getExamScheduleVariantsByScheduleId,
   getAllTestVariants,
-  getExamineeById, // ✅ CHANGED: Get single examinee
-  getNotesByScheduleId, // ✅ CHANGED: Get notes for this schedule
+  getExamineeById,
+  getNotesByScheduleId,
 } from "@/services";
 
 export default function AppointmentDetails() {
@@ -29,16 +29,18 @@ export default function AppointmentDetails() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+
+  // Error state for handling not found or fetch errors
   const [error, setError] = useState(null);
 
   useEffect(() => {
     async function loadDetails() {
       try {
-        // ✅ UPDATED: More efficient - only fetch what we need
+        // only fetch what we need
         const [schedule, scheduleVariants, allVariants, notes] =
           await Promise.all([
             getExamScheduleById(scheduleId),
-            getExamScheduleVariantsByScheduleId(scheduleId), // ✅ NEW: Junction table data
+            getExamScheduleVariantsByScheduleId(scheduleId),
             getAllTestVariants(),
             getNotesByScheduleId(scheduleId),
           ]);
@@ -49,15 +51,16 @@ export default function AppointmentDetails() {
           return;
         }
 
-        // ✅ UPDATED: Get variant IDs from junction table (already sorted by sequenceOrder)
+        // Get variant IDs from junction table (already sorted by sequenceOrder)
         const variantIds = scheduleVariants.map((sv) => sv.testVariantId);
 
-        // ✅ Match variants in the order specified by sequenceOrder
+        // Match variants in the order specified by sequenceOrder
+        // Filter out any that might not be found or invalid
         const examVariants = variantIds
           .map((id) => allVariants.find((v) => v.id === id))
           .filter(Boolean);
 
-        // ✅ UPDATED: Fetch examinee directly
+        // Fetch examinee directly
         const examinee = await getExamineeById(schedule.examineeId);
 
         if (!examinee) {
@@ -66,6 +69,7 @@ export default function AppointmentDetails() {
           return;
         }
 
+        // Compile all the required data into one state
         setData({
           schedule,
           variants: examVariants,
@@ -83,6 +87,7 @@ export default function AppointmentDetails() {
     loadDetails();
   }, [scheduleId]);
 
+  // while loading state is true show spinner
   if (loading) {
     return (
       <div className="text-center py-20">
@@ -91,6 +96,7 @@ export default function AppointmentDetails() {
     );
   }
 
+  // if error state is set show error message
   if (error) {
     return (
       <Container>
@@ -104,14 +110,18 @@ export default function AppointmentDetails() {
     );
   }
 
+  // if no data is available return null
   if (!data) return null;
 
+  // destructure data to get needed values
   const { schedule, variants: examVariants, examinee, examNotes } = data;
 
+  // helper function to get initials from names for header avatar
   const getInitials = (firstName, lastName) => {
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase() || "?";
   };
 
+  // determine if current user can edit schedule based on role
   const canEdit = ["admin", "scheduler", "proctor"].includes(currentUser?.role);
 
   return (

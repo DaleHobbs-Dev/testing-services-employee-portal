@@ -1,13 +1,11 @@
 import { TableRow, TableCell, Badge } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
+import { formatTimeRange } from "@/utils";
 
 export default function AppointmentTableRow({ appointment }) {
   const navigate = useNavigate();
 
-  const handleRowClick = (e) => {
-    console.log("ROW CLICKED", appointment.id);
-    console.log("Event target:", e.target);
-    console.log("Event currentTarget:", e.currentTarget);
+  const handleRowClick = () => {
     navigate(`/appointment-details/${appointment.id}`);
   };
 
@@ -45,16 +43,4 @@ export default function AppointmentTableRow({ appointment }) {
       </TableCell>
     </TableRow>
   );
-}
-
-function formatTimeRange(start, end) {
-  const s = new Date(start).toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-  const e = new Date(end).toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-  return `${s}–${e}`;
 }

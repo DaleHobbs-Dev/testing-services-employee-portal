@@ -20,6 +20,7 @@ export default function AppointmentForm({
   onExamineeAdded,
   children,
 }) {
+  // Form state variables
   const [selectedExaminee, setSelectedExaminee] = useState(
     initialData.examinee || null
   );
@@ -76,7 +77,7 @@ export default function AppointmentForm({
     );
   };
 
-  // ✅ Reset workstation when location changes
+  // Reset workstation when location changes
   const handleLocationChange = (e) => {
     setSelectedLocationId(e.target.value);
     setSelectedWorkstationId(null); // Clear workstation selection
