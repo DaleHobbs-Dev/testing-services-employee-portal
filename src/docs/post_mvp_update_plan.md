@@ -189,6 +189,10 @@ Add a theme toggle button to the navbar for quick switching between dark and lig
 
 Ensure modals are responsive and accessible, with proper focus management and ARIA attributes.
 
+### **32. Add ability to add more Notes to Exam Schedules**
+
+Allow users to add multiple notes to an exam schedule for better context and communication.
+
 ## **Feature Name**
 
 **Category:** (Scheduling / UX / Admin / Data / Visual / Code Quality)

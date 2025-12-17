@@ -1,5 +1,4 @@
 import { fetchJson, postJson, putJson } from "./apiSettings";
-import { getTestVariantsByFamilyId } from "./testVariantService.js";
 
 export const getAllTestFamilies = async () => {
     return fetchJson("/testFamilies");
@@ -18,10 +17,35 @@ export const updateTestFamily = async (familyId, updatedTestFamilyData) => {
 }
 
 export const deleteTestFamily = async (familyId) => {
-    await putJson(`/testFamilies/${familyId}`, { active: false });
+    // Get the current family data first
+    const family = await fetchJson(`/testFamilies/${familyId}`);
 
-    const variants = await getTestVariantsByFamilyId(familyId);
-    await Promise.all(
-        variants.map(v => putJson(`/testVariants/${v.id}`, { active: false }))
-    );
+    // Update with active: false while preserving all other fields
+    return putJson(`/testFamilies/${familyId}`, {
+        ...family,
+        active: false,
+    });
+};
+
+export const deleteTestFamilyWithVariants = async (familyId) => {
+    // Get the family
+    const family = await fetchJson(`/testFamilies/${familyId}`);
+
+    // Mark family as inactive
+    await putJson(`/testFamilies/${familyId}`, {
+        ...family,
+        active: false,
+    });
+
+    // Get all variants for this family
+    const allVariants = await fetchJson("/testVariants");
+    const familyVariants = allVariants.filter(v => v.familyId === familyId);
+
+    // Mark all variants as inactive
+    for (const variant of familyVariants) {
+        await putJson(`/testVariants/${variant.id}`, {
+            ...variant,
+            active: false,
+        });
+    }
 };

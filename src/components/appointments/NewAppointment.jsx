@@ -7,15 +7,19 @@ import {
   getAllTestVariants,
   getAllEmployees,
   getAllWorkstations,
-  createExamSchedule,
-  createNote,
   getAllLocations,
+  createExamSchedule,
+  createExamScheduleVariant,
+  createNote,
 } from "@/services";
+import { useCurrentUser } from "@/context/CurrentUserContext";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import AppointmentForm from "@/components/appointments/AppointmentForm";
+import { isFacultyTest } from "@/utils/testFamilyHelpers";
 
 export default function NewAppointment() {
   const navigate = useNavigate();
+  const { currentUser } = useCurrentUser();
 
   const [examinees, setExaminees] = useState([]);
   const [testFamilies, setTestFamilies] = useState([]);
@@ -42,6 +46,7 @@ export default function NewAppointment() {
   const handleSubmit = (getFormData) => async () => {
     const formData = getFormData();
 
+    // Validation
     if (!formData.selectedExaminee)
       return alert("Please select or create an examinee.");
     if (!formData.selectedFamilyId) return alert("Please choose a test type.");
@@ -51,47 +56,69 @@ export default function NewAppointment() {
     if (!formData.selectedWorkstationId)
       return alert("Please select a workstation.");
 
+    // Validate that variants are selected
+    if (
+      !formData.selectedVariantIds ||
+      formData.selectedVariantIds.length === 0
+    ) {
+      return alert("Please select at least one test variant.");
+    }
+
     const selectedFamily = testFamilies.find(
       (f) => f.id === Number(formData.selectedFamilyId)
     );
-    const isMultiVariantFamily =
-      selectedFamily?.name === "HiSET" || selectedFamily?.name === "Accuplacer";
-    const isFacultyTest = selectedFamily?.name === "Faculty Test";
 
+    // Create exam schedule WITHOUT variant IDs
     const scheduleData = {
       examineeId: formData.selectedExaminee.id,
+      testFamilyId: Number(formData.selectedFamilyId), // Store family ID
       employeeId: Number(formData.selectedProctorId),
       locationId: Number(formData.selectedLocationId),
       workstationId: Number(formData.selectedWorkstationId),
       startTime: formData.appointmentDate,
       endTime: formData.appointmentDate,
       room: "Room A",
+      status: "scheduled",
     };
 
-    if (isMultiVariantFamily) {
-      scheduleData.selectedTestVariantIds = formData.multiVariantIds;
-    } else {
-      scheduleData.testVariantId = Number(formData.selectedVariantId);
-    }
-
-    if (isFacultyTest) {
+    // Faculty test data (if needed, could move to variants table)
+    if (isFacultyTest(selectedFamily)) {
       scheduleData.facultyTitle = formData.facultyData.title;
       scheduleData.facultyName = formData.facultyData.facultyName;
       scheduleData.course = formData.facultyData.course;
       scheduleData.duration = formData.facultyData.duration;
     }
 
-    const createdSchedule = await createExamSchedule(scheduleData);
+    try {
+      // Step 1: Create the exam schedule
+      const createdSchedule = await createExamSchedule(scheduleData);
 
-    if (formData.noteMessage.trim().length > 0) {
-      await createNote({
-        examScheduleId: createdSchedule.id,
-        message: formData.noteMessage,
-      });
+      // Step 2: Create junction table entries for each variant
+      for (let i = 0; i < formData.selectedVariantIds.length; i++) {
+        await createExamScheduleVariant({
+          examScheduleId: createdSchedule.id,
+          testVariantId: formData.selectedVariantIds[i],
+          sequenceOrder: i + 1, // Order they'll take the tests
+          status: "scheduled",
+        });
+      }
+
+      // Step 3: Create note if provided
+      if (formData.noteMessage.trim().length > 0) {
+        await createNote({
+          examScheduleId: createdSchedule.id,
+          message: formData.noteMessage,
+          createdAt: new Date().toISOString(),
+          createdBy: currentUser.id,
+        });
+      }
+
+      alert("Appointment created successfully!");
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to create appointment:", error);
+      alert("Failed to create appointment. Please try again.");
     }
-
-    alert("Appointment created successfully!");
-    navigate("/");
   };
 
   return (

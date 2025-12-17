@@ -14,12 +14,18 @@ import {
   getAllTestVariants,
   getAllEmployees,
   getAllWorkstations,
+  getAllLocations,
   getExamScheduleById,
   updateExamSchedule,
+  getExamScheduleVariantsByScheduleId, // ✅ NEW
+  createExamScheduleVariant, // ✅ NEW
+  updateExamScheduleVariant, // ✅ NEW
+  deleteExamScheduleVariant, // ✅ NEW (or soft delete)
+  getNotesByScheduleId, // ✅ NEW (optional - to load existing notes)
 } from "@/services";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import AppointmentForm from "@/components/appointments/AppointmentForm";
-import { getAllLocations } from "../../services";
+import { isFacultyTest } from "@/utils/testFamilyHelpers"; // ✅ NEW
 
 export default function EditAppointment() {
   const { scheduleId } = useParams();
@@ -32,6 +38,7 @@ export default function EditAppointment() {
   const [locations, setLocations] = useState([]);
   const [workstations, setWorkstations] = useState([]);
   const [initialData, setInitialData] = useState(null);
+  const [existingVariants, setExistingVariants] = useState([]); // ✅ NEW
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,29 +50,56 @@ export default function EditAppointment() {
       getAllLocations(),
       getAllWorkstations(),
       getExamScheduleById(scheduleId),
+      getExamScheduleVariantsByScheduleId(scheduleId), // ✅ NEW - Load junction data
+      getNotesByScheduleId(scheduleId), // ✅ NEW (optional)
     ]).then(
-      ([examData, famData, varData, empData, locData, wsData, schedule]) => {
+      ([
+        examData,
+        famData,
+        varData,
+        empData,
+        locData,
+        wsData,
+        schedule,
+        scheduleVariants,
+        notes,
+      ]) => {
         setExaminees(examData);
         setTestFamilies(famData.filter((f) => f.active !== false));
         setTestVariants(varData);
         setEmployees(empData);
         setLocations(locData);
         setWorkstations(wsData);
+        setExistingVariants(scheduleVariants); // ✅ Store existing variants
+
+        // ✅ UPDATED: Get variant IDs from junction table
+        const variantIds = scheduleVariants.map((sv) => sv.testVariantId);
+
+        // ✅ UPDATED: Get family ID from schedule (now stored directly)
+        const familyId = schedule.testFamilyId;
 
         // Transform schedule data for form
         const examinee = examData.find((e) => e.id === schedule.examineeId);
+
+        // ✅ UPDATED: Check if this is multi-variant based on count
+        const isMultiVariant = variantIds.length > 1;
+
         setInitialData({
           examinee,
           appointmentDate: schedule.startTime,
-          familyId: schedule.testVariantId
-            ? varData.find((v) => v.id === schedule.testVariantId)?.familyId
-            : null,
-          variantId: schedule.testVariantId,
-          multiVariantIds: schedule.selectedTestVariantIds || [],
+          familyId: familyId, // ✅ From schedule, not variant
+          variantId: isMultiVariant ? null : variantIds[0], // ✅ Single variant
+          multiVariantIds: isMultiVariant ? variantIds : [], // ✅ Multiple variants
+          facultyData: {
+            title: schedule.facultyTitle || "",
+            facultyName: schedule.facultyName || "",
+            course: schedule.course || "",
+            duration: schedule.duration || "",
+          },
           proctorId: schedule.employeeId,
           locationId: schedule.locationId,
           workstationId: schedule.workstationId,
-          note: "", // You'd need to fetch this separately
+          note: notes?.[0]?.message || "", // ✅ Load first note if exists
         });
 
         setLoading(false);
@@ -80,10 +114,105 @@ export default function EditAppointment() {
   const handleSubmit = (getFormData) => async () => {
     const formData = getFormData();
 
-    await updateExamSchedule(scheduleId, formData);
+    // Validation
+    if (!formData.selectedExaminee) return alert("Please select an examinee.");
+    if (!formData.selectedFamilyId) return alert("Please choose a test type.");
+    if (!formData.appointmentDate) return alert("Please choose a date.");
+    if (!formData.selectedProctorId) return alert("Please select a proctor.");
+    if (!formData.selectedLocationId) return alert("Please select a location.");
+    if (!formData.selectedWorkstationId)
+      return alert("Please select a workstation.");
+    if (
+      !formData.selectedVariantIds ||
+      formData.selectedVariantIds.length === 0
+    ) {
+      return alert("Please select at least one test variant.");
+    }
 
-    alert("Appointment updated successfully!");
-    navigate("/proctoring-dashboard");
+    const selectedFamily = testFamilies.find(
+      (f) => f.id === Number(formData.selectedFamilyId)
+    );
+
+    try {
+      // Step 1: ✅ Update the exam schedule (without variant data)
+      const scheduleData = {
+        examineeId: formData.selectedExaminee.id,
+        testFamilyId: Number(formData.selectedFamilyId), // ✅ Update family ID
+        employeeId: Number(formData.selectedProctorId),
+        locationId: Number(formData.selectedLocationId),
+        workstationId: Number(formData.selectedWorkstationId),
+        startTime: formData.appointmentDate,
+        endTime: formData.appointmentDate,
+        room: "Room A",
+      };
+
+      // Faculty test data
+      if (isFacultyTest(selectedFamily)) {
+        scheduleData.facultyTitle = formData.facultyData.title;
+        scheduleData.facultyName = formData.facultyData.facultyName;
+        scheduleData.course = formData.facultyData.course;
+        scheduleData.duration = formData.facultyData.duration;
+      }
+
+      await updateExamSchedule(scheduleId, scheduleData);
+
+      // Step 2: ✅ Update junction table entries
+      const currentVariantIds = existingVariants.map((ev) => ev.testVariantId);
+      const newVariantIds = formData.selectedVariantIds;
+
+      // Find variants to delete
+      const variantsToDelete = existingVariants.filter(
+        (ev) => !newVariantIds.includes(ev.testVariantId)
+      );
+
+      // Find variants to add
+      const variantsToAdd = newVariantIds.filter(
+        (id) => !currentVariantIds.includes(id)
+      );
+
+      // Find variants that stayed (to potentially update sequence)
+      const variantsToKeep = existingVariants.filter((ev) =>
+        newVariantIds.includes(ev.testVariantId)
+      );
+
+      // Delete removed variants
+      for (const variant of variantsToDelete) {
+        await deleteExamScheduleVariant(variant.id); // Hard delete
+        // OR: await updateExamScheduleVariant(variant.id, { status: 'cancelled' }); // Soft delete
+      }
+
+      // Add new variants
+      for (let i = 0; i < variantsToAdd.length; i++) {
+        const variantId = variantsToAdd[i];
+        // Calculate sequence order based on position in new list
+        const sequenceOrder = newVariantIds.indexOf(variantId) + 1;
+
+        await createExamScheduleVariant({
+          examScheduleId: Number(scheduleId),
+          testVariantId: variantId,
+          sequenceOrder: sequenceOrder,
+          status: "scheduled",
+        });
+      }
+
+      // Update sequence order for kept variants (in case order changed)
+      for (const variant of variantsToKeep) {
+        const newSequenceOrder =
+          newVariantIds.indexOf(variant.testVariantId) + 1;
+
+        if (variant.sequenceOrder !== newSequenceOrder) {
+          await updateExamScheduleVariant(variant.id, {
+            sequenceOrder: newSequenceOrder,
+          });
+        }
+      }
+
+      alert("Appointment updated successfully!");
+      navigate("/proctoring-dashboard");
+    } catch (error) {
+      console.error("Failed to update appointment:", error);
+      alert("Failed to update appointment. Please try again.");
+    }
   };
 
   if (loading) {

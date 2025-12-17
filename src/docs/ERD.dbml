@@ -46,6 +46,7 @@ Table testFamilies {
   name varchar(100) [not null]
   description text
   allowsMultipleVariants boolean [default: false]
+  requiresVariantSelection boolean [default: true]
   active boolean [default: true]
 }
 
@@ -79,6 +80,7 @@ Table examinees {
 Table examSchedules {
   id int [pk, increment]
   examineeId int [not null, ref: > examinees.id]
+  testFamilyId int [not null, ref: > testFamilies.id]
   testVariantId int [ref: > testVariants.id, note: 'Single variant exams']
   selectedTestVariantIds json [note: 'Multiple variant exams (array of variant IDs)']
   employeeId int [not null, ref: > employees.id, note: 'Proctor']
@@ -90,6 +92,22 @@ Table examSchedules {
   status varchar(50) [default: 'scheduled', note: 'scheduled, checked-in, in-progress, completed, cancelled']
   notes text [note: 'DEPRECATED - use notes table instead']
   created_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table examScheduleVariants {
+  id int [pk, increment]
+  examScheduleId int [not null, ref: > examSchedules.id]
+  testVariantId int [ref: > testVariants.id]
+  sequenceOrder int [not null, note: 'Order subtests are taken']
+  status varchar(50) [default: 'scheduled', note: 'scheduled, in-progress, completed, skipped']
+  actualStartTime timestamp
+  actualEndTime timestamp
+  score decimal
+  notes text
+  
+  indexes {
+    (examScheduleId, testVariantId) [unique]
+  }
 }
 
 Table locations {

@@ -17,14 +17,26 @@ export default function NewExam() {
         name: data.name,
         description: data.description || "",
         allowsMultipleVariants: data.allowsMultipleVariants ?? false,
+        requiresVariantSelection: data.requiresVariantSelection ?? true,
         active: true,
       });
 
-      // Create each variant with new familyId and active flag
-      for (const variant of data.variants) {
+      // Handle variant creation based on requiresVariantSelection
+      if (data.requiresVariantSelection) {
+        // Create user-specified variants
+        for (const variant of data.variants) {
+          await createTestVariant({
+            ...variant,
+            familyId: newFamily.id,
+            active: true,
+          });
+        }
+      } else {
+        // ✅ UPDATED: Create a default generic variant using the family name AND duration
         await createTestVariant({
-          ...variant,
           familyId: newFamily.id,
+          title: data.name, // Use the same name as the family
+          duration: data.defaultDuration || 60, // ✅ Use specified duration
           active: true,
         });
       }
@@ -62,7 +74,7 @@ export default function NewExam() {
 
       <ExamForm
         initialData={{}}
-        variants={[]} // No variants initially
+        variants={[]}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
       />

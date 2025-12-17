@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Input, Label, H2 } from "@/components/ui";
+import { Input, H2 } from "@/components/ui";
 import { CalendarIcon } from "@heroicons/react/24/outline";
 import ExamineeSelector from "./ExamineeSelector";
 import TestSelector from "./TestSelector";
@@ -60,6 +60,9 @@ export default function AppointmentForm({
 
   const isFacultyTest = selectedFamily?.name === "Faculty Test";
 
+  const isMultiVariantFamily =
+    selectedFamily?.name === "HiSET" || selectedFamily?.name === "Accuplacer";
+
   const handleFamilyChange = (e) => {
     setSelectedFamilyId(e.target.value);
     setSelectedVariantId(null);
@@ -79,18 +82,27 @@ export default function AppointmentForm({
     setSelectedWorkstationId(null); // Clear workstation selection
   };
 
-  const getFormData = () => ({
-    selectedExaminee,
-    appointmentDate,
-    selectedFamilyId,
-    selectedVariantId,
-    multiVariantIds,
-    facultyData,
-    selectedProctorId,
-    selectedLocationId,
-    selectedWorkstationId,
-    noteMessage,
-  });
+  const getFormData = () => {
+    // Normalize variant selection into a single array
+    const selectedVariantIds = isMultiVariantFamily
+      ? multiVariantIds
+      : selectedVariantId
+      ? [Number(selectedVariantId)]
+      : [];
+
+    return {
+      selectedExaminee,
+      appointmentDate,
+      selectedFamilyId,
+      selectedVariantId,
+      selectedVariantIds,
+      facultyData,
+      selectedProctorId,
+      selectedLocationId,
+      selectedWorkstationId,
+      noteMessage,
+    };
+  };
 
   return (
     <>
@@ -142,13 +154,13 @@ export default function AppointmentForm({
       <LocationSelector
         locations={locations}
         selectedLocationId={selectedLocationId}
-        onChange={handleLocationChange} // ✅ Use the handler that resets workstation
+        onChange={handleLocationChange}
       />
 
       <WorkstationSelector
         workstations={workstations}
         selectedWorkstationId={selectedWorkstationId}
-        selectedLocationId={selectedLocationId} // ✅ Pass the selected location
+        selectedLocationId={selectedLocationId}
         onChange={(e) => setSelectedWorkstationId(e.target.value)}
       />
 

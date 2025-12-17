@@ -1,11 +1,11 @@
-// Custom hook to fetch and process appointment data
 import { useState, useEffect } from "react";
 import {
     getAllExamSchedules,
+    getAllExamScheduleVariants, // ✅ NEW
+    getAllTestVariants,
     getAllExaminees,
     getAllEmployees,
     getAllTestFamilies,
-    getAllTestVariants,
 } from "@/services";
 
 export function useAppointmentData(selectedDate, currentUserId, currentUserRole) {
@@ -18,13 +18,14 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
         async function loadAll() {
             setLoading(true);
 
-            const [schedules, examinees, employees, families, variants] =
+            const [schedules, scheduleVariants, variants, examinees, employees, families] =
                 await Promise.all([
                     getAllExamSchedules(),
+                    getAllExamScheduleVariants(), // ✅ NEW: Get junction table data
+                    getAllTestVariants(),
                     getAllExaminees(),
                     getAllEmployees(),
                     getAllTestFamilies(),
-                    getAllTestVariants(),
                 ]);
 
             // Build lookup maps
@@ -36,7 +37,7 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
             setFamilyLookup(famMap);
 
             const activeProctors = employees.filter(
-                (e) => e.role === "proctor" && e.status === "active"
+                (e) => (e.role === "proctor" || e.role === "admin") && e.status === "active"
             );
             setProctors(activeProctors);
 
@@ -48,37 +49,60 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
                 return start === selectedStr;
             });
 
-            // Normalize appointments
+            // ✅ UPDATED: Build variant lookup by schedule ID
+            const variantsBySchedule = scheduleVariants.reduce((acc, sv) => {
+                if (!acc[sv.examScheduleId]) {
+                    acc[sv.examScheduleId] = [];
+                }
+                acc[sv.examScheduleId].push(sv);
+                return acc;
+            }, {});
+
+            // Normalize appointments into a consistent object
             const normalized = filteredSchedules.map((s) => {
-                const variantIds =
-                    s.selectedTestVariantIds ??
-                    (s.testVariantId ? [s.testVariantId] : []);
+                // ✅ UPDATED: Get variants from junction table
+                const scheduleVariantsForThisSchedule = variantsBySchedule[s.id] || [];
 
-                const variants = variantIds.map((id) => varMap[id]).filter(Boolean);
+                // Sort by sequence order
+                scheduleVariantsForThisSchedule.sort((a, b) => a.sequenceOrder - b.sequenceOrder);
 
-                const familyId = variants[0]?.familyId;
+                // Get the actual variant objects
+                const examVariants = scheduleVariantsForThisSchedule
+                    .map(sv => varMap[sv.testVariantId])
+                    .filter(Boolean);
+
+                // ✅ UPDATED: Get family ID directly from schedule
+                const familyId = s.testFamilyId;
                 const familyName = famMap[familyId] || "Unknown Family";
 
                 return {
                     id: s.id,
+
                     familyId,
                     familyName,
+
                     startTime: s.startTime,
                     endTime: s.endTime,
+
                     workstationId: s.workstationId,
                     workstationLabel: `WS-${s.workstationId}`,
+
                     proctorId: s.employeeId,
                     proctorName: empMap[s.employeeId]?.name || "Unknown",
+
                     examineeId: s.examineeId,
                     examineeName: exaMap[s.examineeId]
                         ? `${exaMap[s.examineeId].firstName} ${exaMap[s.examineeId].lastName}`
                         : "Unknown Examinee",
-                    variantCount: variants.length,
-                    variantTitles: variants.map((v) => v.title),
+
+                    variantCount: examVariants.length,
+                    variantTitles: examVariants.map((v) => v.title),
+
                     note:
-                        variants.length > 1
-                            ? `Includes subtests: ${variants.map((v) => v.title).join(", ")}`
-                            : variants[0]?.title ?? "Unknown Variant",
+                        examVariants.length > 1
+                            ? `${examVariants.length} tests: ${examVariants.map((v) => v.title).join(", ")}`
+                            : examVariants[0]?.title ?? "Unknown Variant",
+
                     status: s.status || "scheduled",
                 };
             });

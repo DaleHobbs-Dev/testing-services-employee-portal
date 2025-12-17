@@ -1,11 +1,11 @@
 // Examinees
-export { getAllExaminees, getExamineeByEmail, createExaminee } from "./examineeService";
+export { getAllExaminees, getExamineeByEmail, createExaminee, getExamineeById } from "./examineeService";
 
 // Employees
 export { getAllEmployees, getEmployeeByEmail, getEmployeeById, createEmployee, updateEmployee } from "./employeeService";
 
 // Test Families
-export { getAllTestFamilies, getTestFamilyById, updateTestFamily, createTestFamily, deleteTestFamily } from "./testFamilyService";
+export { getAllTestFamilies, getTestFamilyById, updateTestFamily, createTestFamily, deleteTestFamily, deleteTestFamilyWithVariants } from "./testFamilyService";
 
 // Test Variants
 export { getAllTestVariants, getTestVariantById, getTestVariantsExpandedByFamilyId, updateTestVariant, getTestVariantsByFamilyId, createTestVariant } from "./testVariantService";
@@ -14,7 +14,7 @@ export { getAllTestVariants, getTestVariantById, getTestVariantsExpandedByFamily
 export { getAllExamSchedules, getExamScheduleById, getExamSchedulesByDate, createExamSchedule, updateExamSchedule } from "./examScheduleService";
 
 // Notes
-export { getAllNotes, getNoteByExamScheduleId, createNote } from "./noteService";
+export { getAllNotes, getNoteByExamScheduleId, createNote, getNotesByScheduleId } from "./noteService";
 
 // Workstations
 export { getAllWorkstations, getWorkstationById } from "./workstationService";
@@ -36,3 +36,6 @@ export { getAllEmployeeCertifications, getEmployeeCertificationsByEmployeeId, up
 
 // Employee Permissions
 export { getAllEmployeePermissions, getEmployeePermissionsByEmployeeId, updateEmployeePermission, createEmployeePermission } from "./employeePermissionService";
+
+// Exam Schedule Variants
+export { getExamScheduleVariantsByScheduleId, createExamScheduleVariant, updateExamScheduleVariant, deleteExamScheduleVariant, getAllExamScheduleVariants } from "./examScheduleVariantService";

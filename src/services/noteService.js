@@ -11,3 +11,8 @@ export const getNoteByExamScheduleId = async (examScheduleId) => {
 export const createNote = async (noteData) => {
     return postJson("/notes", noteData);
 };
+
+export const getNotesByScheduleId = async (scheduleId) => {
+    const all = await fetchJson("/notes");
+    return all.filter(note => note.examScheduleId === Number(scheduleId));
+};

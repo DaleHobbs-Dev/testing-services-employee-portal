@@ -1,0 +1,1 @@
+export { allowsMultipleVariants, isFacultyTest, requiresVariantSelection } from './testFamilyHelpers';

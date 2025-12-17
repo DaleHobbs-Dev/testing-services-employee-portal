@@ -16,10 +16,11 @@ import {
   H3,
 } from "@/components/ui";
 import {
-  getAllExamSchedules,
+  getExamScheduleById, // ✅ CHANGED: Get single schedule
+  getExamScheduleVariantsByScheduleId, // ✅ NEW: Get variants from junction table
   getAllTestVariants,
-  getAllExaminees,
-  getAllNotes,
+  getExamineeById, // ✅ CHANGED: Get single examinee
+  getNotesByScheduleId, // ✅ CHANGED: Get notes for this schedule
 } from "@/services";
 
 export default function AppointmentDetails() {
@@ -33,14 +34,14 @@ export default function AppointmentDetails() {
   useEffect(() => {
     async function loadDetails() {
       try {
-        const [schedules, variants, examinees, notes] = await Promise.all([
-          getAllExamSchedules(),
-          getAllTestVariants(),
-          getAllExaminees(),
-          getAllNotes(),
-        ]);
-
-        const schedule = schedules.find((s) => s.id === Number(scheduleId));
+        // ✅ UPDATED: More efficient - only fetch what we need
+        const [schedule, scheduleVariants, allVariants, notes] =
+          await Promise.all([
+            getExamScheduleById(scheduleId),
+            getExamScheduleVariantsByScheduleId(scheduleId), // ✅ NEW: Junction table data
+            getAllTestVariants(),
+            getNotesByScheduleId(scheduleId),
+          ]);
 
         if (!schedule) {
           setError("Exam schedule not found");
@@ -48,15 +49,16 @@ export default function AppointmentDetails() {
           return;
         }
 
-        const variantIds =
-          schedule.selectedTestVariantIds ??
-          (schedule.testVariantId ? [schedule.testVariantId] : []);
+        // ✅ UPDATED: Get variant IDs from junction table (already sorted by sequenceOrder)
+        const variantIds = scheduleVariants.map((sv) => sv.testVariantId);
 
+        // ✅ Match variants in the order specified by sequenceOrder
         const examVariants = variantIds
-          .map((id) => variants.find((v) => v.id === id))
+          .map((id) => allVariants.find((v) => v.id === id))
           .filter(Boolean);
 
-        const examinee = examinees.find((e) => e.id === schedule.examineeId);
+        // ✅ UPDATED: Fetch examinee directly
+        const examinee = await getExamineeById(schedule.examineeId);
 
         if (!examinee) {
           setError("Examinee not found");
@@ -64,13 +66,16 @@ export default function AppointmentDetails() {
           return;
         }
 
-        const examNotes = notes.filter((n) => n.examScheduleId === schedule.id);
-
-        setData({ schedule, variants: examVariants, examinee, examNotes });
+        setData({
+          schedule,
+          variants: examVariants,
+          examinee,
+          examNotes: notes,
+        });
         setLoading(false);
       } catch (err) {
-        console.error("Error loading exam details:", err);
-        setError("Failed to load exam details");
+        console.error("Error loading appointment details:", err);
+        setError("Failed to load appointment details");
         setLoading(false);
       }
     }
@@ -113,7 +118,7 @@ export default function AppointmentDetails() {
     <Container>
       <Section className="max-w-4xl mx-auto">
         <PageHeader
-          title="Exam Details"
+          title="Appointment Details"
           description="Detailed information for this scheduled exam"
           center
         />
@@ -230,10 +235,6 @@ export default function AppointmentDetails() {
                   Edit Appointment
                 </Button>
               )}
-              {/* Optional: Add more actions */}
-              {/* <Button variant="primary" className="focus-ring">
-                Check In
-              </Button> */}
             </div>
           </CardContent>
         </Card>

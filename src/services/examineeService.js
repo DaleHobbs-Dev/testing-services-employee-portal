@@ -11,3 +11,7 @@ export const getExamineeByEmail = async (email) => {
 export const createExaminee = async (examineeData) => {
     return postJson("/examinees", examineeData);
 };
+
+export const getExamineeById = async (examineeId) => {
+    return fetchJson(`/examinees/${examineeId}`);
+};

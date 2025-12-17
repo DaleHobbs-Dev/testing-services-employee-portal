@@ -18,3 +18,4 @@ export { Footer } from '../layout/Footer';
 export { Layout } from '../layout/Layout';
 export { Textarea } from './Textarea';
 export { Spinner } from './Spinner';
+export { DeleteConfirmationModal } from './DeleteConfirmationModal';

@@ -11,11 +11,12 @@ import {
   Section,
   Container,
   Alert,
+  DeleteConfirmationModal,
 } from "@/components/ui";
 import {
   getAllTestFamilies,
   getAllTestVariants,
-  deleteTestFamily,
+  deleteTestFamilyWithVariants, // ✅ UPDATED: Use the better delete function
 } from "@/services";
 import { FolderIcon, TrashIcon } from "@heroicons/react/24/outline";
 
@@ -25,44 +26,63 @@ export default function ExamList() {
   const [deleting, setDeleting] = useState(null);
   const [error, setError] = useState(null);
 
+  // ✅ NEW: Modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [familyToDelete, setFamilyToDelete] = useState(null);
+
   const loadData = () => {
     getAllTestFamilies().then((data) => {
       // Filter to only show active families
       setFamilies(data.filter((f) => f.active !== false));
     });
-    getAllTestVariants().then(setVariants);
+    getAllTestVariants().then((data) => {
+      // ✅ Filter to only show active variants
+      setVariants(data.filter((v) => v.active !== false));
+    });
   };
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // Pre-calc variant counts
+  // Pre-calc variant counts (only active variants)
   const variantCount = variants.reduce((map, v) => {
-    map[v.familyId] = (map[v.familyId] || 0) + 1;
+    if (v.active !== false) {
+      map[v.familyId] = (map[v.familyId] || 0) + 1;
+    }
     return map;
   }, {});
 
-  const handleDelete = async (familyId, familyName) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${familyName}"? This will hide it and all its variants from the system.`
-    );
+  // ✅ UPDATED: Open modal instead of window.confirm
+  const handleDeleteClick = (family) => {
+    setFamilyToDelete(family);
+    setDeleteModalOpen(true);
+  };
 
-    if (!confirmed) return;
+  // ✅ UPDATED: Confirm deletion from modal
+  const handleConfirmDelete = async () => {
+    if (!familyToDelete) return;
 
-    setDeleting(familyId);
+    setDeleting(familyToDelete.id);
     setError(null);
 
     try {
-      await deleteTestFamily(familyId);
-      // Reload the list to remove the deleted family
-      loadData();
+      await deleteTestFamilyWithVariants(familyToDelete.id); // ✅ Use improved function
+      loadData(); // Reload the list
+      setDeleteModalOpen(false);
+      setFamilyToDelete(null);
     } catch (err) {
       console.error("Failed to delete test family:", err);
       setError("Failed to delete test family. Please try again.");
     } finally {
       setDeleting(null);
     }
+  };
+
+  // ✅ NEW: Cancel deletion
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
+    setFamilyToDelete(null);
   };
 
   return (
@@ -126,7 +146,7 @@ export default function ExamList() {
                   </Button>
                   <Button
                     variant="danger"
-                    onClick={() => handleDelete(family.id, family.name)}
+                    onClick={() => handleDeleteClick(family)} // ✅ UPDATED
                     disabled={deleting === family.id}
                     className="focus-ring flex items-center gap-1"
                   >
@@ -145,6 +165,17 @@ export default function ExamList() {
           ))}
         </Grid>
       </Section>
+
+      {/* ✅ NEW: Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Delete Test Type"
+        message="Are you sure you want to delete this test type? This will also hide all its variants from the system."
+        itemName={familyToDelete?.name}
+        isDeleting={deleting === familyToDelete?.id}
+      />
     </Container>
   );
 }
