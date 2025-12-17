@@ -13,6 +13,8 @@ import {
   getAllEmployees,
   getAllCertifications,
   getAllPermissions,
+  createEmployeeCertification,
+  createEmployeePermission,
   createEmployee,
   createEmployeeSchedule,
 } from "@/services";
@@ -52,7 +54,22 @@ export default function NewEmployee() {
   // ---------------------------
   const handleSubmit = async (formData) => {
     try {
-      const newEmployee = await createEmployee(formData);
+      const { certificationIds, permissionIds, ...employeeData } = formData;
+      const newEmployee = await createEmployee(employeeData);
+
+      for (const certId of certificationIds) {
+        await createEmployeeCertification({
+          employeeId: newEmployee.id,
+          certificationId: certId,
+        });
+      }
+
+      for (const permId of permissionIds) {
+        await createEmployeePermission({
+          employeeId: newEmployee.id,
+          permissionId: permId,
+        });
+      }
 
       await createEmployeeSchedule({
         employeeId: newEmployee.id,
@@ -104,6 +121,8 @@ export default function NewEmployee() {
             certifications={certifications}
             permissions={permissions}
             allEmployees={employees}
+            employeeCertifications={[]}
+            employeePermissions={[]}
           />
         )}
       </Section>

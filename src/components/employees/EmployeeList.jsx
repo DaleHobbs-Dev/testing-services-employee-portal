@@ -17,6 +17,8 @@ import {
   getAllEmployees,
   getAllCertifications,
   getAllPermissions,
+  getAllEmployeeCertifications,
+  getAllEmployeePermissions,
 } from "@/services";
 import EmployeeDetails from "./EmployeeDetails";
 import { UserIcon } from "@heroicons/react/24/outline";
@@ -25,6 +27,8 @@ export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
   const [certifications, setCertifications] = useState([]);
   const [permissions, setPermissions] = useState([]);
+  const [employeeCertifications, setEmployeeCertifications] = useState([]);
+  const [employeePermissions, setEmployeePermissions] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,11 +38,15 @@ export default function EmployeeList() {
       getAllEmployees(),
       getAllCertifications(),
       getAllPermissions(),
+      getAllEmployeeCertifications(),
+      getAllEmployeePermissions(),
     ])
-      .then(([empData, certData, permData]) => {
+      .then(([empData, certData, permData, empCertData, empPermData]) => {
         setEmployees(empData);
         setCertifications(certData);
         setPermissions(permData);
+        setEmployeeCertifications(empCertData);
+        setEmployeePermissions(empPermData);
         setLoading(false);
       })
       .catch((err) => {
@@ -47,20 +55,39 @@ export default function EmployeeList() {
       });
   }, []);
 
-  // Function to resolve IDs to names
   const enrichedEmployee = useMemo(() => {
     if (!selectedEmployee) return null;
 
+    // Get cert IDs for this employee from junction table
+    const employeeCertIds = employeeCertifications
+      .filter(
+        (ec) => ec.employeeId === selectedEmployee.id && ec.active !== false
+      )
+      .map((ec) => ec.certificationId);
+
+    // Get perm IDs for this employee from junction table
+    const employeePermIds = employeePermissions
+      .filter(
+        (ep) => ep.employeeId === selectedEmployee.id && ep.active !== false
+      )
+      .map((ep) => ep.permissionId);
+
     return {
       ...selectedEmployee,
-      certifications: (selectedEmployee.certificationIds || [])
+      certifications: employeeCertIds
         .map((id) => certifications.find((c) => c.id === id)?.label)
         .filter(Boolean),
-      permissions: (selectedEmployee.permissionIds || [])
+      permissions: employeePermIds
         .map((id) => permissions.find((p) => p.id === id)?.label)
         .filter(Boolean),
     };
-  }, [selectedEmployee, certifications, permissions]);
+  }, [
+    selectedEmployee,
+    certifications,
+    permissions,
+    employeeCertifications,
+    employeePermissions,
+  ]);
 
   const handleViewDetails = (employee) => {
     setSelectedEmployee(employee);

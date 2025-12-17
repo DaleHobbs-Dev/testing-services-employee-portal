@@ -8,7 +8,7 @@ export default function AppointmentTableRow({ appointment }) {
     console.log("ROW CLICKED", appointment.id);
     console.log("Event target:", e.target);
     console.log("Event currentTarget:", e.currentTarget);
-    navigate(`/exam-details/${appointment.id}`);
+    navigate(`/appointment-details/${appointment.id}`);
   };
 
   return (

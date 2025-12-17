@@ -19,14 +19,11 @@ export default function EditExam() {
 
   const [family, setFamily] = useState(null);
   const [variants, setVariants] = useState(null);
-
-  // Keep original variant IDs to detect deletions later
   const [originalVariantIds, setOriginalVariantIds] = useState([]);
 
   useEffect(() => {
     getTestFamilyById(examId).then(setFamily);
     getTestVariantsByFamilyId(examId).then((data) => {
-      // ✅ Filter to only show active variants
       const activeVariants = data.filter((v) => v.active !== false);
       setVariants(activeVariants);
       setOriginalVariantIds(activeVariants.map((v) => v.id));
@@ -42,40 +39,64 @@ export default function EditExam() {
   }
 
   const handleSubmit = async (data) => {
-    // 1) Update test family with all fields
+    // Update test family with all fields including requiresVariantSelection
     await updateTestFamily(examId, {
       name: data.name,
       description: data.description || "",
       allowsMultipleVariants: data.allowsMultipleVariants ?? false,
+      requiresVariantSelection: data.requiresVariantSelection ?? true,
       active: true,
     });
 
-    const updatedIds = [];
+    // Handle variants based on requiresVariantSelection
+    if (data.requiresVariantSelection) {
+      // Handle user-specified variants
+      const updatedIds = [];
 
-    for (const variant of data.variants) {
-      if (originalVariantIds.includes(variant.id)) {
-        // Existing variant → update
-        updatedIds.push(variant.id);
-        await updateTestVariant(variant.id, {
-          ...variant,
+      for (const variant of data.variants) {
+        if (originalVariantIds.includes(variant.id)) {
+          // Existing variant → update
+          updatedIds.push(variant.id);
+          await updateTestVariant(variant.id, {
+            ...variant,
+            active: true,
+          });
+        } else {
+          // New variant → create
+          const body = {
+            ...variant,
+            familyId: Number(examId),
+            active: true,
+          };
+          await createTestVariant(body);
+        }
+      }
+
+      // Soft-delete removed variants
+      const deletedIds = originalVariantIds.filter(
+        (id) => !updatedIds.includes(id)
+      );
+      for (const id of deletedIds) {
+        await updateTestVariant(id, { active: false });
+      }
+    } else {
+      // ✅ UPDATED: Ensure there's a default variant with correct duration
+      if (variants.length === 0) {
+        // No variant exists, create one
+        await createTestVariant({
+          familyId: Number(examId),
+          title: data.name,
+          duration: data.defaultDuration || 60, // ✅ Use specified duration
           active: true,
         });
       } else {
-        // New variant → create
-        const body = {
-          ...variant,
-          familyId: Number(examId),
+        // ✅ UPDATED: Update existing default variant to match family name AND duration
+        await updateTestVariant(variants[0].id, {
+          title: data.name,
+          duration: data.defaultDuration || variants[0].duration, // ✅ Update duration
           active: true,
-        };
-        await createTestVariant(body);
+        });
       }
-    }
-
-    const deletedIds = originalVariantIds.filter(
-      (id) => !updatedIds.includes(id)
-    );
-    for (const id of deletedIds) {
-      await updateTestVariant(id, { active: false });
     }
 
     navigate("/exam-list");
