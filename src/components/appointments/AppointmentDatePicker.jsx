@@ -10,7 +10,15 @@ export default function AppointmentDatePicker({ date, onChange }) {
         type="date"
         value={formattedDate}
         onChange={(e) => onChange(new Date(e.target.value))}
-        className="max-w-xs"
+        className="
+    border border-gray-300 dark:border-gray-600 
+    rounded-md p-2 w-full max-w-xs
+    bg-white dark:bg-gray-800 
+    text-gray-900 dark:text-gray-100
+    focus:ring-2 focus:ring-primary focus:outline-none 
+    transition-colors
+    [color-scheme:light] dark:[color-scheme:dark]
+  "
       />
     </div>
   );

@@ -94,7 +94,7 @@ export default function EmployeeForm({
       {/* Basic Information */}
       {/* ============================ */}
       <Section>
-        <h2 className="text-xl font-semibold mb-4 text-purple-700">
+        <h2 className="text-xl font-semibold mb-4 text-primary-dark">
           Basic Information
         </h2>
 
@@ -180,7 +180,7 @@ export default function EmployeeForm({
       {/* Certifications (checkbox list) */}
       {/* ============================ */}
       <Section>
-        <h2 className="text-xl font-semibold mb-3 text-purple-700">
+        <h2 className="text-xl font-semibold mb-3 text-primary-dark">
           Certifications
         </h2>
 
@@ -205,7 +205,7 @@ export default function EmployeeForm({
       {/* Permissions */}
       {/* ============================ */}
       <Section>
-        <h2 className="text-xl font-semibold mb-3 text-purple-700">
+        <h2 className="text-xl font-semibold mb-3 text-primary-dark">
           Permissions
         </h2>
 

@@ -10,11 +10,11 @@ export function Footer() {
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-mint-500 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-linear-to-br from-primary to-accent rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">TS</span>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-purple-700">
+                <h3 className="text-lg font-bold text-primary-dark">
                   Testing Services
                 </h3>
                 <p className="text-xs text-gray-500">Employee Portal</p>
@@ -37,7 +37,7 @@ export function Footer() {
               <li>
                 <Link
                   to="/"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                  className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -45,7 +45,7 @@ export function Footer() {
               <li>
                 <Link
                   to="/new-appointment"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                  className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   New Appointment
                 </Link>
@@ -53,7 +53,7 @@ export function Footer() {
               <li>
                 <Link
                   to="/proctoring"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                  className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   Proctoring Schedule
                 </Link>
@@ -70,7 +70,7 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:support@testingcenter.edu"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                  className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   Contact Support
                 </a>
@@ -78,7 +78,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                  className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   Help Documentation
                 </a>
@@ -86,7 +86,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                  className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   Report an Issue
                 </a>
@@ -100,19 +100,19 @@ export function Footer() {
           <div className="flex gap-6">
             <a
               href="#"
-              className="text-xs text-gray-500 hover:text-purple-600 transition-colors"
+              className="text-xs text-gray-500 hover:text-primary-dark transition-colors"
             >
               Privacy Policy
             </a>
             <a
               href="#"
-              className="text-xs text-gray-500 hover:text-purple-600 transition-colors"
+              className="text-xs text-gray-500 hover:text-primary-dark transition-colors"
             >
               Terms of Service
             </a>
             <a
               href="#"
-              className="text-xs text-gray-500 hover:text-purple-600 transition-colors"
+              className="text-xs text-gray-500 hover:text-primary-dark transition-colors"
             >
               Accessibility
             </a>
@@ -120,7 +120,7 @@ export function Footer() {
 
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span>Made with</span>
-            <span className="text-purple-500">💜</span>
+            <span className="text-primary">💜</span>
             <span>by the Testing Center Team</span>
           </div>
         </div>

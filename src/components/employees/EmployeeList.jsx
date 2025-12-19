@@ -11,6 +11,7 @@ import {
   Container,
   Badge,
   Spinner,
+  IconWrapper
 } from "@/components/ui";
 import { Link } from "react-router-dom";
 import {
@@ -122,9 +123,9 @@ export default function EmployeeList() {
                 onClick={() => handleViewDetails(emp)}
               >
                 <CardHeader className="flex items-center mb-3 p-2 rounded-lg bg-primary-light/30 text-primary">
-                  <div className="bg-purple-100 p-2 rounded-full shrink-0">
-                    <UserIcon className="h-6 w-6 text-purple-700" />
-                  </div>
+                    <IconWrapper>
+                      <UserIcon className="h-6 w-6 text-primary" />
+                    </IconWrapper>
                   <CardTitle className="text-lg flex-1 text-center font-semibold">
                     {emp.name}
                   </CardTitle>
@@ -132,13 +133,13 @@ export default function EmployeeList() {
                 </CardHeader>
 
                 <CardContent>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-adaptive-muted">
                     <span className="font-medium">Role:</span>{" "}
                     <Badge size="lg" variant={emp.role}>
                       {emp.role.charAt(0).toUpperCase() + emp.role.slice(1)}
                     </Badge>
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-adaptive-muted">
                     <span className="font-medium">Email:</span> {emp.email}
                   </p>
 

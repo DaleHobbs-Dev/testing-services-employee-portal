@@ -11,7 +11,7 @@ export default function AppointmentTableRow({ appointment }) {
 
   return (
     <TableRow
-      className="hover:bg-purple-50 cursor-pointer"
+      className="hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer"
       onClick={handleRowClick}
     >
       <TableCell>
@@ -30,15 +30,15 @@ export default function AppointmentTableRow({ appointment }) {
       <TableCell>
         {appointment.variantCount > 1 ? (
           <div className="text-sm">
-            <span className="font-medium text-gray-700">
+            <span className="font-medium text-adaptive-dark">
               {appointment.variantCount} subtests:
             </span>
-            <span className="italic text-gray-600 ml-1">
+            <span className="italic text-adaptive-light ml-1">
               {appointment.variantTitles.join(", ")}
             </span>
           </div>
         ) : (
-          <span className="text-gray-600">{appointment.note}</span>
+          <span className="text-adaptive-light">{appointment.note}</span>
         )}
       </TableCell>
     </TableRow>

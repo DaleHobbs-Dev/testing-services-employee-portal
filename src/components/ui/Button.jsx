@@ -11,19 +11,19 @@ export default function Button({
     "px-3 py-2 rounded-md font-medium transition-all cursor-pointer focus:outline-none focus:ring-0 border-none";
 
   const variants = {
-    primary: "bg-purple-500 text-white hover:bg-purple-700",
-    accent: "bg-mint-500 text-white hover:bg-mint-700",
-    outline: "border border-purple-500 text-purple-500 hover:bg-purple-100",
+    primary: "bg-primary text-white hover:bg-primary-dark",
+    accent: "bg-accent text-white hover:bg-accent-dark",
+    outline: "border border-primary text-primary hover:bg-primary-lighter",
     danger: "bg-danger-500 text-white hover:bg-red-700",
-    ghost: "bg-transparent text-purple-500 hover:bg-purple-50",
+    ghost: "bg-transparent text-primary hover:bg-primary-lighter",
     secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
 
     /* -------- Navbar Variants -------- */
-    nav: "bg-transparent text-white hover-glow hover:text-mint-500 hover:bg-purple-900/40 hover:shadow-md focus:outline-none focus:ring-0 border-none",
+    nav: "bg-transparent text-white hover-glow hover:text-accent hover:bg-primary-darker/40 hover:shadow-md focus:outline-none focus:ring-0 border-none",
     navGhost:
       "bg-transparent text-white/90 hover:bg-white/10 hover:text-white hover:shadow-md focus:outline-none focus:ring-0 border-none",
     profile:
-      "bg-mint-500/75 backdrop-blur hover-glow text-white px-2 py-1 hover:bg-purple-900/40 hover:shadow-md focus:outline-none focus:ring-0 border-none",
+      "bg-accent/75 backdrop-blur hover-glow text-white px-2 py-1 hover:bg-primary-darker/40 hover:shadow-md focus:outline-none focus:ring-0 border-none",
   };
 
   const classes = `${base} ${variants[variant]} ${className}`;

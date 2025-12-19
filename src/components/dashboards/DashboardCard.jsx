@@ -1,4 +1,4 @@
-import { Card, CardTitle, Button } from "@/components/ui";
+import { Card, CardTitle, Button, IconWrapper } from "@/components/ui";
 import { Link } from "react-router-dom";
 
 export function DashboardCard({ icon, title, description, to }) {
@@ -13,13 +13,13 @@ export function DashboardCard({ icon, title, description, to }) {
     >
       <Link to={to} className="flex flex-col h-full">
         {/* Header with Icon */}
-        <div className="p-2 flex items-center gap-3 rounded-lg bg-primary-light/20 text-primary">
-          {icon}
+        <div className="p-2 flex items-center gap-3 rounded-lg bg-primary-light/20 mb-4">
+          <IconWrapper>{icon}</IconWrapper>
           <CardTitle className="m-auto">{title}</CardTitle>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 mb-3">{description}</p>
+        <p className="text-md text-adaptive-muted mb-3">{description}</p>
 
         {/* Call to Action */}
         <div className="mt-auto pt-4">
