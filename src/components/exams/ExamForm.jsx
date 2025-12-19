@@ -141,7 +141,7 @@ export default function ExamForm({
                   onChange={(e) =>
                     setRequiresVariantSelection(e.target.checked)
                   }
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-primary-dark focus:ring-primary border-gray-300 rounded"
                 />
                 <label
                   htmlFor="requiresVariant"
@@ -194,7 +194,7 @@ export default function ExamForm({
                       onChange={(e) =>
                         setAllowsMultipleVariants(e.target.checked)
                       }
-                      className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-dark focus:ring-primary border-gray-300 rounded"
                     />
                     <label
                       htmlFor="allowsMultiple"
@@ -210,7 +210,7 @@ export default function ExamForm({
 
                 {/* VARIANT LIST */}
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-purple-700">
+                  <h3 className="text-lg font-semibold text-primary-dark">
                     Test Variants
                   </h3>
                   <Button
@@ -237,7 +237,7 @@ export default function ExamForm({
                   >
                     {/* HEADER ROW */}
                     <div className="flex justify-between items-center">
-                      <p className="font-medium text-purple-700">
+                      <p className="font-medium text-primary-dark">
                         {variant.title || "Untitled Variant"}
                       </p>
                       <div className="flex items-center gap-3">

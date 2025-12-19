@@ -6,14 +6,14 @@ export function Badge({
 }) {
   const variants = {
     default: "bg-gray-200 text-gray-800",
-    primary: "bg-purple-100 text-purple-700",
-    accent: "bg-mint-100 text-mint-700",
+    primary: "bg-primary-lighter text-primary-dark",
+    accent: "bg-accent-lighter text-accent-dark",
     success: "bg-green-100 text-green-700",
     warning: "bg-yellow-100 text-yellow-700",
     danger: "bg-red-100 text-red-700",
 
     // role-based colors
-    admin: "bg-purple-100 text-purple-700",
+    admin: "bg-primary-lighter text-primary-dark",
     proctor: "bg-blue-100 text-blue-700",
     technician: "bg-orange-100 text-orange-700",
     checkin: "bg-indigo-100 text-indigo-700",

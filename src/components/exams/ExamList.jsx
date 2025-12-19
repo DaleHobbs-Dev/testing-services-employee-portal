@@ -12,6 +12,7 @@ import {
   Container,
   Alert,
   DeleteConfirmationModal,
+  IconWrapper
 } from "@/components/ui";
 import {
   getAllTestFamilies,
@@ -115,15 +116,15 @@ export default function ExamList() {
               className="p-5 shadow-sm hover:shadow-md transition"
             >
               <CardHeader className="flex items-center mb-3 p-2 rounded-lg bg-primary-light/30 text-primary">
-                <div className="bg-purple-100 p-2 rounded-lg">
-                  <FolderIcon className="h-6 w-6 text-purple-700" />
-                </div>
+                <IconWrapper>
+                  <FolderIcon className="h-6 w-6" />
+                </IconWrapper>
                 <CardTitle className="text-lg font-semibold">
                   {family.name}
                 </CardTitle>
               </CardHeader>
 
-              <CardContent className="text-md text-gray-600">
+              <CardContent className="text-md text-adaptive-muted">
                 <p className="mb-3">
                   <span className="font-medium">Variants:</span>{" "}
                   {variantCount[family.id] || 0}

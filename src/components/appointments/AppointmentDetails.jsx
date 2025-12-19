@@ -135,17 +135,17 @@ export default function AppointmentDetails() {
 
         <Card className="p-6">
           {/* Header with examinee info */}
-          <CardHeader className="items-center mb-6 p-4 rounded-lg bg-primary-light/20 text-primary">
+          <CardHeader className="items-center mb-6 p-4 rounded-lg bg-primary-light/20">
             <div className="flex items-center gap-4">
               {/* Initials avatar */}
-              <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-lg shrink-0">
+              <div className="h-12 w-12 rounded-full bg-primary-lighter flex items-center justify-center text-primary-dark font-bold text-lg shrink-0">
                 {getInitials(examinee.firstName, examinee.lastName)}
               </div>
               <div className="flex-1 text-center">
                 <H2 className="mb-1">
                   {examinee.firstName} {examinee.lastName}
                 </H2>
-                <p className="text-sm text-gray-600">{examinee.email}</p>
+                <p className="text-sm text-adaptive-muted">{examinee.email}</p>
               </div>
               <div className="w-12 shrink-0" /> {/* Spacer for balance */}
             </div>

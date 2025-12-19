@@ -42,36 +42,36 @@ export default function DesignSystem() {
         <H2>Color Palette</H2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {/* Purple Shades */}
-          <div className="p-4 rounded-xl bg-purple-900 text-white text-center">
+          <div className="p-4 rounded-xl bg-primary-darker text-white text-center">
             Purple 900
           </div>
-          <div className="p-4 rounded-xl bg-purple-700 text-white text-center">
+          <div className="p-4 rounded-xl bg-primary-dark text-white text-center">
             Purple 700
           </div>
-          <div className="p-4 rounded-xl bg-purple-500 text-white text-center">
+          <div className="p-4 rounded-xl bg-primary text-white text-center">
             Purple 500
           </div>
-          <div className="p-4 rounded-xl bg-purple-300 text-gray-900 text-center">
+          <div className="p-4 rounded-xl bg-primary-light text-gray-900 text-center">
             Purple 300
           </div>
-          <div className="p-4 rounded-xl bg-purple-100 text-gray-900 text-center">
+          <div className="p-4 rounded-xl bg-primary-lighter text-gray-900 text-center">
             Purple 100
           </div>
 
           {/* Mint */}
-          <div className="p-4 rounded-xl bg-mint-900 text-white text-center">
+          <div className="p-4 rounded-xl bg-accent-darker text-white text-center">
             Mint 900
           </div>
-          <div className="p-4 rounded-xl bg-mint-700 text-white text-center">
+          <div className="p-4 rounded-xl bg-accent-dark text-white text-center">
             Mint 700
           </div>
-          <div className="p-4 rounded-xl bg-mint-500 text-white text-center">
+          <div className="p-4 rounded-xl bg-accent text-white text-center">
             Mint 500
           </div>
-          <div className="p-4 rounded-xl bg-mint-300 text-gray-900 text-center">
+          <div className="p-4 rounded-xl bg-accent-light text-gray-900 text-center">
             Mint 300
           </div>
-          <div className="p-4 rounded-xl bg-mint-100 text-gray-900 text-center">
+          <div className="p-4 rounded-xl bg-accent-lighter text-gray-900 text-center">
             Mint 100
           </div>
         </div>
@@ -173,7 +173,7 @@ export default function DesignSystem() {
             </CardContent>
           </Card>
 
-          <Card className="bg-mint-100 border-mint-300">
+          <Card className="bg-accent-lighter border-accent-light">
             <CardHeader>
               <CardTitle>Accent Card</CardTitle>
             </CardHeader>

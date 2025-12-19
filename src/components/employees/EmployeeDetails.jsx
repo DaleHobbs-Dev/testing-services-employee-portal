@@ -27,7 +27,7 @@ export default function EmployeeDetails({ employee, onClose, isOpen }) {
       <ModalHeader className="items-center mb-3 p-2 rounded-lg bg-primary-light/20 text-primary">
         <div className="flex items-center gap-4">
           {/* Initials avatar */}
-          <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-lg shrink-0">
+          <div className="h-12 w-12 rounded-full bg-primary-lighter flex items-center justify-center text-primary-dark font-bold text-lg shrink-0">
             {getInitials(employee.name)}
           </div>
           <div className="flex-1 text-center">
