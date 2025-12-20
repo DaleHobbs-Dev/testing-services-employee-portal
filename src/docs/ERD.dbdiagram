@@ -1,0 +1,385 @@
+{
+  "version": "1.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "detailLevel": "All",
+  "tablePositions": [
+    {
+      "name": "employees",
+      "schemaName": "public",
+      "x": 702.745226964298,
+      "y": 996.0376467230502
+    },
+    {
+      "name": "certifications",
+      "schemaName": "public",
+      "x": 1479.0469034000655,
+      "y": 907.3029528630616
+    },
+    {
+      "name": "permissions",
+      "schemaName": "public",
+      "x": 1454.914942981269,
+      "y": 1096.2876376964782
+    },
+    {
+      "name": "employeeCertifications",
+      "schemaName": "public",
+      "x": 1383.0773427641982,
+      "y": 732.9250381452082
+    },
+    {
+      "name": "employeePermissions",
+      "schemaName": "public",
+      "x": 1124.8571749141875,
+      "y": 1085.4856551634325
+    },
+    {
+      "name": "testFamilies",
+      "schemaName": "public",
+      "x": 152.78482332802974,
+      "y": 382.780310310559
+    },
+    {
+      "name": "testVariants",
+      "schemaName": "public",
+      "x": 267.3263623543408,
+      "y": 26.659979176492982
+    },
+    {
+      "name": "workstations",
+      "schemaName": "public",
+      "x": 209.11274421902732,
+      "y": 696.0140281558489
+    },
+    {
+      "name": "examinees",
+      "schemaName": "public",
+      "x": 1231.8298946238162,
+      "y": 119.29856289877378
+    },
+    {
+      "name": "examSchedules",
+      "schemaName": "public",
+      "x": 664.4828764867041,
+      "y": 393.528693836986
+    },
+    {
+      "name": "examScheduleVariants",
+      "schemaName": "public",
+      "x": 786.8961699297454,
+      "y": -37.500639016605035
+    },
+    {
+      "name": "locations",
+      "schemaName": "public",
+      "x": 323.4736678464709,
+      "y": 910.3628796171682
+    },
+    {
+      "name": "employeeSchedules",
+      "schemaName": "public",
+      "x": 1195.9427985278876,
+      "y": 852.6060991198602
+    },
+    {
+      "name": "notes",
+      "schemaName": "public",
+      "x": 1167.3874689393097,
+      "y": 361.7961065908271
+    }
+  ],
+  "tableGroupCollapseStates": [],
+  "stickyNoteLayouts": [],
+  "referencePaths": [
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "locations",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "locationId"
+      ],
+      "secondTableName": "employees",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "employees",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "employeeId"
+      ],
+      "secondTableName": "employeeCertifications",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "certifications",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "certificationId"
+      ],
+      "secondTableName": "employeeCertifications",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "employees",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "employeeId"
+      ],
+      "secondTableName": "employeePermissions",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "permissions",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "permissionId"
+      ],
+      "secondTableName": "employeePermissions",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "testFamilies",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "familyId"
+      ],
+      "secondTableName": "testVariants",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "firstEndpointSide": "left",
+      "secondEndpointSide": "left",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "locations",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "locationId"
+      ],
+      "secondTableName": "workstations",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "firstEndpointSide": "left",
+      "secondEndpointSide": "left",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "examinees",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "examineeId"
+      ],
+      "secondTableName": "examSchedules",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "testFamilies",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "testFamilyId"
+      ],
+      "secondTableName": "examSchedules",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "testVariants",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "testVariantId"
+      ],
+      "secondTableName": "examSchedules",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "employees",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "employeeId"
+      ],
+      "secondTableName": "examSchedules",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "locations",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "locationId"
+      ],
+      "secondTableName": "examSchedules",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "workstations",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "workstationId"
+      ],
+      "secondTableName": "examSchedules",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "examSchedules",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "examScheduleId"
+      ],
+      "secondTableName": "examScheduleVariants",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "testVariants",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "testVariantId"
+      ],
+      "secondTableName": "examScheduleVariants",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "employees",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "employeeId"
+      ],
+      "secondTableName": "employeeSchedules",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "examSchedules",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "examScheduleId"
+      ],
+      "secondTableName": "notes",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "employees",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "createdBy"
+      ],
+      "secondTableName": "notes",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "employees",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "updatedBy"
+      ],
+      "secondTableName": "notes",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    }
+  ]
+}

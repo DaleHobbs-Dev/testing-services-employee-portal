@@ -145,9 +145,3 @@ Table notes {
   isInternal boolean [default: false, note: 'Internal notes vs student-visible']
   isImportant boolean [default: false]
 }
-
-Table examArchives {
-  id int [pk, increment]
-  examId int [note: 'Reference to archived exam schedule']
-  archivedAt timestamp [default: `CURRENT_TIMESTAMP`]
-}
