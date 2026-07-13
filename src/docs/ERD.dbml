@@ -8,6 +8,7 @@ Table employees {
   notes text
   employeeCode varchar(20) [unique]
   locationId int [not null, ref: > locations.id]
+  badgeColor varchar(20) [unique, note: 'Hex color used to render this employee\'s schedule badges on the calendar']
   created_at timestamp [default: `CURRENT_TIMESTAMP`]
 }
 
@@ -144,4 +145,155 @@ Table notes {
   noteTypeId int [note: 'Future: reference to noteTypes table']
   isInternal boolean [default: false, note: 'Internal notes vs student-visible']
   isImportant boolean [default: false]
+}
+
+Table irregularities {
+  id int [pk, increment]
+  // Additional fields will be added later
+}
+
+//////////////////////////////////////////////////////////
+// Core Ticketing Database for Testing Services (Relational)
+//////////////////////////////////////////////////////////
+
+Table tickets {
+  id                  int [pk, increment]
+  created_at          datetime
+  updated_at          datetime
+  closed_at           datetime
+
+  // Foreign Keys
+  opened_by_staff_id  int [ref: > employees.id]         // Staff who created the ticket
+  irregularity_id     int [ref: > irregularities.id, null]      // Optional
+  location_id         int [ref: > locations.id, null]           // Campus / test center location
+  testing_event_id    int [ref: > examSchedules.id, null]      // Optional link to testing event
+  examinee_id         varchar(20)                               // Student / examinee ID (not a FK for now)
+
+  // Ticket metadata
+  ticket_type         varchar(50)
+  status              varchar(20)                               // Open / Closed / Pending, etc.
+  priority            varchar(20)                               // Low / Normal / High / Urgent
+  origin_source       varchar(50)                               // Email, phone, form submission, etc.
+
+  // External parties (faculty, vendor, advisor, etc.)
+  faculty_name        varchar(100)
+  faculty_email       varchar(150)
+  external_contact_name  varchar(100)
+  external_contact_email varchar(150)
+
+  // Communication Tracking
+  initial_comm_type   varchar(50)                                // Email, phone, walk-in, etc.
+  original_message    text
+  requires_email      boolean
+  email_template      varchar(100)
+  email_subject       varchar(200)
+  email_body          text
+  email_recipients    text                                       // Could break out eventually into separate table
+
+  // Exam / Testing-specific fields
+  exam_type           varchar(50)
+  exam_due_date       date
+  exam_returned       boolean
+  exam_returned_at    datetime
+
+  // Internal workflow fields
+  log_notes           text                                        // Append-only note field
+  resolution_summary  text
+}
+
+//////////////////////////////////////////////////////////
+// Many-to-Many: Tickets <-> Testing_Employees
+//////////////////////////////////////////////////////////
+
+Table ticketAssignees {
+  id                  int [pk, increment]
+  ticket_id           int [ref: > tickets.id]
+  staff_id            int [ref: > employees.id]
+  assigned_at         datetime
+  removed_at          datetime [null]                            // For historical accuracy
+}
+
+//////////////////////////////////////////////////////////
+// Calendar Manager
+//////////////////////////////////////////////////////////
+
+Table calendars {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  year int [not null]
+  rangeType varchar(30) [not null, note: 'janToMay, juneJuly, augToDec, fullYear, custom']
+  startMonth int [not null, note: '1-12, derived from rangeType or set directly for custom']
+  endMonth int [not null, note: '1-12']
+  createdBy int [ref: > employees.id]
+  createdAt timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table calendarMonths {
+  id int [pk, increment]
+  calendarId int [not null, ref: > calendars.id]
+  year int [not null]
+  month int [not null, note: '1-12']
+
+  indexes {
+    (calendarId, year, month) [unique]
+  }
+}
+
+Table holidays {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  month int [not null, note: '1-12']
+  day int [not null, note: '1-31']
+  year int [note: 'Null = recurring fixed-date holiday (e.g. July 4th), applies every year at month/day. Set = one-off/floating holiday (e.g. Thanksgiving) re-entered each year since it can\'t be expressed as month/day alone']
+}
+
+Table calendarClosures {
+  id int [pk, increment]
+  calendarId int [not null, ref: > calendars.id]
+  locationId int [not null, ref: > locations.id]
+  date date [not null]
+  holidayId int [ref: > holidays.id, note: 'Set when this closure came from the holiday-selection step at creation; null for a manually added closure']
+  reason varchar(150) [note: 'Defaults to the holiday name; editable for manual closures']
+  createdAt timestamp [default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (calendarId, locationId, date) [unique]
+  }
+}
+
+Table calendarDayLabels {
+  id int [pk, increment]
+  calendarId int [not null, ref: > calendars.id]
+  locationId int [not null, ref: > locations.id]
+  date date [not null]
+  label varchar(100) [not null]
+  showWhenClosed boolean [default: false, note: 'If true, label still renders alongside a closed badge instead of being suppressed by it']
+  createdAt timestamp [default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (calendarId, locationId, date) [unique]
+  }
+}
+
+Table calendarTestFamilyBadges {
+  id int [pk, increment]
+  calendarId int [not null, ref: > calendars.id]
+  locationId int [not null, ref: > locations.id]
+  date date [not null]
+  testFamilyId int [not null, ref: > testFamilies.id]
+  startTime time [not null]
+  endTime time [not null]
+  createdAt timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table calendarEmployeeBadges {
+  id int [pk, increment]
+  calendarId int [not null, ref: > calendars.id]
+  locationId int [not null, ref: > locations.id]
+  date date [not null]
+  employeeId int [not null, ref: > employees.id]
+  startTime time [note: 'Null when customLabel is set instead of a time block']
+  endTime time [note: 'Null when customLabel is set instead of a time block']
+  customLabel varchar(50) [note: 'OFF, REQUESTED OFF, or custom text -- used instead of a time block; excluded from the 8th-column hours sum']
+  createdAt timestamp [default: `CURRENT_TIMESTAMP`]
 }
