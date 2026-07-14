@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { createTestFamily, createTestVariant } from "@/services";
-import { PageHeader, Section, Container, Spinner } from "@/components";
-import ExamForm from "@/components/exams/ExamForm";
+import { PageHeader, Section, Container, Spinner, ExamForm } from "@/components";
 import { useState } from "react";
 
 export function NewExam() {
@@ -41,7 +40,7 @@ export function NewExam() {
         });
       }
 
-      navigate("/exam-list");
+      navigate("/exam-management");
     } catch (error) {
       console.error("Failed to create test family:", error);
       alert(
@@ -52,7 +51,7 @@ export function NewExam() {
     }
   };
 
-  const handleCancel = () => navigate("/exam-list");
+  const handleCancel = () => navigate("/exam-management");
 
   if (loading) {
     return (

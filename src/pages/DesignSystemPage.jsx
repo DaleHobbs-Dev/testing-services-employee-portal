@@ -30,7 +30,7 @@ import {
   Container,
 } from "@/components";
 
-export function DesignSystem() {
+export function DesignSystemPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (

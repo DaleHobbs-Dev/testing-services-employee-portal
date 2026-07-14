@@ -5,7 +5,7 @@ export function AppointmentTableRow({ appointment }) {
   const navigate = useNavigate();
 
   const handleRowClick = () => {
-    navigate(`/appointment-details/${appointment.id}`);
+    navigate(`/appointment/${appointment.id}/details`);
   };
 
   return (

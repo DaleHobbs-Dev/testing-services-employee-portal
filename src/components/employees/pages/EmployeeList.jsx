@@ -11,7 +11,8 @@ import {
   Container,
   Badge,
   Spinner,
-  IconWrapper
+  IconWrapper,
+  EmployeeDetails
 } from "@/components";
 import { Link } from "react-router-dom";
 import {
@@ -21,7 +22,6 @@ import {
   getAllEmployeeCertifications,
   getAllEmployeePermissions,
 } from "@/services";
-import EmployeeDetails from "../components/EmployeeDetails";
 import { UserIcon } from "@heroicons/react/24/outline";
 
 export function EmployeeList() {
@@ -104,7 +104,7 @@ export function EmployeeList() {
         />
 
         <div className="flex justify-end mb-6">
-          <Link to="/employee-list/new">
+          <Link to="/employee-management/new">
             <Button variant="accent" className="focus-ring">
               Add New Employee
             </Button>
@@ -156,7 +156,7 @@ export function EmployeeList() {
                   {/* Edit Button */}
                   <div className="mt-4 flex justify-end">
                     <Link
-                      to={`/employee-list/edit/${emp.id}`}
+                      to={`/employee-management/${emp.id}/edit`}
                       onClick={(e) => e.stopPropagation()} // Prevents modal from opening
                     >
                       <Button variant="primary" className="focus-ring">

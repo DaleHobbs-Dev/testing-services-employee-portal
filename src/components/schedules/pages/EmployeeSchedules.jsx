@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Container, Section, PageHeader, Grid, Alert } from "@/components";
 import { getAllEmployees, getAllEmployeeSchedules } from "@/services";
-import EmployeeScheduleCard from "../components/EmployeeScheduleCard";
+import { EmployeeScheduleCard } from "../components/EmployeeScheduleCard";
 
 export function EmployeeSchedules() {
   const [employees, setEmployees] = useState([]);

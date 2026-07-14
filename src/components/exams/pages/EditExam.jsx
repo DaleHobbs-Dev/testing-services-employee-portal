@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 import {
   getTestFamilyById,
   getTestVariantsByFamilyId,
@@ -8,10 +7,7 @@ import {
   updateTestVariant,
   createTestVariant,
 } from "@/services";
-
-import { Spinner, PageHeader, Section, Container } from "@/components";
-
-import ExamForm from "@/components/exams/ExamForm";
+import { Spinner, PageHeader, Section, Container, ExamForm } from "@/components";
 
 export function EditExam() {
   const { examId } = useParams();
@@ -99,10 +95,10 @@ export function EditExam() {
       }
     }
 
-    navigate("/exam-list");
+    navigate("/exam-management");
   };
 
-  const handleCancel = () => navigate("/exam-list");
+  const handleCancel = () => navigate("/exam-management");
 
   return (
     <Container>

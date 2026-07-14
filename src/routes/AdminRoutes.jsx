@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 // Functional component to protect admin routes
-export function AdminRoute({ currentEmployee }) {
+export function AdminRoutes({ currentEmployee }) {
   // Wait for user data to load
   if (currentEmployee === null || currentEmployee === undefined) {
     return <div>Loading...</div>;

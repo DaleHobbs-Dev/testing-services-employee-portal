@@ -1,4 +1,4 @@
-export { default as Button } from './ui/Button';
+export { Button } from './ui/Button';
 export { Input } from './ui/Input';
 export { Label } from './ui/Label';
 export { FormField } from './ui/FormField';
@@ -17,6 +17,7 @@ export { Textarea } from './ui/Textarea';
 export { Spinner } from './ui/Spinner';
 export { DeleteConfirmationModal } from './ui/DeleteConfirmationModal';
 export { DarkModeToggle } from './ui/DarkModeToggle';
+export { LoadingPage } from './ui/LoadingPage';
 // export { Tooltip } from './Tooltip';
 // export { Pagination } from './Pagination';
 // export { Tabs, TabList, Tab, TabPanels, TabPanel } from './Tabs';
@@ -105,10 +106,12 @@ export { NewExam } from './exams/pages/NewExam';
 export { ExamList } from './exams/pages/ExamList';
 
 // Proctoring Components
+export { EmployeeFilter } from './proctoring/components/EmployeeFilter';
+export { ExamineeFilter } from './proctoring/components/ExamineeFilter';
 
 // Proctoring Pages
+export { ProctoringDashboard } from './proctoring/pages/ProctoringDashboard';
 
 // Celendar Components
 
 // Calendar Pages
-

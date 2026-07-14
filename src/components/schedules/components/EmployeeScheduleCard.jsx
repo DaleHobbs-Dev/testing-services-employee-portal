@@ -8,7 +8,7 @@ import {
   Badge,
   Alert,
 } from "@/components";
-import DaysOfWeekSelector from "./DaysOfWeekSelector";
+import { DaysOfWeekSelector } from "./DaysOfWeekSelector";
 import { updateEmployeeSchedule, createEmployeeSchedule } from "@/services";
 
 export function EmployeeScheduleCard({ employee, schedule }) {

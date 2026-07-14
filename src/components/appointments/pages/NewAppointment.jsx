@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Card, PageHeader, Section, Container, AppointmentForm, isFaclutyTest, calculatedEndTime } from "@/components";
+import {
+  Button,
+  Card,
+  PageHeader,
+  Section,
+  Container,
+  AppointmentForm,
+  isFacultyTest,
+  calculateEndTime,
+} from "@/components";
 import {
   getAllExaminees,
   getAllTestFamilies,
@@ -12,7 +21,7 @@ import {
   createExamScheduleVariant,
   createNote,
 } from "@/services";
-import { useCurrentUser } from "@/context/CurrentUserContext";
+import { useCurrentUser } from "@/context";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 
 export function NewAppointment() {
@@ -119,7 +128,7 @@ const scheduleData = {
       }
 
       alert("Appointment created successfully!");
-      navigate("/");
+      navigate("/employee-dashboard");
     } catch (error) {
       console.error("Failed to create appointment:", error);
       alert("Failed to create appointment. Please try again.");

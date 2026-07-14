@@ -1,7 +1,7 @@
 import { Card, Button, H1 } from "@/components";
 import { Link } from "react-router-dom";
 
-export function AccessDenied({ message, returnPath = "/" }) {
+export function AccessDeniedPage({ message, returnPath = "/employee-dashboard" }) {
   return (
     <Card className="max-w-md mx-auto mt-20 p-8 text-center">
       <H1 className="mb-4">Access Denied</H1>

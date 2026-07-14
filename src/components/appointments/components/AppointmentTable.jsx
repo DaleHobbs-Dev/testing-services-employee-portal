@@ -5,7 +5,7 @@ import {
   TableRow,
   TableHead,
 } from "@/components";
-import AppointmentTableRow from "./AppointmentTableRow";
+import { AppointmentTableRow } from "./AppointmentTableRow";
 
 // Component to display a table of appointments
 export function AppointmentTable({ appointments }) {

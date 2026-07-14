@@ -36,7 +36,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/"
+                  to="/employee-dashboard"
                   className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   Dashboard
@@ -44,7 +44,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  to="/new-appointment"
+                  to="/appointment/new"
                   className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   New Appointment
@@ -52,7 +52,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  to="/proctoring"
+                  to="/proctoring-dashboard"
                   className="text-sm text-gray-600 hover:text-primary-dark transition-colors"
                 >
                   Proctoring Schedule

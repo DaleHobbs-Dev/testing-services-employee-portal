@@ -21,7 +21,7 @@ export const dashboardCards = [
     title: "New Testing Appointment",
     description: "Schedule a new testing appointment for any student.",
     icon: <CalendarIcon className="w-8 h-8 text-primary" />,
-    to: "/new-appointment",
+    to: "/appointment/new",
   },
   {
     id: "daily-proctoring",
@@ -37,7 +37,7 @@ export const dashboardCards = [
     title: "Employee Management",
     description: "Add, edit, or remove testing center employees.",
     icon: <UsersIcon className="w-8 h-8 text-primary" />,
-    to: "/employee-list",
+    to: "/employee-management",
   },
   {
     id: "employee-schedule-management",
@@ -53,6 +53,6 @@ export const dashboardCards = [
     title: "Exam Management",
     description: "Maintain exam offerings and configuration.",
     icon: <BookOpenIcon className="w-8 h-8 text-primary" />,
-    to: "/exam-list",
+    to: "/exam-management",
   },
 ];

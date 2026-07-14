@@ -7,9 +7,8 @@ import {
   PageHeader,
   Alert,
   Spinner,
+  EmployeeForm
 } from "@/components";
-
-import EmployeeForm from "../components/EmployeeForm";
 import {
   getEmployeeById,
   getAllCertifications,
@@ -149,7 +148,7 @@ export function EditEmployee() {
         }
       }
 
-      navigate("/employee-list");
+      navigate("/employee-management");
     } catch (err) {
       console.error(err);
       setError("Failed to update employee. Please try again.");
@@ -157,7 +156,7 @@ export function EditEmployee() {
   };
 
   const handleCancel = () => {
-    navigate("/employee-list");
+    navigate("/employee-management");
   };
 
   if (loading) {

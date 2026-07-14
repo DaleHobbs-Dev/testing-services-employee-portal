@@ -13,7 +13,7 @@ import {
 } from "@/components";
 import { PostItNote } from "../components/postit/PostItNote.jsx";
 
-export function Login() {
+export function LoginPage() {
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
   const { setCurrentUser } = useCurrentUser();
@@ -34,7 +34,7 @@ export function Login() {
           "testing_services_user",
           JSON.stringify({ id: employee.id })
         );
-        navigate("/");
+        navigate("/employee-dashboard");
       } else {
         setError("Login failed: Employee not found.");
       }

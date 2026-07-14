@@ -5,12 +5,12 @@ import {
   PageHeader,
   Spinner,
   Alert,
+  AppointmentDatePicker,
+  AppointmentTableGroup,
+  ExamineeFilter,
+  EmployeeFilter,
 } from "@/components";
-import { useCurrentUser } from "@/context/CurrentUserContext";
-import AppointmentDatePicker from "@/components/appointments/AppointmentDatePicker";
-import AppointmentTableGroup from "@/components/appointments/AppointmentTableGroup";
-import EmployeeFilter from "../filters/EmployeeFilter";
-import ExamineeFilter from "../components/ExamineeFilter";
+import { useCurrentUser } from "@/context";
 import { useAppointmentData, useAppointmentFilters } from "@/hooks";
 
 export function ProctoringDashboard() {

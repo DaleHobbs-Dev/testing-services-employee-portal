@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useCurrentUser } from "@/context/CurrentUserContext";
+import { useCurrentUser } from "@/context";
 import {
   Container,
   Section,

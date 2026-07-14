@@ -17,7 +17,7 @@ import {
 import {
   getAllTestFamilies,
   getAllTestVariants,
-  deleteTestFamilyWithVariants, // ✅ UPDATED: Use the better delete function
+  deleteTestFamilyWithVariants
 } from "@/services";
 import { FolderIcon, TrashIcon } from "@heroicons/react/24/outline";
 
@@ -139,7 +139,7 @@ export function ExamList() {
 
                 <div className="flex justify-end gap-2">
                   <Button
-                    to={`/exam-list/edit/${family.id}`}
+                    to={`/exam-management/${family.id}/edit`}
                     variant="primary"
                     className="focus-ring"
                   >

@@ -1,7 +1,8 @@
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { Outlet } from "react-router-dom";
 
-export function Layout({ children }) {
+export function Layout() {
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* WCAG Skip Link */}
@@ -20,7 +21,7 @@ export function Layout({ children }) {
       </a>
       <Navbar />
       <main id="main-content" className="flex-1 container mx-auto px-4 py-6">
-        {children}
+        <Outlet />
       </main>
       {/* <Footer /> */}
     </div>

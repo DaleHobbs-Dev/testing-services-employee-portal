@@ -6,9 +6,8 @@ import {
   PageHeader,
   Alert,
   Spinner,
+  EmployeeForm
 } from "@/components";
-
-import EmployeeForm from "../components/EmployeeForm";
 import {
   getAllEmployees,
   getAllCertifications,
@@ -78,7 +77,7 @@ export function NewEmployee() {
         endTime: "",
       });
 
-      navigate("/employee-list");
+      navigate("/employee-management");
     } catch (error) {
       setError("Failed to create employee. Please try again.");
       console.error("Error creating employee:", error);
@@ -89,7 +88,7 @@ export function NewEmployee() {
   // Cancel handler
   // ---------------------------
   const handleCancel = () => {
-    navigate("/employee-list");
+    navigate("/employee-management");
   };
 
   // ---------------------------

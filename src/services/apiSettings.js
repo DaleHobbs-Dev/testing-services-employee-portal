@@ -1,113 +1,91 @@
-export const API_BASE_URL = "http://localhost:8088";
+// Config for API requests
+export const API_BASE_URL = "http://localhost:8088"
+export const TOKEN_KEY = "testing_services_user"
 
-/**
- * Generic helper function for fetching JSON data from the API.
- *
- * Example usage:
- * ------------------------------------------------
- * // 1️⃣ Fetch all customers
- * const customers = await fetchJson("/customers");
- *
- * // 2️⃣ Fetch all orders and expand related customer data
- * const orders = await fetchJson("/orders?_expand=customer");
- *
- * // 3️⃣ Fetch a single pizza by ID
- * const pizza = await fetchJson("/pizzas/5");
- * ------------------------------------------------
- */
+// Helper AuthHeader function to include the token in the request headers
+const getAuthHeader = () => {
+    // Retrieve the stored token from localStorage (set during login) for authenticated requests
+    const token = JSON.parse(localStorage.getItem(TOKEN_KEY))?.token
+    return token ? { "Authorization": `Token ${token}` } : {}
+}
 
-export const fetchJson = async (endpoint, options = {}) => {
-    // Combine the base URL and endpoint to form the full request URL
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        // Default to sending JSON headers; allow overrides via `options`
-        headers: { "Content-Type": "application/json" },
-        ...options
-    });
-    // Check if the request was successful (status 200–299)
-    if (!response.ok) {
-        // Throw an error if the response failed, including HTTP status details
-        throw new Error(`Fetch failed: ${response.status} ${response.statusText}`);
+// Helper function to check for errors in the response and parse JSON
+const checkErrorJson = async (response) => {
+
+    // Any 2xx status sets response.ok to true, regardless of HTTP method
+    if (response.ok) {
+        // For 204 No Content has no body on DELETE and PATCH
+        // return null instead of calling .json()
+        return response.status === 204 ? null : response.json()
     }
 
-    // Parse and return the JSON body of the response
-    return response.json();
-};
+    // Non-2xx response: store the error details in an Error object and throw it for further handling
+    const err = new Error(`Request to ${response.url} failed with status ${response.status}`)
+    err.status = response.status
+    try {
+        err.body = await response.json()
+    } catch {
+        err.body = null
+    }
+    throw err
+}
 
-/**
- * Helper function to POST JSON data to the API.
- *
- * Example usage:
- * ------------------------------------------------
- * // 1️⃣ Add a new customer
- * const newCustomer = await postJson("/customers", {
- *   first_name: "Alex",
- *   last_name: "Rivera",
- *   phone: "555-9090"
- * });
- *
- * // 2️⃣ Add a new order
- * const newOrder = await postJson("/orders", {
- *   customer_id: 1,
- *   order_type: "delivery",
- *   delivery_address: "123 Elm Street",
- *   total_amount: 22.75,
- *   status: "in-progress"
- * });
- *
- * // 3️⃣ Add a new pizza to an order
- * const newPizza = await postJson("/pizzas", {
- *   order_id: 2,
- *   size: "Medium",
- *   cheese_type: "Mozzarella",
- *   sauce_type: "Marinara",
- *   price: 12.50
- * });
- * ------------------------------------------------
- */
+// request takes an endpoint (e.g. /instructors) and an optional options object.
+// Properties might include method, body, custom headers. It defaults to {} if omitted
+const request = (endpoint, options = {}) => {
 
+    // Get the auth token header
+    const authHeader = getAuthHeader()
 
-// helper function to POST new JSON data to the API
-export const postJson = async (endpoint, data) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: "POST",                     // Specify HTTP method
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)          // Convert JS object to JSON string
-    });
+    // Get any custom headers provided in the options object
+    const customHeaders = options.headers || {}
 
-    // Handle response the same way as in fetchJson
-    if (!response.ok) {
-        throw new Error(`POST failed: ${response.status} ${response.statusText}`);
+    // Rebuild the headers field by merging the auth token header with any headers the caller provided
+    const finalOptions = {
+        ...options,
+        headers: {
+            ...authHeader,
+            ...customHeaders
+        }
     }
 
-    return response.json();
-};
+    // Calls fetch against API_BASE_URL + endpoint, using finalOptions
+    // (carries over method/body from options, with the merged headers from above)
+    return fetch(`${API_BASE_URL}${endpoint}`, finalOptions)
+        // The resulting promise is piped through checkErrorJson, which returns parsed JSON on success
+        // It could also throw an error (with .status/.body attached) on failure.
+        .then(checkErrorJson)
+}
 
-// helper function to PUT (update) JSON data to the API
-export const putJson = async (endpoint, data) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: "PUT",                      // Specify HTTP method
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)          // Convert JS object to JSON string
-    });
+// Exported fetchJson for making API fetch requests
+export const fetchJson = (endpoint) => request(endpoint)
 
-    // Handle response the same way as in fetchJson
-    if (!response.ok) {
-        throw new Error(`PUT failed: ${response.status} ${response.statusText}`);
-    }
+// Exported postJson for making API POST requests with JSON body
+export const postJson = (endpoint, body) => request(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+})
 
-    return response.json();
-};
+// Exported putJson for making API PUT requests with JSON body
+export const putJson = (endpoint, body) => request(endpoint, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+})
 
-// helper function to DELETE data from the API
-export const deleteJson = async (endpoint) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: "DELETE"                    // Specify HTTP method
-    });
+// Exported patchJson for making API PATCH requests with JSON body
+export const patchJson = (endpoint, body) => request(endpoint, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+})
 
-    // Handle response the same way as in fetchJson
-    if (!response.ok) {
-        throw new Error(`DELETE failed: ${response.status} ${response.statusText}`);
-    }
+// Exported deleteJson for making API DELETE requests
+export const deleteJson = (endpoint) => request(endpoint, { method: "DELETE" })
 
-    return response.json();
-};
+export const fetchJSON = fetchJson
+export const postJSON = postJson
+export const putJSON = putJson
+export const patchJSON = patchJson
+export const deleteJSON = deleteJson

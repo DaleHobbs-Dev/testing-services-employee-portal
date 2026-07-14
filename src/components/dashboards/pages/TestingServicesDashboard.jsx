@@ -9,7 +9,7 @@ import {
   dashboardCards,
   DashboardCard
 } from "@/components";
-import { useCurrentUser } from "@/context/CurrentUserContext";
+import { useCurrentUser } from "@/context";
 
 export function TestingServicesDashboard() {
   const { currentUser } = useCurrentUser();
