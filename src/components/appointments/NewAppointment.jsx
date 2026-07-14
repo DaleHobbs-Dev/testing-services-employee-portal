@@ -15,7 +15,7 @@ import {
 import { useCurrentUser } from "@/context/CurrentUserContext";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import AppointmentForm from "@/components/appointments/AppointmentForm";
-import { isFacultyTest } from "@/utils/testFamilyHelpers";
+import { isFacultyTest, calculateEndTime } from "@/utils";
 
 export default function NewAppointment() {
   const navigate = useNavigate();
@@ -68,20 +68,27 @@ export default function NewAppointment() {
       (f) => f.id === Number(formData.selectedFamilyId)
     );
 
-    // Create exam schedule WITHOUT variant IDs
-    const scheduleData = {
-      examineeId: formData.selectedExaminee.id,
-      testFamilyId: Number(formData.selectedFamilyId), // Store family ID
-      employeeId: Number(formData.selectedProctorId),
-      locationId: Number(formData.selectedLocationId),
-      workstationId: Number(formData.selectedWorkstationId),
-      startTime: formData.appointmentDate,
-      endTime: formData.appointmentDate,
-      room: "Room A",
-      status: "scheduled",
-    };
+   const startTimeISO = formData.appointmentDate;
 
-    // Faculty test data (if needed, could move to variants table)
+const endTimeISO = calculateEndTime(
+  startTimeISO,
+  formData.selectedVariantIds,
+  testVariants
+);
+
+const scheduleData = {
+  examineeId: formData.selectedExaminee.id,
+  testFamilyId: Number(formData.selectedFamilyId),
+  employeeId: Number(formData.selectedProctorId),
+  locationId: Number(formData.selectedLocationId),
+  workstationId: Number(formData.selectedWorkstationId),
+  startTime: startTimeISO,
+  endTime: endTimeISO,
+  room: "Room A",
+  status: "scheduled",
+};
+
+    // Faculty test data 
     if (isFacultyTest(selectedFamily)) {
       scheduleData.facultyTitle = formData.facultyData.title;
       scheduleData.facultyName = formData.facultyData.facultyName;

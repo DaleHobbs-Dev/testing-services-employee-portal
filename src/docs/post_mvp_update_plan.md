@@ -193,6 +193,10 @@ Ensure modals are responsive and accessible, with proper focus management and AR
 
 Allow users to add multiple notes to an exam schedule for better context and communication.
 
+### **33. Make an "Edit Examinee" View**
+
+Allow users to edit examinee details from the appointment scheduling interface.
+
 ## **Feature Name**
 
 **Category:** (Scheduling / UX / Admin / Data / Visual / Code Quality)

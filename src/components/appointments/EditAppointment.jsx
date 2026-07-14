@@ -134,7 +134,7 @@ export default function EditAppointment() {
     );
 
     try {
-      // Step 1: ✅ Update the exam schedule (without variant data)
+      // Update the exam schedule (without variant data)
       const scheduleData = {
         examineeId: formData.selectedExaminee.id,
         testFamilyId: Number(formData.selectedFamilyId),
@@ -156,7 +156,7 @@ export default function EditAppointment() {
 
       await updateExamSchedule(scheduleId, scheduleData);
 
-      // Step 2: ✅ Update junction table entries
+      // Update junction table entries
       const currentVariantIds = existingVariants.map((ev) => ev.testVariantId);
       const newVariantIds = formData.selectedVariantIds;
 
