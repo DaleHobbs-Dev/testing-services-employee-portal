@@ -23,6 +23,7 @@ import {
   getAllEmployeePermissions,
 } from "@/services";
 import { UserIcon } from "@heroicons/react/24/outline";
+import { formatRole, getEmployeeRoles } from "@/utils/roleUtils";
 
 export function EmployeeList() {
   const [employees, setEmployees] = useState([]);
@@ -134,10 +135,14 @@ export function EmployeeList() {
 
                 <CardContent>
                   <p className="text-sm text-adaptive-muted">
-                    <span className="font-medium">Role:</span>{" "}
-                    <Badge size="lg" variant={emp.role}>
-                      {emp.role.charAt(0).toUpperCase() + emp.role.slice(1)}
-                    </Badge>
+                    <span className="font-medium">Roles:</span>{" "}
+                    <span className="inline-flex flex-wrap gap-1">
+                      {getEmployeeRoles(emp).map((role) => (
+                        <Badge key={role} size="lg" variant={role}>
+                          {formatRole(role)}
+                        </Badge>
+                      ))}
+                    </span>
                   </p>
                   <p className="text-sm text-adaptive-muted">
                     <span className="font-medium">Email:</span> {emp.email}

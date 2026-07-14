@@ -6,12 +6,13 @@ import {
   ProctoringDashboardPage,
   AccessDeniedPage,
   LoginPage,
+  RegisterPage,
   EmployeeDashboardPage,
   EmployeeManagementPage,
   EmployeeSchedulesPage,
   ExamManagementPage,
 } from "@/pages";
-import { AuthorizedRoutes, AdminRoutes } from "@/routes";
+import { AuthorizedRoutes, RoleRoutes } from "@/routes";
 import {
   Layout,
   NewAppointment,
@@ -29,15 +30,16 @@ import {
 } from "@/components";
 
 export function ApplicationRoutes() {
-  const { currentUser } = useCurrentUser();
+  const { currentUser, isLoading } = useCurrentUser();
 
-  if (currentUser === null) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route element={<AuthorizedRoutes />}>
         <Route element={<Layout />}>
           <Route index element={<Navigate to="/employee-dashboard" replace />} />
@@ -74,7 +76,11 @@ export function ApplicationRoutes() {
           <Route path="design-system" element={<DesignSystemPage />} />
 
           {/* admin protected routes */}
-          <Route element={<AdminRoutes currentEmployee={currentUser} />}>
+          <Route
+            element={
+              <RoleRoutes currentEmployee={currentUser} roles={["admin"]} />
+            }
+          >
             {/* Employee Management Routes */}
             <Route
               path="employee-management"

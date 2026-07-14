@@ -7,10 +7,17 @@ import {
     getAllEmployees,
     getAllTestFamilies,
 } from "@/services";
+import { employeeHasRole } from "@/utils/roleUtils";
 
 // custom hook to fetch and manage appointment data
 // accepts selected date, current user ID and role for filtering
 export function useAppointmentData(selectedDate, currentUserId, currentUserRole) {
+    const currentUserRolesKey = (Array.isArray(currentUserRole)
+        ? currentUserRole
+        : currentUserRole
+            ? [currentUserRole]
+            : []
+    ).join("|");
     const [loading, setLoading] = useState(true);
     const [appointments, setAppointments] = useState([]);
     const [familyLookup, setFamilyLookup] = useState({});
@@ -18,6 +25,7 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
 
     useEffect(() => {
         async function loadAll() {
+            const currentUserRoles = currentUserRolesKey.split("|").filter(Boolean);
             setLoading(true);
 
             const [schedules, scheduleVariants, variants, examinees, employees, families] =
@@ -42,7 +50,7 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
             setFamilyLookup(famMap);
 
             const activeProctors = employees.filter(
-                (e) => (e.role === "proctor" || e.role === "admin") && e.status === "active"
+                (e) => employeeHasRole(e, ["proctor", "admin"]) && e.status === "active"
             );
             setProctors(activeProctors);
 
@@ -114,7 +122,7 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
 
             // Filter by role
             const visibleAppointments =
-                currentUserRole === "admin"
+                currentUserRoles.includes("admin")
                     ? normalized
                     : normalized.filter((a) => a.proctorId === currentUserId);
 
@@ -123,7 +131,7 @@ export function useAppointmentData(selectedDate, currentUserId, currentUserRole)
         }
 
         loadAll();
-    }, [selectedDate, currentUserId, currentUserRole]);
+    }, [selectedDate, currentUserId, currentUserRolesKey]);
 
     return { loading, appointments, familyLookup, proctors };
 }

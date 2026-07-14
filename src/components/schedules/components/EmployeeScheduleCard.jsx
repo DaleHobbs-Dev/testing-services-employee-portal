@@ -10,6 +10,7 @@ import {
 } from "@/components";
 import { DaysOfWeekSelector } from "./DaysOfWeekSelector";
 import { updateEmployeeSchedule, createEmployeeSchedule } from "@/services";
+import { formatRole, getEmployeeRoles } from "@/utils/roleUtils";
 
 export function EmployeeScheduleCard({ employee, schedule }) {
   const [workDays, setWorkDays] = useState(schedule?.workDays || []);
@@ -49,7 +50,13 @@ export function EmployeeScheduleCard({ employee, schedule }) {
     <Card>
       <CardHeader className="flex justify-between items-center">
         <CardTitle>{employee.name}</CardTitle>
-        <Badge variant={employee.role}>{employee.role}</Badge>
+        <div className="flex flex-wrap gap-1">
+          {getEmployeeRoles(employee).map((role) => (
+            <Badge key={role} variant={role}>
+              {formatRole(role)}
+            </Badge>
+          ))}
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-4">

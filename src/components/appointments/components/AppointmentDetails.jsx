@@ -22,6 +22,7 @@ import {
   getExamineeById,
   getNotesByScheduleId,
 } from "@/services";
+import { employeeHasRole } from "@/utils/roleUtils";
 
 export function AppointmentDetails() {
   const { currentUser } = useCurrentUser();
@@ -122,7 +123,7 @@ export function AppointmentDetails() {
   };
 
   // determine if current user can edit schedule based on role
-  const canEdit = ["admin", "scheduler", "proctor"].includes(currentUser?.role);
+  const canEdit = employeeHasRole(currentUser, ["admin", "scheduler", "proctor"]);
 
   return (
     <Container>

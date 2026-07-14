@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../context/CurrentUserContext.js";
-import { getEmployeeByEmail } from "../services/employeeService.js";
+import { login } from "@/services";
+import { TOKEN_KEY } from "@/services/apiSettings";
 import {
   Container,
   PageHeader,
@@ -11,10 +12,10 @@ import {
   Button,
   Alert,
 } from "@/components";
-import { PostItNote } from "../components/postit/PostItNote.jsx";
 
 export function LoginPage() {
   const [userEmail, setUserEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { setCurrentUser } = useCurrentUser();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,33 +27,35 @@ export function LoginPage() {
     setError(""); // Clear any previous errors
 
     try {
-      const employees = await getEmployeeByEmail(userEmail);
-      if (employees.length === 1) {
-        const employee = employees[0];
-        setCurrentUser(employee);
-        localStorage.setItem(
-          "testing_services_user",
-          JSON.stringify({ id: employee.id })
-        );
-        navigate("/employee-dashboard");
-      } else {
-        setError("Login failed: Employee not found.");
+      const { employee, token } = await login({
+        email: userEmail,
+        password,
+      });
+
+      if (!employee || !token) {
+        setError("Login failed: missing employee or token from server.");
+        return;
       }
+
+      setCurrentUser(employee);
+      localStorage.setItem(TOKEN_KEY, JSON.stringify({ token }));
+      navigate("/employee-dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      setError("An error occurred during login. Please try again.");
+      setError(
+        error.status === 401
+          ? "Invalid email or password."
+          : "An error occurred during login. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Container className="mt-20 max-w-4xl">
-      <div className="flex gap-6 mt-6">
-        <Card className="p-6 shrink-0">
-          <PostItNote />
-        </Card>
-        <Card className="p-6 flex-1">
+    <Container className="mt-20 max-w-lg">
+      <div className="mt-6">
+        <Card className="p-6">
           <PageHeader
             title="Employee Login"
             description="Please enter your email to log in."
@@ -60,7 +63,7 @@ export function LoginPage() {
             center
           />
           {error && (
-            <Alert variant="danger" className="mb-4">
+            <Alert variant="error" className="mb-4">
               {error}
             </Alert>
           )}
@@ -75,6 +78,16 @@ export function LoginPage() {
                 placeholder="your.email@example.com"
               />
             </FormField>
+            <FormField label="Password">
+              <Input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Enter your password"
+              />
+            </FormField>
             <Button
               type="submit"
               variant="primary"
@@ -84,6 +97,12 @@ export function LoginPage() {
               {isLoading ? "Logging in..." : "Log In"}
             </Button>
           </form>
+          <div className="mt-4 text-center text-sm text-adaptive-muted">
+            Need an account?{" "}
+            <Button to="/register" variant="ghost" className="px-1 py-0">
+              Register
+            </Button>
+          </div>
         </Card>
       </div>
     </Container>

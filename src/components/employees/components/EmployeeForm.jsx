@@ -7,6 +7,17 @@ import {
   Textarea,
   Section,
 } from "@/components";
+import { formatRole, getEmployeeRoles } from "@/utils/roleUtils";
+
+const roleOptions = [
+  "admin",
+  "proctor",
+  "scheduler",
+  "frontdesk",
+  "checkin",
+  "technician",
+  "clerk",
+];
 
 export function EmployeeForm({
   employee = null,
@@ -37,7 +48,8 @@ export function EmployeeForm({
     return {
       name: employee?.name || "",
       email: employee?.email || "",
-      role: employee?.role || "",
+      password: "",
+      roles: getEmployeeRoles(employee),
       status: employee?.status || "active",
       phone: employee?.phone || "",
       notes: employee?.notes || "",
@@ -67,6 +79,16 @@ export function EmployeeForm({
     });
   };
 
+  const toggleRole = (role) => {
+    setFormData((prev) => {
+      const roles = prev.roles.includes(role)
+        ? prev.roles.filter((item) => item !== role)
+        : [...prev.roles, role];
+
+      return { ...prev, roles };
+    });
+  };
+
   // Validate employee code uniqueness
   const codeError = useMemo(() => {
     if (!formData.employeeCode) {
@@ -83,9 +105,14 @@ export function EmployeeForm({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (codeError) return;
+    if (codeError || formData.roles.length === 0) return;
 
-    onSubmit(formData);
+    const submittedData = { ...formData };
+    if (employee?.id) {
+      delete submittedData.password;
+    }
+
+    onSubmit(submittedData);
   };
 
   return (
@@ -126,22 +153,39 @@ export function EmployeeForm({
           />
         </FormField>
 
-        <FormField label="Role">
-          <Select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select role…</option>
-            <option value="admin">Admin</option>
-            <option value="proctor">Proctor</option>
-            <option value="scheduler">Scheduler</option>
-            <option value="frontdesk">Front Desk</option>
-            <option value="checkin">Check-in</option>
-            <option value="technician">Technician</option>
-            <option value="clerk">Clerk</option>
-          </Select>
+        {!employee?.id && (
+          <FormField label="Temporary Password">
+            <Input
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              type="password"
+              required
+            />
+          </FormField>
+        )}
+
+        <FormField label="Roles">
+          <div className="grid grid-cols-2 gap-2">
+            {roleOptions.map((role) => (
+              <label
+                key={role}
+                className="flex items-center gap-2 rounded border border-gray-200 px-3 py-2"
+              >
+                <input
+                  type="checkbox"
+                  checked={formData.roles.includes(role)}
+                  onChange={() => toggleRole(role)}
+                />
+                <span>{formatRole(role)}</span>
+              </label>
+            ))}
+          </div>
+          {formData.roles.length === 0 && (
+            <p className="text-red-600 text-sm mt-1">
+              Select at least one role.
+            </p>
+          )}
         </FormField>
 
         <FormField label="Status">

@@ -1,4 +1,5 @@
-import { fetchJson, postJson, putJson } from "./apiSettings";
+import { fetchJson, putJson } from "./apiSettings";
+import { register } from "./authService";
 
 export const getAllEmployees = async () => {
     return fetchJson("/employees");
@@ -25,7 +26,8 @@ export const getEmployeeSchedules = async (employeeId) => {
 };
 
 export const createEmployee = async (employeeData) => {
-    return postJson("/employees", employeeData);
+    const { employee } = await register(employeeData);
+    return employee;
 };
 
 export const updateEmployee = async (employeeId, employeeData) => {

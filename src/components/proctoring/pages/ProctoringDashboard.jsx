@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Container,
   Section,
@@ -12,9 +12,14 @@ import {
 } from "@/components";
 import { useCurrentUser } from "@/context";
 import { useAppointmentData, useAppointmentFilters } from "@/hooks";
+import { employeeHasRole, getEmployeeRoles } from "@/utils/roleUtils";
 
 export function ProctoringDashboard() {
   const { currentUser } = useCurrentUser();
+  const currentUserRoles = useMemo(
+    () => getEmployeeRoles(currentUser),
+    [currentUser]
+  );
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
@@ -26,7 +31,7 @@ export function ProctoringDashboard() {
   const { loading, appointments, familyLookup, proctors } = useAppointmentData(
     selectedDate,
     currentUser?.id,
-    currentUser?.role
+    currentUserRoles
   );
 
   const {
@@ -62,7 +67,7 @@ export function ProctoringDashboard() {
         )}
 
         <div className="flex flex-wrap gap-4 mb-6">
-          {currentUser.role === "admin" && (
+          {employeeHasRole(currentUser, "admin") && (
             <EmployeeFilter
               employees={proctors}
               value={selectedEmployeeId}
