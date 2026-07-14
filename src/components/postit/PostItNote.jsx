@@ -1,6 +1,6 @@
 import "./PostItNote.css";
 import { useState, useEffect, useMemo } from "react";
-import { getAllActiveEmployees } from "../../services/employeeService";
+import { getAllActiveEmployees } from "@/services";
 
 export const PostItNote = () => {
   const [employees, setEmployees] = useState([]);

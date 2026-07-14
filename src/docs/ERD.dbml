@@ -219,14 +219,15 @@ Table ticketAssignees {
 
 Table calendars {
   id int [pk, increment]
+  employeeId int [not null, ref: > employees.id, note: 'Owner of this calendar -- each employee manages their own set of calendars']
   name varchar(100) [not null]
   year int [not null]
   rangeType varchar(30) [not null, note: 'janToMay, juneJuly, augToDec, fullYear, custom']
-  startMonth int [not null, note: '1-12, derived from rangeType or set directly for custom']
+  startMonth int [not null, note: '1-12']
   endMonth int [not null, note: '1-12']
-  createdBy int [ref: > employees.id]
   createdAt timestamp [default: `CURRENT_TIMESTAMP`]
 }
+
 
 Table calendarMonths {
   id int [pk, increment]
@@ -296,4 +297,16 @@ Table calendarEmployeeBadges {
   endTime time [note: 'Null when customLabel is set instead of a time block']
   customLabel varchar(50) [note: 'OFF, REQUESTED OFF, or custom text -- used instead of a time block; excluded from the 8th-column hours sum']
   createdAt timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table calendarDayNotes {
+  id int [pk, increment]
+  calendarId int [not null, ref: > calendars.id]
+  locationId int [not null, ref: > locations.id]
+  date date [not null]
+  message text [not null]
+  createdAt timestamp [default: `CURRENT_TIMESTAMP`]
+  updatedAt timestamp [default: `CURRENT_TIMESTAMP`]
+  createdBy int [ref: > employees.id]
+  updatedBy int [ref: > employees.id]
 }

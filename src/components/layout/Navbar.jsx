@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCurrentUser } from "@/context/CurrentUserContext";
-import { Button, Badge } from "@/components/ui";
-import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
+import { useCurrentUser } from "@/context";
+import { Button, Badge, DarkModeToggle } from "@/components";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export function Navbar() {
@@ -24,7 +23,7 @@ export function Navbar() {
         {/* Top Row */}
         <div className="flex justify-between items-center h-16">
           {/* LOGO */}
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/employee-dashboard" className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-lg flex items-center justify-center 
                 bg-gradient-to-br from-primary to-accent shadow-md"
@@ -42,22 +41,22 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             {/* DESKTOP NAV */}
             <div className="hidden lg:flex items-center gap-3">
-              <Button variant="nav" to="/">
+              <Button variant="nav" to="/employee-dashboard">
                 Dashboard
               </Button>
 
               {isAdmin && (
                 <>
-                  <Button variant="nav" to="/employee-list">
+                  <Button variant="nav" to="/employee-management">
                     Employees
                   </Button>
-                  <Button variant="nav" to="/exam-list">
+                  <Button variant="nav" to="/exam-management">
                     Exams
                   </Button>
                 </>
               )}
 
-              <Button variant="nav" to="/new-appointment">
+              <Button variant="nav" to="/appointment/new">
                 New Appointment
               </Button>
 
@@ -118,7 +117,7 @@ export function Navbar() {
           <div className="lg:hidden bg-primary-dark/40 backdrop-blur-md py-4 rounded-xl mt-2 shadow-xl dark:bg-gray-800/60">
             <div className="flex flex-col gap-3 text-white">
               <Link
-                to="/"
+                to="/employee-dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="px-4 py-2 hover:bg-primary-darker/40 rounded transition"
               >
@@ -128,7 +127,7 @@ export function Navbar() {
               {isAdmin && (
                 <>
                   <Link
-                    to="/employee-list"
+                    to="/employee-management"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="px-4 py-2 hover:bg-primary-darker/40 rounded transition"
                   >
@@ -136,7 +135,7 @@ export function Navbar() {
                   </Link>
 
                   <Link
-                    to="/exam-list"
+                    to="/exam-management"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="px-4 py-2 hover:bg-primary-darker/40 rounded transition"
                   >
@@ -146,7 +145,7 @@ export function Navbar() {
               )}
 
               <Link
-                to="/new-appointment"
+                to="/appointment/new"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="px-4 py-2 hover:bg-primary-darker/40 rounded transition"
               >

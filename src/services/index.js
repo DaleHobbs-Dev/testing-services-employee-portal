@@ -2,7 +2,7 @@
 export { getAllExaminees, getExamineeByEmail, createExaminee, getExamineeById } from "./examineeService";
 
 // Employees
-export { getAllEmployees, getEmployeeByEmail, getEmployeeById, createEmployee, updateEmployee } from "./employeeService";
+export { getAllEmployees, getAllActiveEmployees, getAllInactiveEmployees, getEmployeeByEmail, getEmployeeById, getEmployeeSchedules, createEmployee, updateEmployee } from "./employeeService";
 
 // Test Families
 export { getAllTestFamilies, getTestFamilyById, updateTestFamily, createTestFamily, deleteTestFamily, deleteTestFamilyWithVariants } from "./testFamilyService";
