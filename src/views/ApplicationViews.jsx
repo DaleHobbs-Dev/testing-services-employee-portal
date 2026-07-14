@@ -17,7 +17,7 @@ import AccessDenied from "../components/errors/AccessDenied.jsx";
 import AppointmentDetails from "../components/appointments/AppointmentDetails.jsx";
 import EditAppointment from "../components/appointments/EditAppointment.jsx";
 
-export default function ApplicationViews() {
+export function ApplicationViews() {
   const { currentUser } = useCurrentUser();
 
   if (currentUser === null) {

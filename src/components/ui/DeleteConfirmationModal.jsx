@@ -4,7 +4,7 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-} from "@/components/ui";
+} from "@/components";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 export function DeleteConfirmationModal({

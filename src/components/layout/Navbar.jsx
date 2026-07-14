@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/context/CurrentUserContext";
-import { Button, Badge } from "@/components/ui";
-import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
+import { Button, Badge } from "@/components";
+import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export function Navbar() {

@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useCurrentUser } from "../context/CurrentUserContext.js";
 
-export default function Authorized({ children }) {
+export function Authorized({ children }) {
   const { currentUser, isLoading } = useCurrentUser();
   const location = useLocation();
 

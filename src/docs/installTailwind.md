@@ -46,7 +46,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default defineConfig({
+export defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -124,7 +124,7 @@ function App() {
   )
 }
 
-export default App
+export App
 ```
 
 ---

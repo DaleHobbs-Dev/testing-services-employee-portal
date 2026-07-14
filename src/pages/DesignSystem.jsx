@@ -28,9 +28,9 @@ import {
   PageHeader,
   Section,
   Container,
-} from "@/components/ui";
+} from "@/components";
 
-export default function DesignSystem() {
+export function DesignSystem() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
