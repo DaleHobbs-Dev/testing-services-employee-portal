@@ -1,12 +1,12 @@
 // Config for API requests
-export const API_BASE_URL = "http://localhost:8088"
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"
 export const TOKEN_KEY = "testing_services_user"
 
 // Helper AuthHeader function to include the token in the request headers
 const getAuthHeader = () => {
     // Retrieve the stored token from localStorage (set during login) for authenticated requests
     const token = JSON.parse(localStorage.getItem(TOKEN_KEY))?.token
-    return token ? { "Authorization": `Token ${token}` } : {}
+    return token ? { "Authorization": `Bearer ${token}` } : {}
 }
 
 // Helper function to check for errors in the response and parse JSON

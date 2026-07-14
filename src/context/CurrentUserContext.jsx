@@ -6,29 +6,29 @@
 // Wrap your app with <CurrentUserProvider> in src/main.jsx after importing it.
 import { CurrentUserContext } from "./CurrentUserContext.js";
 import { useState, useEffect } from "react";
-import { getEmployeeById } from "@/services";
+import { getCurrentEmployee } from "@/services";
+import { TOKEN_KEY } from "@/services/apiSettings";
 
 export function CurrentUserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
 
   // Initialize isLoading based on whether there's a user in localStorage
   const [isLoading, setIsLoading] = useState(() => {
-    return localStorage.getItem("testing_services_user") !== null;
+    return localStorage.getItem(TOKEN_KEY) !== null;
   });
 
   useEffect(() => {
-    const localUser = localStorage.getItem("testing_services_user");
+    const localUser = localStorage.getItem(TOKEN_KEY);
 
     if (localUser) {
-      const userObject = JSON.parse(localUser);
-      getEmployeeById(userObject.id)
+      getCurrentEmployee()
         .then((user) => {
-          setCurrentUser(user);
+          setCurrentUser(user.employee || user.user || user);
         })
         .catch((error) => {
           console.error("Failed to fetch user data:", error);
           setCurrentUser(null);
-          localStorage.removeItem("testing_services_user");
+          localStorage.removeItem(TOKEN_KEY);
         })
         .finally(() => {
           setIsLoading(false);

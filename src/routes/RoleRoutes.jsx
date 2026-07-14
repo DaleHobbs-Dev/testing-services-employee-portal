@@ -1,13 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { employeeHasRole } from "@/utils/roleUtils";
 
-// Functional component to protect admin routes
-export function AdminRoutes({ currentEmployee }) {
-  // Wait for user data to load
+export function RoleRoutes({ currentEmployee, roles }) {
   if (currentEmployee === null || currentEmployee === undefined) {
     return <div>Loading...</div>;
   }
-  // Redirect non-admin users to home page
-  if (!currentEmployee || currentEmployee.role !== "admin") {
+
+  if (!employeeHasRole(currentEmployee, roles)) {
     return <Navigate to="/access-denied" replace />;
   }
 

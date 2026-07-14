@@ -45,9 +45,6 @@ export { Navbar } from './layout/Navbar';
 export { Footer } from './layout/Footer';
 export { Layout } from './layout/Layout';
 
-// Post-It
-export { PostItNote } from './postit/PostItNote';
-
 // Exam utilities
 export { allowsMultipleVariants, isFacultyTest, requiresVariantSelection } from './utils/testFamilyHelpers';
 

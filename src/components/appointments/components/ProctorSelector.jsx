@@ -1,5 +1,6 @@
 import { H2, Select } from "@/components";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { employeeHasRole } from "@/utils/roleUtils";
 
 export function ProctorSelector({
   employees,
@@ -17,7 +18,7 @@ export function ProctorSelector({
       <Select value={selectedProctorId || ""} onChange={onChange}>
         <option value="">Select Proctor</option>
         {employees
-          .filter((e) => e.role === "proctor" || e.role === "admin")
+          .filter((e) => employeeHasRole(e, ["proctor", "admin"]))
           .filter((e) => e.status === "active")
           .map((emp) => (
             <option key={emp.id} value={emp.id}>

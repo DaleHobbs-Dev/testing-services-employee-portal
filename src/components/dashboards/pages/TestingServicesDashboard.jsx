@@ -10,13 +10,14 @@ import {
   DashboardCard
 } from "@/components";
 import { useCurrentUser } from "@/context";
+import { getEmployeeRoles } from "@/utils/roleUtils";
 
 export function TestingServicesDashboard() {
   const { currentUser } = useCurrentUser();
-  const role = currentUser?.role;
+  const roles = getEmployeeRoles(currentUser);
 
   const visibleCards = dashboardCards.filter((card) =>
-    card.roles.includes(role)
+    card.roles.some((role) => roles.includes(role))
   );
 
   return (

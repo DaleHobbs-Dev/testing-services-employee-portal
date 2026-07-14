@@ -9,6 +9,7 @@ import {
   H3,
 } from "@/components";
 import { Link } from "react-router-dom";
+import { formatRole, getEmployeeRoles } from "@/utils/roleUtils";
 
 export function EmployeeDetails({ employee, onClose, isOpen }) {
   if (!employee) return null;
@@ -51,10 +52,14 @@ export function EmployeeDetails({ employee, onClose, isOpen }) {
 
         {/* Role */}
         <div className="mb-6">
-          <H3 underline>Role</H3>
-          <Badge size="lg" variant={employee.role}>
-            {employee.role.charAt(0).toUpperCase() + employee.role.slice(1)}
-          </Badge>
+          <H3 underline>Roles</H3>
+          <div className="flex flex-wrap gap-2">
+            {getEmployeeRoles(employee).map((role) => (
+              <Badge key={role} size="lg" variant={role}>
+                {formatRole(role)}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* Phone */}
