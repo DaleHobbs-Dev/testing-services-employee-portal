@@ -177,7 +177,7 @@ export function EditEmployee() {
         />
 
         {error && (
-          <Alert variant="danger" className="mb-6">
+          <Alert variant="error" className="mb-6">
             {error}
           </Alert>
         )}
