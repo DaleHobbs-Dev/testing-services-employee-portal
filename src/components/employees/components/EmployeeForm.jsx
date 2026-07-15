@@ -7,17 +7,7 @@ import {
   Textarea,
   Section,
 } from "@/components";
-import { formatRole, getEmployeeRoles } from "@/utils/roleUtils";
-
-const roleOptions = [
-  "admin",
-  "proctor",
-  "scheduler",
-  "frontdesk",
-  "checkin",
-  "technician",
-  "clerk",
-];
+import { EMPLOYEE_ROLES, formatRole, getEmployeeRoles } from "@/utils/roleUtils";
 
 export function EmployeeForm({
   employee = null,
@@ -167,7 +157,7 @@ export function EmployeeForm({
 
         <FormField label="Roles">
           <div className="grid grid-cols-2 gap-2">
-            {roleOptions.map((role) => (
+            {EMPLOYEE_ROLES.map((role) => (
               <label
                 key={role}
                 className="flex items-center gap-2 rounded border border-gray-200 px-3 py-2"

@@ -1,5 +1,6 @@
-import { fetchJson, putJson } from "./apiSettings";
+import { fetchJson, patchJson, putJson } from "./apiSettings";
 import { register } from "./authService";
+import { toApiRole } from "@/utils/roleUtils";
 
 export const getAllEmployees = async () => {
     return fetchJson("/employees");
@@ -32,4 +33,10 @@ export const createEmployee = async (employeeData) => {
 
 export const updateEmployee = async (employeeId, employeeData) => {
     return putJson(`/employees/${employeeId}`, employeeData);
+};
+
+export const updateEmployeeRoles = async (employeeId, roles) => {
+    return patchJson(`/employees/${employeeId}/roles`, {
+        roles: roles.map(toApiRole),
+    });
 };

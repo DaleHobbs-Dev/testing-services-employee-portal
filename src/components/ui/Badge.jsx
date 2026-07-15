@@ -20,6 +20,7 @@ export function Badge({
     frontdesk: "bg-teal-100 text-teal-700",
     scheduler: "bg-emerald-100 text-emerald-700",
     clerk: "bg-gray-300 text-gray-800",
+    unassigned: "bg-slate-100 text-slate-700",
     restricted: "bg-yellow-100 text-yellow-800",
     inactive: "bg-gray-200 text-gray-500",
   };

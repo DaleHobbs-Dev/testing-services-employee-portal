@@ -75,13 +75,15 @@ export function ApplicationRoutes() {
           {/* Design System Route */}
           <Route path="design-system" element={<DesignSystemPage />} />
 
-          {/* admin protected routes */}
+          {/* Employee Management Routes */}
           <Route
             element={
-              <RoleRoutes currentEmployee={currentUser} roles={["admin"]} />
+              <RoleRoutes
+                currentEmployee={currentUser}
+                roles={["admin", "technician"]}
+              />
             }
           >
-            {/* Employee Management Routes */}
             <Route
               path="employee-management"
               element={<EmployeeManagementPage />}
@@ -91,16 +93,34 @@ export function ApplicationRoutes() {
               <Route path="new" element={<NewEmployee />} />
               <Route path=":employeeId/edit" element={<EditEmployee />} />
             </Route>
+          </Route>
 
-            {/* Employee Schedule Management Routes */}
+          {/* Employee Schedule Management Routes */}
+          <Route
+            element={
+              <RoleRoutes
+                currentEmployee={currentUser}
+                roles={["admin", "scheduler"]}
+              />
+            }
+          >
             <Route
               path="employee-schedules"
               element={<EmployeeSchedulesPage />}
             >
               <Route index element={<EmployeeSchedules />} />
             </Route>
+          </Route>
 
-            {/* Exam Management Routes */}
+          {/* Exam Management Routes */}
+          <Route
+            element={
+              <RoleRoutes
+                currentEmployee={currentUser}
+                roles={["admin", "technician"]}
+              />
+            }
+          >
             <Route path="exam-management" element={<ExamManagementPage />}>
               <Route index element={<ExamList />} />
               <Route path="list" element={<ExamList />} />
