@@ -21,6 +21,10 @@ export const getAllCalendars = async (params = {}) => {
   return fetchJson(`/calendars${toQueryString(params)}`);
 };
 
+export const createCalendar = async (calendarData) => {
+  return postJson("/calendars", calendarData);
+};
+
 export const getCalendarMonthView = async (calendarId, params = {}) => {
   return fetchJson(
     `/calendars/${calendarId}/month-view${toQueryString(params)}`

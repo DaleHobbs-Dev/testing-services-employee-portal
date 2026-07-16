@@ -1,25 +1,32 @@
 import { fetchJson, patchJson, putJson } from "./apiSettings";
 import { register } from "./authService";
 import { toApiRole } from "@/utils/roleUtils";
+import { normalizeEmployee, normalizeEmployeeList } from "@/utils/employeeUtils";
 
 export const getAllEmployees = async () => {
-    return fetchJson("/employees");
+    return fetchJson("/employees").then(normalizeEmployeeList);
+};
+
+export const getEmployeeDirectory = async () => {
+    return fetchJson("/employees/directory").then(normalizeEmployeeList);
 };
 
 export const getEmployeeByEmail = async (email) => {
-    return fetchJson(`/employees?email=${encodeURIComponent(email)}`);
+    return fetchJson(`/employees?email=${encodeURIComponent(email)}`).then(
+        normalizeEmployeeList
+    );
 };
 
 export const getEmployeeById = async (employeeId) => {
-    return fetchJson(`/employees/${employeeId}`);
+    return fetchJson(`/employees/${employeeId}`).then(normalizeEmployee);
 };
 
 export const getAllActiveEmployees = async () => {
-    return fetchJson("/employees?status=active");
+    return fetchJson("/employees?status=ACTIVE").then(normalizeEmployeeList);
 };
 
 export const getAllInactiveEmployees = async () => {
-    return fetchJson("/employees?status=inactive");
+    return fetchJson("/employees?status=INACTIVE").then(normalizeEmployeeList);
 };
 
 export const getEmployeeSchedules = async (employeeId) => {

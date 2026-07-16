@@ -34,6 +34,11 @@ import {
   formatRole,
   getEmployeeRoles,
 } from "@/utils/roleUtils";
+import {
+  formatEmployeeStatus,
+  getEmployeeDisplayName,
+  normalizeEmployeeStatus,
+} from "@/utils/employeeUtils";
 
 export function EmployeeList() {
   const { currentUser } = useCurrentUser();
@@ -161,7 +166,7 @@ export function EmployeeList() {
       setSelectedEmployee((prev) =>
         prev?.id === roleEmployee.id ? { ...prev, ...updatedEmployee } : prev
       );
-      setRoleSuccess(`Updated roles for ${roleEmployee.name}.`);
+      setRoleSuccess(`Updated roles for ${getEmployeeDisplayName(roleEmployee)}.`);
       setRoleEmployee(null);
       setSelectedRoles([]);
     } catch (err) {
@@ -218,7 +223,9 @@ export function EmployeeList() {
                     className="cursor-pointer"
                     onClick={() => handleViewDetails(emp)}
                   >
-                    <TableCell className="font-medium">{emp.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {getEmployeeDisplayName(emp)}
+                    </TableCell>
                     <TableCell>{emp.email}</TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
@@ -232,13 +239,12 @@ export function EmployeeList() {
                     <TableCell>
                       <Badge
                         variant={
-                          emp.status === "active" ? "success" : emp.status
+                          normalizeEmployeeStatus(emp.status) === "active"
+                            ? "success"
+                            : normalizeEmployeeStatus(emp.status)
                         }
                       >
-                        {emp.status
-                          ? emp.status.charAt(0).toUpperCase() +
-                            emp.status.slice(1)
-                          : "Unknown"}
+                        {formatEmployeeStatus(emp.status)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -272,7 +278,9 @@ export function EmployeeList() {
             <h2 className="text-xl font-semibold text-primary-dark">
               Modify Roles
             </h2>
-            <p className="text-sm text-gray-600">{roleEmployee?.name}</p>
+            <p className="text-sm text-gray-600">
+              {getEmployeeDisplayName(roleEmployee)}
+            </p>
           </div>
         </ModalHeader>
         <ModalBody>

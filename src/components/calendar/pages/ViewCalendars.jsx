@@ -14,6 +14,7 @@ import {
   getCalendarMonthView,
   getMyCalendars,
   getAllEmployees,
+  getEmployeeDirectory,
   getAllLocations,
   getAllTestFamilies,
 } from "@/services";
@@ -46,6 +47,10 @@ const buildMonthOptions = (calendar) => {
 export function ViewCalendars() {
   const { currentUser } = useCurrentUser();
   const canViewAllCalendars = employeeHasRole(currentUser, ["admin", "clerk"]);
+  const canUseFullEmployeeList = employeeHasRole(currentUser, [
+    "admin",
+    "technician",
+  ]);
 
   const [calendars, setCalendars] = useState([]);
   const [selectedCalendar, setSelectedCalendar] = useState(null);
@@ -121,7 +126,7 @@ export function ViewCalendars() {
     Promise.all([
       canViewAllCalendars ? getAllCalendars() : getMyCalendars(),
       getAllLocations(),
-      getAllEmployees(),
+      canUseFullEmployeeList ? getAllEmployees() : getEmployeeDirectory(),
       getAllTestFamilies(),
     ])
       .then(([calendarData, locationData, employeeData, testFamilyData]) => {
@@ -145,7 +150,7 @@ export function ViewCalendars() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [canViewAllCalendars]);
+  }, [canUseFullEmployeeList, canViewAllCalendars]);
 
   useEffect(() => {
     loadMonthView();

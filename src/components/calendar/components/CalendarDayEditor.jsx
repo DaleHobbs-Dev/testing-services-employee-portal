@@ -13,6 +13,7 @@ import {
   Textarea,
 } from "@/components";
 import { validateEmployeeBreakRule } from "@/components/calendar/utils/scheduleValidation";
+import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const asString = (value) => (value === undefined || value === null ? "" : String(value));
 
@@ -105,7 +106,7 @@ export function CalendarDayEditor({
       (item) => asString(item.id) === asString(badge.employeeId)
     );
 
-    return employee?.name || "Employee";
+    return getEmployeeDisplayName(employee);
   };
 
   const handleSubmit = (event) => {
@@ -311,7 +312,7 @@ export function CalendarDayEditor({
                 <option value="">Select employee</option>
                 {employees.map((employee) => (
                   <option key={employee.id} value={employee.id}>
-                    {employee.name}
+                    {getEmployeeDisplayName(employee)}
                   </option>
                 ))}
               </Select>

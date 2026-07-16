@@ -14,12 +14,9 @@ export function useDarkMode() {
             }
             return isDarkMode;
         }
-        // Default to system preference
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (systemPrefersDark) {
-            document.documentElement.classList.add('dark');
-        }
-        return systemPrefersDark;
+        // Default new sessions to light mode.
+        document.documentElement.classList.remove('dark');
+        return false;
     });
 
     useEffect(() => {

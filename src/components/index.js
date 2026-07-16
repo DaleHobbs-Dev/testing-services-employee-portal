@@ -87,6 +87,7 @@ export { TestingServicesDashboard } from './dashboards/pages/TestingServicesDash
 
 // Calendar Pages
 export { CalendarManagementHome } from './calendar/pages/CalendarManagementHome';
+export { CreateCalendar } from './calendar/pages/CreateCalendar';
 export { EditCalendars } from './calendar/pages/EditCalendars';
 export { ViewCalendars } from './calendar/pages/ViewCalendars';
 

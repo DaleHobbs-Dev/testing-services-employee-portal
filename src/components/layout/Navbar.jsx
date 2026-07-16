@@ -3,6 +3,7 @@ import { useCurrentUser } from "@/context";
 import { Button, Badge, DarkModeToggle } from "@/components";
 import { logout } from "@/services";
 import { TOKEN_KEY } from "@/services/apiSettings";
+import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 import { formatRole, getEmployeeRoles } from "@/utils/roleUtils";
 
 export function Navbar() {
@@ -42,10 +43,16 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
+            <Button variant="nav" to="/employee-dashboard">
+              Home Dashboard
+            </Button>
+
             <DarkModeToggle />
 
             <div className="hidden sm:flex flex-col items-center leading-tight">
-              <p className="text-sm font-semibold">{currentUser?.name}</p>
+              <p className="text-sm font-semibold">
+                {getEmployeeDisplayName(currentUser)}
+              </p>
               <div className="flex flex-wrap justify-center gap-1 mt-1">
                 {userRoles.map((role) => (
                   <Badge key={role} variant={role} size="sm">

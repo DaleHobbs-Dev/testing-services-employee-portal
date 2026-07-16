@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Alert,
   Container,
@@ -21,6 +22,7 @@ import {
   createCalendarEmployeeBadge,
   createCalendarDayNote,
   getAllEmployees,
+  getEmployeeDirectory,
   getAllLocations,
   getAllTestFamilies,
 } from "@/services";
@@ -51,8 +53,15 @@ const buildMonthOptions = (calendar) => {
 };
 
 export function EditCalendars() {
+  const location = useLocation();
   const { currentUser } = useCurrentUser();
   const canManageAllCalendars = employeeHasRole(currentUser, ["admin", "clerk"]);
+  const canUseFullEmployeeList = employeeHasRole(currentUser, [
+    "admin",
+    "technician",
+  ]);
+  const initialCalendarId = location.state?.calendarId;
+  const initialStartMonth = location.state?.startMonth;
 
   const [calendars, setCalendars] = useState([]);
   const [selectedCalendar, setSelectedCalendar] = useState(null);
@@ -125,7 +134,7 @@ export function EditCalendars() {
     Promise.all([
       canManageAllCalendars ? getAllCalendars() : getMyCalendars(),
       getAllLocations(),
-      getAllEmployees(),
+      canUseFullEmployeeList ? getAllEmployees() : getEmployeeDirectory(),
       getAllTestFamilies(),
     ])
       .then(([calendarData, locationData, employeeData, testFamilyData]) => {
@@ -145,9 +154,15 @@ export function EditCalendars() {
         }
 
         if (nextCalendars.length > 0) {
-          const firstCalendar = nextCalendars[0];
-          setSelectedCalendar(firstCalendar);
-          setSelectedMonth(String(firstCalendar.startMonth));
+          const initialCalendar =
+            nextCalendars.find(
+              (calendar) => String(calendar.id) === String(initialCalendarId)
+            ) || nextCalendars[0];
+
+          setSelectedCalendar(initialCalendar);
+          setSelectedMonth(
+            String(initialStartMonth || initialCalendar.startMonth)
+          );
         }
       })
       .catch((err) => {
@@ -157,7 +172,12 @@ export function EditCalendars() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [canManageAllCalendars]);
+  }, [
+    canManageAllCalendars,
+    canUseFullEmployeeList,
+    initialCalendarId,
+    initialStartMonth,
+  ]);
 
   useEffect(() => {
     loadMonthView();
