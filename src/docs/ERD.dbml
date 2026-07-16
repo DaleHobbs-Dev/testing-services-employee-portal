@@ -305,6 +305,7 @@ Table calendarDayNotes {
   locationId int [not null, ref: > locations.id]
   date date [not null]
   message text [not null]
+  color varchar(7) [not null, default: '#FEF3C7', note: 'Hex color used to render the note on calendar views']
   createdAt timestamp [default: `CURRENT_TIMESTAMP`]
   updatedAt timestamp [default: `CURRENT_TIMESTAMP`]
   createdBy int [ref: > employees.id]

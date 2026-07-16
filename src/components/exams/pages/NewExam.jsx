@@ -42,7 +42,7 @@ export function NewExam() {
 
       navigate("/exam-management");
     } catch (error) {
-      console.error("Failed to create test family:", error);
+      console.error("Failed to create test type:", error);
       alert(
         "An error occurred while creating the test type. Please try again."
       );

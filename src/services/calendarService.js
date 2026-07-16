@@ -13,6 +13,65 @@ const toQueryString = (params = {}) => {
   return queryString ? `?${queryString}` : "";
 };
 
+const toDateOnly = (value) => {
+  if (!value) return value;
+  return String(value).slice(0, 10);
+};
+
+const toTimeOnly = (value) => {
+  if (!value) return value;
+
+  const rawValue = String(value);
+  const timeMatch = rawValue.match(/T(\d{2}:\d{2})/);
+
+  if (timeMatch) return timeMatch[1];
+
+  return rawValue.slice(0, 5);
+};
+
+const normalizeCalendarDayItem = (item = {}) => ({
+  ...item,
+  date: toDateOnly(item.date),
+});
+
+const normalizeBadge = (badge = {}) => ({
+  ...normalizeCalendarDayItem(badge),
+  startTime: toTimeOnly(badge.startTime),
+  endTime: toTimeOnly(badge.endTime),
+});
+
+const normalizeDayNote = (note = {}) => ({
+  ...normalizeCalendarDayItem(note),
+  colorHex: note.colorHex || note.color,
+});
+
+const normalizeMonthView = (response) => {
+  const calendar = response?.calendar || response || {};
+
+  return {
+    ...response,
+    calendar,
+    days: calendar.days || response?.days || [],
+    closures: (calendar.closures || response?.closures || []).map(
+      normalizeCalendarDayItem
+    ),
+    labels: (calendar.dayLabels || response?.labels || []).map(
+      normalizeCalendarDayItem
+    ),
+    testFamilyBadges: (
+      calendar.testFamilyBadges ||
+      response?.testFamilyBadges ||
+      []
+    ).map(normalizeBadge),
+    employeeBadges: (
+      calendar.employeeBadges ||
+      response?.employeeBadges ||
+      []
+    ).map(normalizeBadge),
+    notes: (calendar.dayNotes || response?.notes || []).map(normalizeDayNote),
+  };
+};
+
 export const getMyCalendars = async () => {
   return fetchJson("/calendars/mine");
 };
@@ -25,10 +84,16 @@ export const createCalendar = async (calendarData) => {
   return postJson("/calendars", calendarData);
 };
 
+export const deleteCalendar = async (calendarId) => {
+  return deleteJson(`/calendars/${calendarId}`);
+};
+
 export const getCalendarMonthView = async (calendarId, params = {}) => {
-  return fetchJson(
+  const response = await fetchJson(
     `/calendars/${calendarId}/month-view${toQueryString(params)}`
   );
+
+  return normalizeMonthView(response);
 };
 
 export const createCalendarClosure = async (calendarId, closureData) => {

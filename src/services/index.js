@@ -39,6 +39,7 @@ export {
     getMyCalendars,
     getAllCalendars,
     createCalendar,
+    deleteCalendar,
     getCalendarMonthView,
     createCalendarClosure,
     deleteCalendarClosure,
