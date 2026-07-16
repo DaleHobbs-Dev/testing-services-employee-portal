@@ -11,6 +11,7 @@ import {
   EmployeeManagementPage,
   EmployeeSchedulesPage,
   ExamManagementPage,
+  CalendarManagementPage,
 } from "@/pages";
 import { AuthorizedRoutes, RoleRoutes } from "@/routes";
 import {
@@ -27,6 +28,9 @@ import {
   AppointmentDetails,
   EditAppointment,
   ProctoringDashboard,
+  CalendarManagementHome,
+  EditCalendars,
+  ViewCalendars,
 } from "@/components";
 
 export function ApplicationRoutes() {
@@ -126,6 +130,33 @@ export function ApplicationRoutes() {
               <Route path="list" element={<ExamList />} />
               <Route path="new" element={<NewExam />} />
               <Route path=":examId/edit" element={<EditExam />} />
+            </Route>
+          </Route>
+
+          {/* Calendar Management Routes */}
+          <Route
+            element={
+              <RoleRoutes
+                currentEmployee={currentUser}
+                roles={[
+                  "admin",
+                  "proctor",
+                  "scheduler",
+                  "checkin",
+                  "technician",
+                  "frontdesk",
+                  "clerk",
+                ]}
+              />
+            }
+          >
+            <Route
+              path="calendar-management"
+              element={<CalendarManagementPage />}
+            >
+              <Route index element={<CalendarManagementHome />} />
+              <Route path="edit" element={<EditCalendars />} />
+              <Route path="view" element={<ViewCalendars />} />
             </Route>
           </Route>
         </Route>

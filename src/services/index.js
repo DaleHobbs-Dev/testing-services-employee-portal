@@ -34,6 +34,25 @@ export { getAllEmployeeSchedules, updateEmployeeSchedule, createEmployeeSchedule
 // Locations
 export { getAllLocations, getLocationById, createLocation, updateLocation } from "./locationService";
 
+// Calendars
+export {
+    getMyCalendars,
+    getAllCalendars,
+    getCalendarMonthView,
+    createCalendarClosure,
+    deleteCalendarClosure,
+    upsertCalendarDayLabel,
+    deleteCalendarDayLabel,
+    createCalendarTestFamilyBadge,
+    deleteCalendarTestFamilyBadge,
+    createCalendarEmployeeBadge,
+    updateCalendarEmployeeBadge,
+    deleteCalendarEmployeeBadge,
+    createCalendarDayNote,
+    updateCalendarDayNote,
+    deleteCalendarDayNote,
+} from "./calendarService";
+
 // Employee Certifications
 export { getAllEmployeeCertifications, getEmployeeCertificationsByEmployeeId, updateEmployeeCertification, createEmployeeCertification } from "./employeeCertificationService";
 

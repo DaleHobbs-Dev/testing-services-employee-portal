@@ -85,6 +85,17 @@ export { dashboardCards } from './dashboards/components/dashboardCards';
 // Dashboard Pages
 export { TestingServicesDashboard } from './dashboards/pages/TestingServicesDashboard';
 
+// Calendar Pages
+export { CalendarManagementHome } from './calendar/pages/CalendarManagementHome';
+export { EditCalendars } from './calendar/pages/EditCalendars';
+export { ViewCalendars } from './calendar/pages/ViewCalendars';
+
+// Calendar Components
+export { CalendarSelector } from './calendar/components/CalendarSelector';
+export { CalendarFilterBar } from './calendar/components/CalendarFilterBar';
+export { CalendarMonthGrid } from './calendar/components/CalendarMonthGrid';
+export { CalendarDayEditor } from './calendar/components/CalendarDayEditor';
+
 // Employee Components
 export { EmployeeForm } from './employees/components/EmployeeForm';
 export { EmployeeDetails } from './employees/components/EmployeeDetails';

@@ -5,6 +5,7 @@ import {
   ClipboardDocumentCheckIcon,
   UsersIcon,
   BookOpenIcon,
+  CalendarDaysIcon,
 } from "@heroicons/react/24/solid";
 
 export const dashboardCards = [
@@ -54,5 +55,21 @@ export const dashboardCards = [
     description: "Maintain exam offerings and configuration.",
     icon: <BookOpenIcon className="w-8 h-8 text-primary" />,
     to: "/exam-management",
+  },
+  {
+    id: "calendar-management",
+    roles: [
+      "admin",
+      "proctor",
+      "scheduler",
+      "checkin",
+      "technician",
+      "frontdesk",
+      "clerk",
+    ],
+    title: "Calendar Management",
+    description: "View and edit testing center calendar schedules.",
+    icon: <CalendarDaysIcon className="w-8 h-8 text-primary" />,
+    to: "/calendar-management",
   },
 ];
