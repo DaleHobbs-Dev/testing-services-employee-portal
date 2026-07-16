@@ -10,18 +10,15 @@ import {
 } from "@/components";
 import { Link } from "react-router-dom";
 import { formatRole, getEmployeeRoles } from "@/utils/roleUtils";
+import {
+  formatEmployeeStatus,
+  getEmployeeDisplayName,
+  getEmployeeInitials,
+  normalizeEmployeeStatus,
+} from "@/utils/employeeUtils";
 
 export function EmployeeDetails({ employee, onClose, isOpen }) {
   if (!employee) return null;
-
-  const getInitials = (name) => {
-    if (!name) return "?";
-    const parts = name.trim().split(" ");
-    return parts
-      .map((p) => p[0].toUpperCase())
-      .join("")
-      .slice(0, 2);
-  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -29,10 +26,10 @@ export function EmployeeDetails({ employee, onClose, isOpen }) {
         <div className="flex items-center gap-4">
           {/* Initials avatar */}
           <div className="h-12 w-12 rounded-full bg-primary-lighter flex items-center justify-center text-primary-dark font-bold text-lg shrink-0">
-            {getInitials(employee.name)}
+            {getEmployeeInitials(employee)}
           </div>
           <div className="flex-1 text-center">
-            <H2 className="mb-1">{employee.name}</H2>
+            <H2 className="mb-1">{getEmployeeDisplayName(employee)}</H2>
             <p className="text-sm text-gray-600">{employee.email}</p>
           </div>
           <div className="w-12 shrink-0" /> {/* Spacer for balance */}
@@ -44,9 +41,13 @@ export function EmployeeDetails({ employee, onClose, isOpen }) {
         <div className="mb-4">
           <Badge
             size="xl"
-            variant={employee.status === "active" ? "success" : employee.status}
+            variant={
+              normalizeEmployeeStatus(employee.status) === "active"
+                ? "success"
+                : normalizeEmployeeStatus(employee.status)
+            }
           >
-            {employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
+            {formatEmployeeStatus(employee.status)}
           </Badge>
         </div>
 

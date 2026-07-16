@@ -1,4 +1,5 @@
 import { FormField, Select } from "@/components";
+import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 export function CalendarFilterBar({
   filters,
@@ -56,7 +57,7 @@ export function CalendarFilterBar({
             <option value="">All employees</option>
             {employees.map((employee) => (
               <option key={employee.id} value={employee.id}>
-                {employee.name}
+                {getEmployeeDisplayName(employee)}
               </option>
             ))}
           </Select>

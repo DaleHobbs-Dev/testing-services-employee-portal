@@ -5,6 +5,7 @@ import {
   WEEKDAY_LABELS,
 } from "@/components/calendar/utils/dateGrid";
 import { sumEmployeeBadgeHours } from "@/components/calendar/utils/hoursSum";
+import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const asString = (value) => (value === undefined || value === null ? "" : String(value));
 
@@ -45,7 +46,7 @@ const getEmployeeName = (badge, employees) => {
     (item) => asString(item.id) === asString(badge.employeeId)
   );
 
-  return employee?.name || "Employee";
+  return getEmployeeDisplayName(employee);
 };
 
 export function CalendarMonthGrid({

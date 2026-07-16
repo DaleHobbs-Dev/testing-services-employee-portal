@@ -20,7 +20,20 @@ export function CalendarManagementHome() {
           center
         />
 
-        <Grid cols={2}>
+        <Grid cols={3}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Create Calendar</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-adaptive-muted">
+                Start a new calendar from Jan-May, Jun-July, Aug-Dec, or a
+                custom month range.
+              </p>
+              <Button to="/calendar-management/new">Create Calendar</Button>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Edit Calendars</CardTitle>

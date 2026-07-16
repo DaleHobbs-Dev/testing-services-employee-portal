@@ -7,7 +7,20 @@ import {
   Textarea,
   Section,
 } from "@/components";
-import { EMPLOYEE_ROLES, formatRole, getEmployeeRoles } from "@/utils/roleUtils";
+import {
+  EMPLOYEE_ROLES,
+  formatRole,
+  getEmployeeRoles,
+  toApiRole,
+} from "@/utils/roleUtils";
+
+const splitLegacyName = (name = "") => {
+  const [firstName = "", ...lastNameParts] = name.trim().split(/\s+/);
+  return {
+    firstName,
+    lastName: lastNameParts.join(" "),
+  };
+};
 
 export function EmployeeForm({
   employee = null,
@@ -35,12 +48,15 @@ export function EmployeeForm({
         .map((ep) => ep.permissionId);
     }
 
+    const legacyName = splitLegacyName(employee?.name);
+
     return {
-      name: employee?.name || "",
+      firstName: employee?.firstName || legacyName.firstName,
+      lastName: employee?.lastName || legacyName.lastName,
       email: employee?.email || "",
       password: "",
       roles: getEmployeeRoles(employee),
-      status: employee?.status || "active",
+      status: employee?.status || "ACTIVE",
       phone: employee?.phone || "",
       notes: employee?.notes || "",
       employeeCode: employee?.employeeCode || "",
@@ -97,7 +113,11 @@ export function EmployeeForm({
 
     if (codeError || formData.roles.length === 0) return;
 
-    const submittedData = { ...formData };
+    const submittedData = {
+      ...formData,
+      roles: formData.roles.map(toApiRole),
+      status: formData.status.toUpperCase(),
+    };
     if (employee?.id) {
       delete submittedData.password;
     }
@@ -115,14 +135,25 @@ export function EmployeeForm({
           Basic Information
         </h2>
 
-        <FormField label="Name">
-          <Input
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </FormField>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField label="First Name">
+            <Input
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+            />
+          </FormField>
+
+          <FormField label="Last Name">
+            <Input
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              required
+            />
+          </FormField>
+        </div>
 
         <FormField label="Email">
           <Input
@@ -185,9 +216,9 @@ export function EmployeeForm({
             onChange={handleChange}
             required
           >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="restricted">Restricted</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+            <option value="RESTRICTED">Restricted</option>
           </Select>
         </FormField>
       </Section>

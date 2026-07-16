@@ -10,6 +10,7 @@ import {
   DashboardCard
 } from "@/components";
 import { useCurrentUser } from "@/context";
+import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 import { employeeHasRole } from "@/utils/roleUtils";
 
 export function TestingServicesDashboard() {
@@ -31,7 +32,7 @@ export function TestingServicesDashboard() {
         <Card className="p-8 shadow-md">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-center">
-              Welcome, {currentUser?.name}
+              Welcome, {getEmployeeDisplayName(currentUser)}
             </CardTitle>
           </CardHeader>
 

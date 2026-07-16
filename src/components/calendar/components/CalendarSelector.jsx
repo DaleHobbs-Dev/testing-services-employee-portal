@@ -1,7 +1,10 @@
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@/components";
+import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const getOwnerName = (calendar) =>
-  calendar.employee?.name || calendar.owner?.name || calendar.employeeName;
+  calendar.employeeName ||
+  (calendar.employee ? getEmployeeDisplayName(calendar.employee) : "") ||
+  (calendar.owner ? getEmployeeDisplayName(calendar.owner) : "");
 
 export function CalendarSelector({
   calendars = [],
