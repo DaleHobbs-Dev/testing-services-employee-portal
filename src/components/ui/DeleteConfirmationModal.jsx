@@ -14,6 +14,7 @@ export function DeleteConfirmationModal({
   title,
   message,
   itemName,
+  warning,
   isDeleting = false,
 }) {
   return (
@@ -38,10 +39,12 @@ export function DeleteConfirmationModal({
             "{itemName}"
           </p>
         )}
-        <p className="text-gray-600 text-sm mt-3">
-          This will hide it from the system. This action can be reversed by an
-          administrator.
-        </p>
+        {warning !== null && (
+          <p className="text-gray-600 text-sm mt-3">
+            {warning ||
+              "This will hide it from the system. This action can be reversed by an administrator."}
+          </p>
+        )}
       </ModalBody>
 
       <ModalFooter className="flex justify-end gap-3">

@@ -170,11 +170,11 @@ export function ViewCalendars() {
   }
 
   return (
-    <Container>
-      <Section className="max-w-7xl mx-auto">
+    <Container wide>
+      <Section className="max-w-7xl 2xl:max-w-[96rem] mx-auto">
         <PageHeader
-          title="View Calendars"
-          description="Review calendar months with filters for labels, hours, notes, schedules, and test families."
+          title="View and Print Calendars"
+          description="Review calendar months with filters for labels, hours, notes, schedules, and test types."
           center
         />
 
@@ -193,21 +193,43 @@ export function ViewCalendars() {
             {selectedCalendar ? (
               <>
                 <div className="rounded-xl border border-adaptive bg-muted p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField label="Month">
-                      <Select
-                        value={selectedMonth}
-                        onChange={(event) =>
-                          setSelectedMonth(event.target.value)
-                        }
-                      >
-                        {monthOptions.map((month) => (
-                          <option key={month} value={month}>
-                            {getMonthName(month)}
-                          </option>
-                        ))}
-                      </Select>
-                    </FormField>
+                  <div className="grid grid-cols-1 gap-5 lg:grid-cols-[240px_1fr]">
+                    <div>
+                      <h3 className="mb-3 text-sm font-semibold text-adaptive">
+                        Choose a Month
+                      </h3>
+                      <FormField label="Month">
+                        <Select
+                          value={selectedMonth}
+                          onChange={(event) =>
+                            setSelectedMonth(event.target.value)
+                          }
+                        >
+                          {monthOptions.map((month) => (
+                            <option key={month} value={month}>
+                              {getMonthName(month)}
+                            </option>
+                          ))}
+                        </Select>
+                      </FormField>
+                    </div>
+
+                    <div className="lg:border-l lg:border-adaptive lg:pl-5">
+                      <h3 className="mb-3 text-sm font-semibold text-adaptive">
+                        Additional Filters
+                      </h3>
+                      <CalendarFilterBar
+                        filters={filters}
+                        onChange={setFilters}
+                        locations={locations}
+                        testFamilies={testFamilies}
+                        employees={employees}
+                        showEmployeeFilter
+                        showMyScheduleToggle
+                        showToggles={false}
+                        filterClassName="grid grid-cols-1 md:grid-cols-3 gap-4"
+                      />
+                    </div>
                   </div>
 
                   <CalendarFilterBar
@@ -218,6 +240,8 @@ export function ViewCalendars() {
                     employees={employees}
                     showEmployeeFilter
                     showMyScheduleToggle
+                    showFilters={false}
+                    toggleClassName="mt-4 flex flex-wrap gap-x-6 gap-y-3 border-t border-adaptive pt-4"
                   />
                 </div>
 

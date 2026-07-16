@@ -73,8 +73,8 @@ export function ExamList() {
       setDeleteModalOpen(false);
       setFamilyToDelete(null);
     } catch (err) {
-      console.error("Failed to delete test family:", err);
-      setError("Failed to delete test family. Please try again.");
+      console.error("Failed to delete test type:", err);
+      setError("Failed to delete test type. Please try again.");
     } finally {
       setDeleting(null);
     }

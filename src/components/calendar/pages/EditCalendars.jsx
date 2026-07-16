@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import {
   Alert,
   Container,
+  DeleteConfirmationModal,
   FormField,
   PageHeader,
   Section,
@@ -14,6 +15,7 @@ import {
   getAllCalendars,
   getCalendarMonthView,
   getMyCalendars,
+  deleteCalendar,
   createCalendarClosure,
   deleteCalendarClosure,
   upsertCalendarDayLabel,
@@ -77,12 +79,16 @@ export function EditCalendars() {
     employeeId: "",
     showLabels: true,
     showNotes: true,
-    showHoursColumn: true,
+    showHoursColumn: false,
     showMySchedule: true,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isMonthLoading, setIsMonthLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeletingCalendars, setIsDeletingCalendars] = useState(false);
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [markedCalendarIds, setMarkedCalendarIds] = useState([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -190,6 +196,59 @@ export function EditCalendars() {
     setSuccess("");
   };
 
+  const handleToggleDeleteMode = () => {
+    setIsDeleteMode((prev) => !prev);
+    setMarkedCalendarIds([]);
+  };
+
+  const handleToggleMarkedCalendar = (calendarId) => {
+    setMarkedCalendarIds((prev) =>
+      prev.map(String).includes(String(calendarId))
+        ? prev.filter((id) => String(id) !== String(calendarId))
+        : [...prev, calendarId]
+    );
+  };
+
+  const handleConfirmDeleteCalendars = async () => {
+    setIsDeletingCalendars(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      await Promise.all(markedCalendarIds.map((id) => deleteCalendar(id)));
+
+      const deletedIdStrings = markedCalendarIds.map(String);
+      const nextCalendars = calendars.filter(
+        (calendar) => !deletedIdStrings.includes(String(calendar.id))
+      );
+
+      setCalendars(nextCalendars);
+      setMarkedCalendarIds([]);
+      setIsDeleteMode(false);
+      setIsDeleteModalOpen(false);
+      setSuccess("Deleted marked calendars.");
+
+      if (
+        selectedCalendar &&
+        deletedIdStrings.includes(String(selectedCalendar.id))
+      ) {
+        const nextSelectedCalendar = nextCalendars[0] || null;
+
+        setSelectedCalendar(nextSelectedCalendar);
+        setSelectedMonth(
+          nextSelectedCalendar ? String(nextSelectedCalendar.startMonth) : ""
+        );
+        setSelectedDate("");
+        setMonthView({});
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Could not delete the marked calendars.");
+    } finally {
+      setIsDeletingCalendars(false);
+    }
+  };
+
   const handleSaveDay = async (dayData) => {
     if (!selectedCalendar) return;
 
@@ -268,8 +327,8 @@ export function EditCalendars() {
   }
 
   return (
-    <Container>
-      <Section className="max-w-7xl mx-auto">
+    <Container wide>
+      <Section className="max-w-7xl 2xl:max-w-[96rem] mx-auto">
         <PageHeader
           title="Edit Calendars"
           description="Choose a calendar, select a month, and save updates to individual days."
@@ -290,28 +349,57 @@ export function EditCalendars() {
             onSelect={handleSelectCalendar}
             title={canManageAllCalendars ? "All Calendars" : "My Calendars"}
             emptyMessage="No calendars are available yet."
+            allowDelete
+            isDeleteMode={isDeleteMode}
+            markedCalendarIds={markedCalendarIds}
+            onToggleDeleteMode={handleToggleDeleteMode}
+            onToggleMarkedCalendar={handleToggleMarkedCalendar}
+            onDeleteMarkedCalendars={() => setIsDeleteModalOpen(true)}
+            isDeleting={isDeletingCalendars}
           />
 
           <div className="space-y-6">
             {selectedCalendar ? (
               <>
                 <div className="rounded-xl border border-adaptive bg-muted p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField label="Month">
-                      <Select
-                        value={selectedMonth}
-                        onChange={(event) => {
-                          setSelectedMonth(event.target.value);
-                          setSelectedDate("");
-                        }}
-                      >
-                        {monthOptions.map((month) => (
-                          <option key={month} value={month}>
-                            {getMonthName(month)}
-                          </option>
-                        ))}
-                      </Select>
-                    </FormField>
+                  <div className="grid grid-cols-1 gap-5 lg:grid-cols-[240px_1fr]">
+                    <div>
+                      <h3 className="mb-3 text-sm font-semibold text-adaptive">
+                        Choose a Month
+                      </h3>
+                      <FormField label="Month">
+                        <Select
+                          value={selectedMonth}
+                          onChange={(event) => {
+                            setSelectedMonth(event.target.value);
+                            setSelectedDate("");
+                          }}
+                        >
+                          {monthOptions.map((month) => (
+                            <option key={month} value={month}>
+                              {getMonthName(month)}
+                            </option>
+                          ))}
+                        </Select>
+                      </FormField>
+                    </div>
+
+                    <div className="lg:border-l lg:border-adaptive lg:pl-5">
+                      <h3 className="mb-3 text-sm font-semibold text-adaptive">
+                        Additional Filters
+                      </h3>
+                      <CalendarFilterBar
+                        filters={filters}
+                        onChange={setFilters}
+                        locations={locations}
+                        testFamilies={testFamilies}
+                        employees={employees}
+                        showEmployeeFilter
+                        showMyScheduleToggle
+                        showToggles={false}
+                        filterClassName="grid grid-cols-1 md:grid-cols-3 gap-4"
+                      />
+                    </div>
                   </div>
 
                   <CalendarFilterBar
@@ -322,6 +410,8 @@ export function EditCalendars() {
                     employees={employees}
                     showEmployeeFilter
                     showMyScheduleToggle
+                    showFilters={false}
+                    toggleClassName="mt-4 flex flex-wrap gap-x-6 gap-y-3 border-t border-adaptive pt-4"
                   />
                 </div>
 
@@ -363,6 +453,15 @@ export function EditCalendars() {
           </div>
         </div>
       </Section>
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDeleteCalendars}
+        title="Delete Calendars"
+        message="Are you sure you want to delete these calendars? This action cannot be undone."
+        warning={null}
+        isDeleting={isDeletingCalendars}
+      />
     </Container>
   );
 }

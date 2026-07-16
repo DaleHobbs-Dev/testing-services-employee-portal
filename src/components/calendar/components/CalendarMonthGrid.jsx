@@ -5,6 +5,7 @@ import {
   WEEKDAY_LABELS,
 } from "@/components/calendar/utils/dateGrid";
 import { sumEmployeeBadgeHours } from "@/components/calendar/utils/hoursSum";
+import { DEFAULT_DAY_NOTE_COLOR } from "@/components/calendar/components/DayNoteColorPicker";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const asString = (value) => (value === undefined || value === null ? "" : String(value));
@@ -33,20 +34,43 @@ const filterBadges = (items = [], filters, key) =>
     return true;
   });
 
+const getNoteColor = (note) =>
+  note?.colorHex || note?.color || DEFAULT_DAY_NOTE_COLOR;
+
 const getTestFamilyName = (badge, testFamilies) => {
+  if (badge.testFamily?.name) return badge.testFamily.name;
+
   const testFamily = testFamilies.find(
     (item) => asString(item.id) === asString(badge.testFamilyId)
   );
 
-  return testFamily?.name || testFamily?.label || "Test Family";
+  return testFamily?.name || testFamily?.label || "Test Type";
+};
+
+const getTestFamilyColor = (badge, testFamilies) => {
+  const testFamily = testFamilies.find(
+    (item) => asString(item.id) === asString(badge.testFamilyId)
+  );
+
+  return badge.testFamily?.badgeColor || testFamily?.badgeColor || "#DBEAFE";
 };
 
 const getEmployeeName = (badge, employees) => {
+  if (badge.employee) return getEmployeeDisplayName(badge.employee);
+
   const employee = employees.find(
     (item) => asString(item.id) === asString(badge.employeeId)
   );
 
   return getEmployeeDisplayName(employee);
+};
+
+const getEmployeeBadgeColor = (badge, employees) => {
+  const employee = employees.find(
+    (item) => asString(item.id) === asString(badge.employeeId)
+  );
+
+  return badge.employee?.badgeColor || employee?.badgeColor || "#E5E7EB";
 };
 
 export function CalendarMonthGrid({
@@ -99,11 +123,19 @@ export function CalendarMonthGrid({
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="calendar-print-area overflow-hidden">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="text-xl font-semibold text-primary-dark">
-          {getMonthName(month)} {year}
-        </h2>
+        <div>
+          <h2 className="text-xl font-semibold text-primary-dark">
+            {getMonthName(month)} {year}
+          </h2>
+          {editable && (
+            <p className="mt-1 text-sm text-adaptive-muted">
+              Select a day by clicking the appropriate day on the calendar to
+              edit the day.
+            </p>
+          )}
+        </div>
       </div>
 
       <div
@@ -165,7 +197,6 @@ export function CalendarMonthGrid({
                           <span className="font-semibold text-adaptive">
                             {day.dayNumber}
                           </span>
-                          {editable && <Badge size="sm">Edit</Badge>}
                         </div>
 
                         {dayData.isClosed && (
@@ -190,7 +221,13 @@ export function CalendarMonthGrid({
                         {dayData.dayTestFamilyBadges.map((badge) => (
                           <div
                             key={badge.id}
-                            className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-800"
+                            className="rounded px-2 py-1 text-xs text-gray-900"
+                            style={{
+                              backgroundColor: getTestFamilyColor(
+                                badge,
+                                testFamilies
+                              ),
+                            }}
                           >
                             {getTestFamilyName(badge, testFamilies)}{" "}
                             {badge.startTime}-{badge.endTime}
@@ -202,12 +239,10 @@ export function CalendarMonthGrid({
                             key={badge.id}
                             className="rounded px-2 py-1 text-xs text-gray-900"
                             style={{
-                              backgroundColor:
-                                employees.find(
-                                  (item) =>
-                                    asString(item.id) ===
-                                    asString(badge.employeeId)
-                                )?.badgeColor || "#E5E7EB",
+                              backgroundColor: getEmployeeBadgeColor(
+                                badge,
+                                employees
+                              ),
                             }}
                           >
                             {getEmployeeName(badge, employees)}{" "}
@@ -220,7 +255,8 @@ export function CalendarMonthGrid({
                           dayData.dayNotes.map((note) => (
                             <div
                               key={note.id}
-                              className="rounded bg-yellow-50 px-2 py-1 text-xs text-yellow-800"
+                              className="rounded px-2 py-1 text-xs text-gray-900"
+                              style={{ backgroundColor: getNoteColor(note) }}
                             >
                               {note.message}
                             </div>
@@ -242,7 +278,7 @@ export function CalendarMonthGrid({
       </div>
 
       {!editable && (
-        <div className="mt-4 flex justify-end">
+        <div className="calendar-print-controls mt-4 flex justify-end">
           <Button onClick={() => window.print()} variant="secondary">
             Print View
           </Button>

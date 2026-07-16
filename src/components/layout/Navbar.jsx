@@ -26,7 +26,7 @@ export function Navbar() {
 
   return (
     <nav className="bg-primary text-white border-b-4 p-2 rounded-2xl border-accent shadow-sm dark:bg-primary-dark dark:border-accent-dark">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl 2xl:max-w-[96rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-3">
             <div

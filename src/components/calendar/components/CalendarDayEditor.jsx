@@ -12,7 +12,10 @@ import {
   Select,
   Textarea,
 } from "@/components";
-import { validateEmployeeBreakRule } from "@/components/calendar/utils/scheduleValidation";
+import {
+  DayNoteColorPicker,
+  DEFAULT_DAY_NOTE_COLOR,
+} from "@/components/calendar/components/DayNoteColorPicker";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const asString = (value) => (value === undefined || value === null ? "" : String(value));
@@ -28,6 +31,12 @@ const listForDayLocation = (items = [], date, locationId) =>
     (item) =>
       item.date === date && asString(item.locationId) === asString(locationId)
   );
+
+const getNoteColor = (note) =>
+  note?.colorHex || note?.color || DEFAULT_DAY_NOTE_COLOR;
+
+const DEFAULT_EMPLOYEE_START_TIME = "07:45";
+const DEFAULT_EMPLOYEE_END_TIME = "16:15";
 
 export function CalendarDayEditor({
   date,
@@ -69,20 +78,21 @@ export function CalendarDayEditor({
   );
 
   const [formData, setFormData] = useState(() => ({
-      isClosed: !!existingClosure,
-      closureReason: existingClosure?.reason || "",
-      label: existingLabel?.label || "",
-      showWhenClosed: !!existingLabel?.showWhenClosed,
-      testFamilyId: "",
-      testFamilyStartTime: "",
-      testFamilyEndTime: "",
-      employeeId: "",
-      employeeStartTime: "",
-      employeeEndTime: "",
-      employeeCustomLabel: "",
-      noteMessage: "",
+    isClosed: !!existingClosure,
+    closureReason: existingClosure?.reason || "",
+    label: existingLabel?.label || "",
+    showWhenClosed: !!existingLabel?.showWhenClosed,
+    testFamilyId: "",
+    testFamilyStartTime: "",
+    testFamilyEndTime: "",
+    employeeId: "",
+    employeeStartTime: DEFAULT_EMPLOYEE_START_TIME,
+    employeeEndTime: DEFAULT_EMPLOYEE_END_TIME,
+    employeeLabelType: "",
+    employeeCustomLabel: "",
+    noteMessage: "",
+    noteColorHex: DEFAULT_DAY_NOTE_COLOR,
   }));
-  const [validationMessage, setValidationMessage] = useState("");
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -93,12 +103,27 @@ export function CalendarDayEditor({
     }));
   };
 
+  const handleEmployeeLabelTypeChange = (labelType) => {
+    setFormData((prev) => ({
+      ...prev,
+      employeeLabelType: prev.employeeLabelType === labelType ? "" : labelType,
+      employeeStartTime:
+        prev.employeeLabelType === labelType ? DEFAULT_EMPLOYEE_START_TIME : "",
+      employeeEndTime:
+        prev.employeeLabelType === labelType ? DEFAULT_EMPLOYEE_END_TIME : "",
+      employeeCustomLabel:
+        labelType === "custom" && prev.employeeLabelType !== "custom"
+          ? prev.employeeCustomLabel
+          : "",
+    }));
+  };
+
   const getTestFamilyName = (badge) => {
     const testFamily = testFamilies.find(
       (item) => asString(item.id) === asString(badge.testFamilyId)
     );
 
-    return testFamily?.name || testFamily?.label || "Test Family";
+    return testFamily?.name || testFamily?.label || "Test Type";
   };
 
   const getEmployeeName = (badge) => {
@@ -111,38 +136,23 @@ export function CalendarDayEditor({
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setValidationMessage("");
+
+    const employeeCustomLabel =
+      formData.employeeLabelType === "custom"
+        ? formData.employeeCustomLabel
+        : formData.employeeLabelType;
 
     const newEmployeeBadge =
       formData.employeeId &&
-      (formData.employeeCustomLabel ||
+      (employeeCustomLabel ||
         (formData.employeeStartTime && formData.employeeEndTime))
         ? {
             employeeId: formData.employeeId,
-            startTime: formData.employeeCustomLabel
-              ? null
-              : formData.employeeStartTime,
-            endTime: formData.employeeCustomLabel
-              ? null
-              : formData.employeeEndTime,
-            customLabel: formData.employeeCustomLabel || null,
+            startTime: employeeCustomLabel ? null : formData.employeeStartTime,
+            endTime: employeeCustomLabel ? null : formData.employeeEndTime,
+            customLabel: employeeCustomLabel || null,
           }
         : null;
-
-    if (newEmployeeBadge) {
-      const employeeBlocks = [
-        ...existingEmployeeBadges.filter(
-          (badge) => asString(badge.employeeId) === asString(formData.employeeId)
-        ),
-        newEmployeeBadge,
-      ];
-      const validation = validateEmployeeBreakRule(employeeBlocks);
-
-      if (!validation.isValid) {
-        setValidationMessage(validation.message);
-        return;
-      }
-    }
 
     onSave({
       date,
@@ -177,6 +187,7 @@ export function CalendarDayEditor({
             locationId,
             date,
             message: formData.noteMessage,
+            color: formData.noteColorHex,
           }
         : null,
     });
@@ -221,10 +232,6 @@ export function CalendarDayEditor({
         </p>
       </CardHeader>
       <CardContent>
-        {validationMessage && (
-          <Alert variant="error">{validationMessage}</Alert>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <section>
             <label className="flex items-center gap-2 text-sm font-medium text-adaptive">
@@ -266,16 +273,16 @@ export function CalendarDayEditor({
           </section>
 
           <section className="rounded-lg border border-adaptive p-4">
-            <h3 className="mb-3 font-semibold text-adaptive">
-              Add Test-Family Badge
+            <h3 className="mb-3 font-semibold text-primary">
+              Add a Test Type
             </h3>
-            <FormField label="Test Family">
+            <FormField label="Test Type">
               <Select
                 name="testFamilyId"
                 value={formData.testFamilyId}
                 onChange={handleChange}
               >
-                <option value="">Select test family</option>
+                <option value="">Select test type</option>
                 {testFamilies.map((testFamily) => (
                   <option key={testFamily.id} value={testFamily.id}>
                     {testFamily.name || testFamily.label}
@@ -300,8 +307,8 @@ export function CalendarDayEditor({
           </section>
 
           <section className="rounded-lg border border-adaptive p-4">
-            <h3 className="mb-3 font-semibold text-adaptive">
-              Add Employee Badge
+            <h3 className="mb-3 font-semibold text-primary">
+              Add Employee Schedule
             </h3>
             <FormField label="Employee">
               <Select
@@ -317,36 +324,74 @@ export function CalendarDayEditor({
                 ))}
               </Select>
             </FormField>
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                type="time"
-                name="employeeStartTime"
-                value={formData.employeeStartTime}
-                onChange={handleChange}
-              />
-              <Input
-                type="time"
-                name="employeeEndTime"
-                value={formData.employeeEndTime}
-                onChange={handleChange}
-              />
+            {!formData.employeeLabelType && (
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  type="time"
+                  name="employeeStartTime"
+                  value={formData.employeeStartTime}
+                  onChange={handleChange}
+                />
+                <Input
+                  type="time"
+                  name="employeeEndTime"
+                  value={formData.employeeEndTime}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+            <div className="mt-4 space-y-3">
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                {[
+                  { label: "OFF", value: "OFF" },
+                  { label: "REQUESTED OFF", value: "REQUESTED OFF" },
+                  { label: "CUSTOM LABEL", value: "custom" },
+                ].map((option) => (
+                  <label
+                    key={option.value}
+                    className="flex items-center gap-2 text-sm text-adaptive"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.employeeLabelType === option.value}
+                      onChange={() =>
+                        handleEmployeeLabelTypeChange(option.value)
+                      }
+                    />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+
+              {formData.employeeLabelType === "custom" && (
+                <Input
+                  name="employeeCustomLabel"
+                  value={formData.employeeCustomLabel}
+                  onChange={handleChange}
+                  placeholder="Custom schedule label"
+                />
+              )}
             </div>
-            <Input
-              name="employeeCustomLabel"
-              value={formData.employeeCustomLabel}
-              onChange={handleChange}
-              placeholder="OFF, REQUESTED OFF, or custom text"
-              className="mt-3"
-            />
           </section>
 
-          <section>
+          <section className="rounded-lg border border-adaptive p-4">
+            <h3 className="mb-3 font-semibold text-primary">
+              Add a Special Note
+            </h3>
             <FormField label="Add Note">
               <Textarea
                 name="noteMessage"
                 value={formData.noteMessage}
                 onChange={handleChange}
                 placeholder="Add a day note"
+              />
+            </FormField>
+            <FormField label="Note Color">
+              <DayNoteColorPicker
+                value={formData.noteColorHex}
+                onChange={(colorHex) =>
+                  setFormData((prev) => ({ ...prev, noteColorHex: colorHex }))
+                }
               />
             </FormField>
           </section>
@@ -358,7 +403,7 @@ export function CalendarDayEditor({
 
         <div className="mt-6 space-y-4">
           <section>
-            <h3 className="font-semibold text-adaptive">Existing Badges</h3>
+            <h3 className="font-semibold text-adaptive">Existing Entries</h3>
             <div className="mt-2 flex flex-wrap gap-2">
               {existingTestFamilyBadges.map((badge) => (
                 <Badge key={`tf-${badge.id}`} variant="primary">
@@ -383,7 +428,8 @@ export function CalendarDayEditor({
                 existingNotes.map((note) => (
                   <p
                     key={note.id}
-                    className="rounded bg-yellow-50 px-3 py-2 text-sm text-yellow-800"
+                    className="rounded px-3 py-2 text-sm text-gray-900"
+                    style={{ backgroundColor: getNoteColor(note) }}
                   >
                     {note.message}
                   </p>

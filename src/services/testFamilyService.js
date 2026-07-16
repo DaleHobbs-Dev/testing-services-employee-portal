@@ -1,27 +1,36 @@
 import { fetchJson, postJson, putJson } from "./apiSettings";
 
+const TEST_FAMILIES_ENDPOINT = "/test-families";
+
+const normalizeTestFamilyList = (response) => {
+    if (Array.isArray(response)) return response;
+    return response?.testFamilies || response?.items || [];
+};
+
+const normalizeTestFamily = (response) => response?.testFamily || response;
+
 export const getAllTestFamilies = async () => {
-    return fetchJson("/testFamilies");
+    return fetchJson(TEST_FAMILIES_ENDPOINT).then(normalizeTestFamilyList);
 };
 
 export const getTestFamilyById = async (familyId) => {
-    return fetchJson(`/testFamilies/${familyId}`);
+    return fetchJson(`${TEST_FAMILIES_ENDPOINT}/${familyId}`).then(normalizeTestFamily);
 };
 
 export const createTestFamily = async (testFamilyData) => {
-    return postJson("/testFamilies", testFamilyData);
+    return postJson(TEST_FAMILIES_ENDPOINT, testFamilyData);
 }
 
 export const updateTestFamily = async (familyId, updatedTestFamilyData) => {
-    return putJson(`/testFamilies/${familyId}`, updatedTestFamilyData);
+    return putJson(`${TEST_FAMILIES_ENDPOINT}/${familyId}`, updatedTestFamilyData);
 }
 
 export const deleteTestFamily = async (familyId) => {
     // Get the current family data first
-    const family = await fetchJson(`/testFamilies/${familyId}`);
+    const family = await getTestFamilyById(familyId);
 
     // Update with active: false while preserving all other fields
-    return putJson(`/testFamilies/${familyId}`, {
+    return putJson(`${TEST_FAMILIES_ENDPOINT}/${familyId}`, {
         ...family,
         active: false,
     });
@@ -29,10 +38,10 @@ export const deleteTestFamily = async (familyId) => {
 
 export const deleteTestFamilyWithVariants = async (familyId) => {
     // Get the family
-    const family = await fetchJson(`/testFamilies/${familyId}`);
+    const family = await getTestFamilyById(familyId);
 
     // Mark family as inactive
-    await putJson(`/testFamilies/${familyId}`, {
+    await putJson(`${TEST_FAMILIES_ENDPOINT}/${familyId}`, {
         ...family,
         active: false,
     });
