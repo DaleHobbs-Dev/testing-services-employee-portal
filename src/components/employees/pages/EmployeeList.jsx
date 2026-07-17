@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   PageHeader,
@@ -21,10 +21,10 @@ import {
 } from "@/components";
 import {
   getAllEmployees,
-  getAllCertifications,
-  getAllPermissions,
-  getAllEmployeeCertifications,
-  getAllEmployeePermissions,
+  // getAllCertifications,
+  // getAllPermissions,
+  // getAllEmployeeCertifications,
+  // getAllEmployeePermissions,
   updateEmployeeRoles,
 } from "@/services";
 import { useCurrentUser } from "@/context";
@@ -43,10 +43,12 @@ import {
 export function EmployeeList() {
   const { currentUser } = useCurrentUser();
   const [employees, setEmployees] = useState([]);
-  const [certifications, setCertifications] = useState([]);
-  const [permissions, setPermissions] = useState([]);
-  const [employeeCertifications, setEmployeeCertifications] = useState([]);
-  const [employeePermissions, setEmployeePermissions] = useState([]);
+  // Certifications and permissions are temporarily disabled until the backend
+  // endpoints are available.
+  // const [certifications, setCertifications] = useState([]);
+  // const [permissions, setPermissions] = useState([]);
+  // const [employeeCertifications, setEmployeeCertifications] = useState([]);
+  // const [employeePermissions, setEmployeePermissions] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [roleEmployee, setRoleEmployee] = useState(null);
   const [selectedRoles, setSelectedRoles] = useState([]);
@@ -58,20 +60,21 @@ export function EmployeeList() {
   const canModifyRoles = employeeHasRole(currentUser, ["admin", "technician"]);
 
   useEffect(() => {
-    // Fetch all data
+    // Fetch only employee data for now. The permissions/certifications
+    // endpoints are not built yet.
     Promise.all([
       getAllEmployees(),
-      getAllCertifications(),
-      getAllPermissions(),
-      getAllEmployeeCertifications(),
-      getAllEmployeePermissions(),
+      // getAllCertifications(),
+      // getAllPermissions(),
+      // getAllEmployeeCertifications(),
+      // getAllEmployeePermissions(),
     ])
-      .then(([empData, certData, permData, empCertData, empPermData]) => {
+      .then(([empData]) => {
         setEmployees(empData);
-        setCertifications(certData);
-        setPermissions(permData);
-        setEmployeeCertifications(empCertData);
-        setEmployeePermissions(empPermData);
+        // setCertifications(certData);
+        // setPermissions(permData);
+        // setEmployeeCertifications(empCertData);
+        // setEmployeePermissions(empPermData);
         setLoading(false);
       })
       .catch((err) => {
@@ -80,46 +83,18 @@ export function EmployeeList() {
       });
   }, []);
 
-  const enrichedEmployee = useMemo(() => {
-    if (!selectedEmployee) return null;
-
-    // Get cert IDs for this employee from junction table
-    const employeeCertIds = employeeCertifications
-      .filter(
-        (ec) => ec.employeeId === selectedEmployee.id && ec.active !== false
-      )
-      .map((ec) => ec.certificationId);
-
-    // Get perm IDs for this employee from junction table
-    const employeePermIds = employeePermissions
-      .filter(
-        (ep) => ep.employeeId === selectedEmployee.id && ep.active !== false
-      )
-      .map((ep) => ep.permissionId);
-
-    return {
-      ...selectedEmployee,
-      certifications: employeeCertIds
-        .map((id) => certifications.find((c) => c.id === id)?.label)
-        .filter(Boolean),
-      permissions: employeePermIds
-        .map((id) => permissions.find((p) => p.id === id)?.label)
-        .filter(Boolean),
-    };
-  }, [
-    selectedEmployee,
-    certifications,
-    permissions,
-    employeeCertifications,
-    employeePermissions,
-  ]);
-
   const handleViewDetails = (employee) => {
     setSelectedEmployee(employee);
   };
 
   const isCurrentEmployee = (employee) =>
     String(employee?.id) === String(currentUser?.id);
+
+  const roleEmployeeRoles = getEmployeeRoles(roleEmployee);
+  const roleEmployeeIsTechnician = roleEmployeeRoles.includes("technician");
+  const editableRoles = EMPLOYEE_ROLES.filter(
+    (role) => role !== "technician" || roleEmployeeIsTechnician
+  );
 
   const openRoleModal = (employee) => {
     setRoleEmployee(employee);
@@ -136,6 +111,8 @@ export function EmployeeList() {
   };
 
   const toggleRole = (role) => {
+    if (role === "technician") return;
+
     setSelectedRoles((prev) =>
       prev.includes(role)
         ? prev.filter((selectedRole) => selectedRole !== role)
@@ -150,10 +127,16 @@ export function EmployeeList() {
     setRoleError("");
 
     try {
-      const response = await updateEmployeeRoles(roleEmployee.id, selectedRoles);
+      const nextRoles = selectedRoles.filter((role) => role !== "technician");
+
+      if (roleEmployeeIsTechnician) {
+        nextRoles.push("technician");
+      }
+
+      const response = await updateEmployeeRoles(roleEmployee.id, nextRoles);
       const updatedEmployee = response?.employee || response || {
         ...roleEmployee,
-        roles: selectedRoles,
+        roles: nextRoles,
       };
 
       setEmployees((prev) =>
@@ -261,7 +244,7 @@ export function EmployeeList() {
                           openRoleModal(emp);
                         }}
                       >
-                        {isSelf ? "Your Roles" : "Modify Role"}
+                        Edit Roles
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -291,19 +274,26 @@ export function EmployeeList() {
           )}
 
           <div className="grid grid-cols-2 gap-2">
-            {EMPLOYEE_ROLES.map((role) => (
-              <label
-                key={role}
-                className="flex items-center gap-2 rounded border border-gray-200 px-3 py-2"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedRoles.includes(role)}
-                  onChange={() => toggleRole(role)}
-                />
-                <span>{formatRole(role)}</span>
-              </label>
-            ))}
+            {editableRoles.map((role) => {
+              const isLockedTechnicianRole = role === "technician";
+
+              return (
+                <label
+                  key={role}
+                  className={`flex items-center gap-2 rounded border border-adaptive bg-adaptive px-3 py-2 text-adaptive ${
+                    isLockedTechnicianRole ? "opacity-70" : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedRoles.includes(role)}
+                    disabled={isLockedTechnicianRole}
+                    onChange={() => toggleRole(role)}
+                  />
+                  <span>{formatRole(role)}</span>
+                </label>
+              );
+            })}
           </div>
           {selectedRoles.length === 0 && (
             <p className="text-red-600 text-sm mt-2">
@@ -335,7 +325,7 @@ export function EmployeeList() {
 
       {/* Employee Details Modal */}
       <EmployeeDetails
-        employee={enrichedEmployee}
+        employee={selectedEmployee}
         isOpen={!!selectedEmployee}
         onClose={() => setSelectedEmployee(null)}
       />

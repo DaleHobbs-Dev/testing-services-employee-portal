@@ -58,7 +58,7 @@ const request = (endpoint, options = {}) => {
 }
 
 // Exported fetchJson for making API fetch requests
-export const fetchJson = (endpoint) => request(endpoint)
+export const fetchJson = (endpoint, options) => request(endpoint, options)
 
 // Exported postJson for making API POST requests with JSON body
 export const postJson = (endpoint, body) => request(endpoint, {

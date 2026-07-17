@@ -10,11 +10,11 @@ const normalizeTestFamilyList = (response) => {
 const normalizeTestFamily = (response) => response?.testFamily || response;
 
 export const getAllTestFamilies = async () => {
-    return fetchJson(TEST_FAMILIES_ENDPOINT).then(normalizeTestFamilyList);
+    return fetchJson(TEST_FAMILIES_ENDPOINT, { cache: "no-store" }).then(normalizeTestFamilyList);
 };
 
 export const getTestFamilyById = async (familyId) => {
-    return fetchJson(`${TEST_FAMILIES_ENDPOINT}/${familyId}`).then(normalizeTestFamily);
+    return fetchJson(`${TEST_FAMILIES_ENDPOINT}/${familyId}`, { cache: "no-store" }).then(normalizeTestFamily);
 };
 
 export const createTestFamily = async (testFamilyData) => {

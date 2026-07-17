@@ -21,7 +21,9 @@ import {
   upsertCalendarDayLabel,
   deleteCalendarDayLabel,
   createCalendarTestFamilyBadge,
+  createBulkCalendarTestFamilyBadges,
   createCalendarEmployeeBadge,
+  createBulkCalendarEmployeeBadges,
   createCalendarDayNote,
   getAllEmployees,
   getEmployeeDirectory,
@@ -34,10 +36,31 @@ import { CalendarFilterBar } from "@/components/calendar/components/CalendarFilt
 import { CalendarMonthGrid } from "@/components/calendar/components/CalendarMonthGrid";
 import { CalendarDayEditor } from "@/components/calendar/components/CalendarDayEditor";
 import { getMonthName } from "@/components/calendar/utils/dateGrid";
+import { DEFAULT_CLOSURE_TYPE } from "@/components/calendar/utils/closureTypes";
+import { toApiFilterValue } from "@/components/calendar/utils/filterValues";
 
 const normalizeList = (response, key) => {
   if (Array.isArray(response)) return response;
   return response?.[key] || response?.items || [];
+};
+
+const normalizeOptionalString = (value) => value || "";
+
+const toSingleDateBadge = (badge) => {
+  const { dates, ...singleBadge } = badge;
+  return {
+    ...singleBadge,
+    date: dates?.[0] || singleBadge.date,
+  };
+};
+
+const getSkippedMessage = (result, label) => {
+  const skipped = result?.skipped || [];
+  if (skipped.length === 0) return "";
+
+  return ` ${label}: skipped ${skipped.length} closed date${
+    skipped.length === 1 ? "" : "s"
+  }.`;
 };
 
 const buildMonthOptions = (calendar) => {
@@ -72,6 +95,7 @@ export function EditCalendars() {
   const [locations, setLocations] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [testFamilies, setTestFamilies] = useState([]);
+  const [calendarEmployeeFilter, setCalendarEmployeeFilter] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [filters, setFilters] = useState({
     locationId: "",
@@ -81,6 +105,8 @@ export function EditCalendars() {
     showNotes: true,
     showHoursColumn: false,
     showMySchedule: true,
+    showSunday: false,
+    showSaturday: false,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isMonthLoading, setIsMonthLoading] = useState(false);
@@ -123,8 +149,8 @@ export function EditCalendars() {
         year: selectedCalendar.year,
         month: selectedMonth,
         locationId: filters.locationId,
-        testFamilyId: filters.testFamilyId,
-        employeeId: filters.employeeId,
+        testFamilyId: toApiFilterValue(filters.testFamilyId),
+        employeeId: toApiFilterValue(filters.employeeId),
       });
       setMonthView(data);
     } catch (err) {
@@ -196,6 +222,11 @@ export function EditCalendars() {
     setSuccess("");
   };
 
+  const handleCalendarEmployeeFilterChange = (employeeId) => {
+    setCalendarEmployeeFilter(employeeId);
+    setMarkedCalendarIds([]);
+  };
+
   const handleToggleDeleteMode = () => {
     setIsDeleteMode((prev) => !prev);
     setMarkedCalendarIds([]);
@@ -257,11 +288,33 @@ export function EditCalendars() {
     setSuccess("");
 
     try {
+      const skippedMessages = [];
+      const closurePayload = {
+        locationId: dayData.locationId,
+        date: dayData.date,
+        closureType: dayData.closureType,
+        reason: dayData.closureReason,
+      };
+
+      const closureChanged =
+        dayData.existingClosure &&
+        (normalizeOptionalString(dayData.existingClosure.reason) !==
+          normalizeOptionalString(dayData.closureReason) ||
+          normalizeOptionalString(dayData.existingClosure.closureType) !==
+            normalizeOptionalString(dayData.closureType || DEFAULT_CLOSURE_TYPE));
+
       if (dayData.isClosed && !dayData.existingClosure) {
+        await createCalendarClosure(selectedCalendar.id, closurePayload);
+      }
+
+      if (dayData.isClosed && closureChanged) {
+        await deleteCalendarClosure(
+          selectedCalendar.id,
+          dayData.existingClosure.id
+        );
         await createCalendarClosure(selectedCalendar.id, {
-          locationId: dayData.locationId,
-          date: dayData.date,
-          reason: dayData.closureReason,
+          ...closurePayload,
+          closureType: dayData.closureType || DEFAULT_CLOSURE_TYPE,
         });
       }
 
@@ -291,24 +344,44 @@ export function EditCalendars() {
       }
 
       if (dayData.testFamilyBadge) {
-        await createCalendarTestFamilyBadge(
-          selectedCalendar.id,
-          dayData.testFamilyBadge
-        );
+        const dates = dayData.testFamilyBadge.dates || [];
+        const result =
+          dates.length > 1
+            ? await createBulkCalendarTestFamilyBadges(
+                selectedCalendar.id,
+                dayData.testFamilyBadge
+              )
+            : await createCalendarTestFamilyBadge(
+                selectedCalendar.id,
+                toSingleDateBadge(dayData.testFamilyBadge)
+              );
+
+        skippedMessages.push(getSkippedMessage(result, "Test type"));
       }
 
       if (dayData.employeeBadge) {
-        await createCalendarEmployeeBadge(
-          selectedCalendar.id,
-          dayData.employeeBadge
-        );
+        const dates = dayData.employeeBadge.dates || [];
+        const result =
+          dates.length > 1
+            ? await createBulkCalendarEmployeeBadges(
+                selectedCalendar.id,
+                dayData.employeeBadge
+              )
+            : await createCalendarEmployeeBadge(
+                selectedCalendar.id,
+                toSingleDateBadge(dayData.employeeBadge)
+              );
+
+        skippedMessages.push(getSkippedMessage(result, "Employee schedule"));
       }
 
       if (dayData.note) {
         await createCalendarDayNote(selectedCalendar.id, dayData.note);
       }
 
-      setSuccess(`Saved changes for ${dayData.date}.`);
+      setSuccess(
+        `Saved changes for ${dayData.date}.${skippedMessages.join("")}`
+      );
       await loadMonthView();
     } catch (err) {
       console.error(err);
@@ -356,6 +429,10 @@ export function EditCalendars() {
             onToggleMarkedCalendar={handleToggleMarkedCalendar}
             onDeleteMarkedCalendars={() => setIsDeleteModalOpen(true)}
             isDeleting={isDeletingCalendars}
+            employees={employees}
+            showEmployeeFilter={canManageAllCalendars}
+            employeeFilterValue={calendarEmployeeFilter}
+            onEmployeeFilterChange={handleCalendarEmployeeFilterChange}
           />
 
           <div className="space-y-6">
@@ -382,6 +459,34 @@ export function EditCalendars() {
                           ))}
                         </Select>
                       </FormField>
+                      <div className="mt-4 space-y-2">
+                        <label className="flex items-center gap-2 text-sm text-adaptive">
+                          <input
+                            type="checkbox"
+                            checked={filters.showSunday}
+                            onChange={() =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                showSunday: !prev.showSunday,
+                              }))
+                            }
+                          />
+                          Show Sunday
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-adaptive">
+                          <input
+                            type="checkbox"
+                            checked={filters.showSaturday}
+                            onChange={() =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                showSaturday: !prev.showSaturday,
+                              }))
+                            }
+                          />
+                          Show Saturday
+                        </label>
+                      </div>
                     </div>
 
                     <div className="lg:border-l lg:border-adaptive lg:pl-5">

@@ -14,7 +14,8 @@ export function Button({
     primary: "bg-primary text-white hover:bg-primary-dark",
     accent: "bg-accent text-white hover:bg-accent-dark",
     outline: "border border-primary text-primary hover:bg-primary-lighter",
-    danger: "bg-danger-500 text-white hover:bg-red-700",
+    danger:
+      "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:text-white dark:hover:bg-red-400 disabled:bg-red-300 disabled:text-white disabled:cursor-not-allowed dark:disabled:bg-red-900 dark:disabled:text-red-200",
     ghost: "bg-transparent text-primary hover:bg-primary-lighter",
     secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
 

@@ -19,7 +19,7 @@ export const register = async (employeeData) => {
 };
 
 export const getCurrentEmployee = async () => {
-  return fetchJson("/auth/me");
+  return fetchJson("/auth/me", { cache: "no-store" });
 };
 
 export const logout = async () => {

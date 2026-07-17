@@ -8,7 +8,7 @@ export function Modal({ isOpen, onClose, children, className = "" }) {
 
       {/* Modal Content */}
       <div
-        className={`relative bg-white rounded-xl shadow-xl max-w-lg w-full mx-4 p-6 ${className}`}
+        className={`relative bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-lg w-full mx-4 p-6 ${className}`}
       >
         {children}
       </div>

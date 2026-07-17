@@ -9,6 +9,10 @@ import {
   CardTitle,
   FormField,
   Input,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
   Select,
   Textarea,
 } from "@/components";
@@ -16,6 +20,15 @@ import {
   DayNoteColorPicker,
   DEFAULT_DAY_NOTE_COLOR,
 } from "@/components/calendar/components/DayNoteColorPicker";
+import {
+  CLOSURE_TYPES,
+  DEFAULT_CLOSURE_TYPE,
+} from "@/components/calendar/utils/closureTypes";
+import {
+  buildMonthGrid,
+  getMonthName,
+  WEEKDAY_LABELS,
+} from "@/components/calendar/utils/dateGrid";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const asString = (value) => (value === undefined || value === null ? "" : String(value));
@@ -37,6 +50,90 @@ const getNoteColor = (note) =>
 
 const DEFAULT_EMPLOYEE_START_TIME = "07:45";
 const DEFAULT_EMPLOYEE_END_TIME = "16:15";
+
+const sortDates = (dates) => [...dates].sort();
+
+const getDateParts = (date) => {
+  const [year, month] = asString(date).split("-").map(Number);
+  return { year, month };
+};
+
+const formatEditorDate = (date) => {
+  if (!date) return "";
+
+  const [year, month, day] = asString(date).split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+function BadgeDatePicker({
+  title,
+  isOpen,
+  onClose,
+  selectedDates,
+  onToggleDate,
+  year,
+  month,
+}) {
+  const weeks = buildMonthGrid(year, month);
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalHeader onClose={onClose}>
+        <div>
+          <h2 className="text-xl font-semibold text-adaptive">{title}</h2>
+          <p className="text-sm text-adaptive-muted">
+            {getMonthName(month)} {year}
+          </p>
+        </div>
+      </ModalHeader>
+      <ModalBody>
+        <div className="grid grid-cols-7 text-center text-xs font-semibold text-adaptive">
+          {WEEKDAY_LABELS.map((weekday) => (
+            <div key={weekday} className="p-1">
+              {weekday}
+            </div>
+          ))}
+        </div>
+        <div className="mt-1 grid grid-cols-7 gap-1">
+          {weeks.flat().map((day) => {
+            const isSelected = selectedDates.includes(day.date);
+
+            return (
+              <button
+                key={day.key}
+                type="button"
+                disabled={!day.isCurrentMonth}
+                onClick={() => onToggleDate(day.date)}
+                className={`min-h-9 rounded border text-sm transition ${
+                  day.isCurrentMonth
+                    ? isSelected
+                      ? "border-primary bg-primary text-white"
+                      : "border-adaptive bg-adaptive text-adaptive hover:border-primary"
+                    : "border-transparent bg-transparent"
+                }`}
+              >
+                {day.dayNumber}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-sm text-adaptive-muted">
+          {selectedDates.length} date{selectedDates.length === 1 ? "" : "s"} selected
+        </p>
+      </ModalBody>
+      <ModalFooter>
+        <Button type="button" variant="secondary" onClick={onClose}>
+          Done
+        </Button>
+      </ModalFooter>
+    </Modal>
+  );
+}
 
 export function CalendarDayEditor({
   date,
@@ -79,9 +176,12 @@ export function CalendarDayEditor({
 
   const [formData, setFormData] = useState(() => ({
     isClosed: !!existingClosure,
+    closureType: existingClosure?.closureType || DEFAULT_CLOSURE_TYPE,
     closureReason: existingClosure?.reason || "",
     label: existingLabel?.label || "",
-    showWhenClosed: !!existingLabel?.showWhenClosed,
+    showWhenClosed: existingLabel
+      ? existingLabel.showWhenClosed !== false
+      : true,
     testFamilyId: "",
     testFamilyStartTime: "",
     testFamilyEndTime: "",
@@ -93,14 +193,38 @@ export function CalendarDayEditor({
     noteMessage: "",
     noteColorHex: DEFAULT_DAY_NOTE_COLOR,
   }));
+  const [testFamilyDates, setTestFamilyDates] = useState(() => [date]);
+  const [employeeDates, setEmployeeDates] = useState(() => [date]);
+  const [datePickerType, setDatePickerType] = useState(null);
+  const { year: editorYear, month: editorMonth } = getDateParts(date);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormData((prev) => {
+      const nextValue = type === "checkbox" ? checked : value;
+
+      if (name === "isClosed" && checked) {
+        return {
+          ...prev,
+          isClosed: true,
+          closureType: prev.closureType || DEFAULT_CLOSURE_TYPE,
+          testFamilyId: "",
+          testFamilyStartTime: "",
+          testFamilyEndTime: "",
+          employeeId: "",
+          employeeStartTime: DEFAULT_EMPLOYEE_START_TIME,
+          employeeEndTime: DEFAULT_EMPLOYEE_END_TIME,
+          employeeLabelType: "",
+          employeeCustomLabel: "",
+        };
+      }
+
+      return {
+        ...prev,
+        [name]: nextValue,
+      };
+    });
   };
 
   const handleEmployeeLabelTypeChange = (labelType) => {
@@ -117,6 +241,24 @@ export function CalendarDayEditor({
           : "",
     }));
   };
+
+  const toggleSelectedDate = (type, selectedDate) => {
+    const updateDates = (prev) =>
+      prev.includes(selectedDate)
+        ? prev.length === 1
+          ? prev
+          : sortDates(prev.filter((item) => item !== selectedDate))
+        : sortDates([...prev, selectedDate]);
+
+    if (type === "testFamily") {
+      setTestFamilyDates(updateDates);
+    } else {
+      setEmployeeDates(updateDates);
+    }
+  };
+
+  const getDateSummary = (dates) =>
+    dates.length === 1 ? dates[0] : `${dates.length} dates selected`;
 
   const getTestFamilyName = (badge) => {
     const testFamily = testFamilies.find(
@@ -160,26 +302,30 @@ export function CalendarDayEditor({
       existingClosure,
       existingLabel,
       isClosed: formData.isClosed,
+      closureType: formData.closureType,
       closureReason: formData.closureReason,
       label: formData.label,
       showWhenClosed: formData.showWhenClosed,
       testFamilyBadge:
+        !formData.isClosed &&
         formData.testFamilyId &&
         formData.testFamilyStartTime &&
         formData.testFamilyEndTime
           ? {
               testFamilyId: formData.testFamilyId,
-              locationIds: [locationId],
-              dates: [date],
+              locationId,
+              date,
+              dates: testFamilyDates,
               startTime: formData.testFamilyStartTime,
               endTime: formData.testFamilyEndTime,
             }
           : null,
-      employeeBadge: newEmployeeBadge
+      employeeBadge: !formData.isClosed && newEmployeeBadge
         ? {
             ...newEmployeeBadge,
-            locationIds: [locationId],
-            dates: [date],
+            locationId,
+            date,
+            dates: employeeDates,
           }
         : null,
       note: formData.noteMessage
@@ -226,7 +372,7 @@ export function CalendarDayEditor({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Editing {date}</CardTitle>
+        <CardTitle>Editing {formatEditorDate(date)}</CardTitle>
         <p className="text-sm text-adaptive-muted">
           {location?.name || "Selected location"}
         </p>
@@ -243,13 +389,29 @@ export function CalendarDayEditor({
               />
               Testing Center Closed
             </label>
-            <Input
-              name="closureReason"
-              value={formData.closureReason}
-              onChange={handleChange}
-              placeholder="Closure reason"
-              className="mt-2"
-            />
+            {formData.isClosed && (
+              <div className="mt-2 space-y-3">
+                <FormField label="Closure Type">
+                  <Select
+                    name="closureType"
+                    value={formData.closureType}
+                    onChange={handleChange}
+                  >
+                    {CLOSURE_TYPES.map((closureType) => (
+                      <option key={closureType.value} value={closureType.value}>
+                        {closureType.label}
+                      </option>
+                    ))}
+                  </Select>
+                </FormField>
+                <Input
+                  name="closureReason"
+                  value={formData.closureReason}
+                  onChange={handleChange}
+                  placeholder="Closure reason"
+                />
+              </div>
+            )}
           </section>
 
           <section>
@@ -272,107 +434,143 @@ export function CalendarDayEditor({
             </label>
           </section>
 
-          <section className="rounded-lg border border-adaptive p-4">
-            <h3 className="mb-3 font-semibold text-primary">
-              Add a Test Type
-            </h3>
-            <FormField label="Test Type">
-              <Select
-                name="testFamilyId"
-                value={formData.testFamilyId}
-                onChange={handleChange}
-              >
-                <option value="">Select test type</option>
-                {testFamilies.map((testFamily) => (
-                  <option key={testFamily.id} value={testFamily.id}>
-                    {testFamily.name || testFamily.label}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                type="time"
-                name="testFamilyStartTime"
-                value={formData.testFamilyStartTime}
-                onChange={handleChange}
-              />
-              <Input
-                type="time"
-                name="testFamilyEndTime"
-                value={formData.testFamilyEndTime}
-                onChange={handleChange}
-              />
-            </div>
-          </section>
-
-          <section className="rounded-lg border border-adaptive p-4">
-            <h3 className="mb-3 font-semibold text-primary">
-              Add Employee Schedule
-            </h3>
-            <FormField label="Employee">
-              <Select
-                name="employeeId"
-                value={formData.employeeId}
-                onChange={handleChange}
-              >
-                <option value="">Select employee</option>
-                {employees.map((employee) => (
-                  <option key={employee.id} value={employee.id}>
-                    {getEmployeeDisplayName(employee)}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-            {!formData.employeeLabelType && (
-              <div className="grid grid-cols-2 gap-3">
-                <Input
-                  type="time"
-                  name="employeeStartTime"
-                  value={formData.employeeStartTime}
-                  onChange={handleChange}
-                />
-                <Input
-                  type="time"
-                  name="employeeEndTime"
-                  value={formData.employeeEndTime}
-                  onChange={handleChange}
-                />
-              </div>
-            )}
-            <div className="mt-4 space-y-3">
-              <div className="flex flex-wrap gap-x-4 gap-y-2">
-                {[
-                  { label: "OFF", value: "OFF" },
-                  { label: "REQUESTED OFF", value: "REQUESTED OFF" },
-                  { label: "CUSTOM LABEL", value: "custom" },
-                ].map((option) => (
-                  <label
-                    key={option.value}
-                    className="flex items-center gap-2 text-sm text-adaptive"
+          {!formData.isClosed && (
+            <>
+              <section className="rounded-lg border border-adaptive p-4">
+                <h3 className="mb-3 font-semibold text-primary">
+                  Add a Test Type
+                </h3>
+                <FormField label="Test Type">
+                  <Select
+                    name="testFamilyId"
+                    value={formData.testFamilyId}
+                    onChange={handleChange}
                   >
-                    <input
-                      type="checkbox"
-                      checked={formData.employeeLabelType === option.value}
-                      onChange={() =>
-                        handleEmployeeLabelTypeChange(option.value)
-                      }
-                    />
-                    {option.label}
-                  </label>
-                ))}
-              </div>
+                    <option value="">Select test type</option>
+                    {testFamilies.map((testFamily) => (
+                      <option key={testFamily.id} value={testFamily.id}>
+                        {testFamily.name || testFamily.label}
+                      </option>
+                    ))}
+                  </Select>
+                </FormField>
+                <div className="grid grid-cols-2 gap-3">
+                  <Input
+                    type="time"
+                    name="testFamilyStartTime"
+                    value={formData.testFamilyStartTime}
+                    onChange={handleChange}
+                  />
+                  <Input
+                    type="time"
+                    name="testFamilyEndTime"
+                    value={formData.testFamilyEndTime}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mt-4 rounded-md border border-adaptive bg-adaptive p-3">
+                  <p className="text-sm font-medium text-adaptive">
+                    Apply to
+                  </p>
+                  <p className="text-sm text-adaptive-muted">
+                    {getDateSummary(testFamilyDates)}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="mt-3"
+                    onClick={() => setDatePickerType("testFamily")}
+                  >
+                    Choose Dates
+                  </Button>
+                </div>
+              </section>
 
-              {formData.employeeLabelType === "custom" && (
-                <Input
-                  name="employeeCustomLabel"
-                  value={formData.employeeCustomLabel}
-                  onChange={handleChange}
-                  placeholder="Custom schedule label"
-                />
-              )}
-            </div>
-          </section>
+              <section className="rounded-lg border border-adaptive p-4">
+                <h3 className="mb-3 font-semibold text-primary">
+                  Add Employee Schedule
+                </h3>
+                <FormField label="Employee">
+                  <Select
+                    name="employeeId"
+                    value={formData.employeeId}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select employee</option>
+                    {employees.map((employee) => (
+                      <option key={employee.id} value={employee.id}>
+                        {getEmployeeDisplayName(employee)}
+                      </option>
+                    ))}
+                  </Select>
+                </FormField>
+                {!formData.employeeLabelType && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input
+                      type="time"
+                      name="employeeStartTime"
+                      value={formData.employeeStartTime}
+                      onChange={handleChange}
+                    />
+                    <Input
+                      type="time"
+                      name="employeeEndTime"
+                      value={formData.employeeEndTime}
+                      onChange={handleChange}
+                    />
+                  </div>
+                )}
+                <div className="mt-4 space-y-3">
+                  <div className="flex flex-wrap gap-x-4 gap-y-2">
+                    {[
+                      { label: "OFF", value: "OFF" },
+                      { label: "REQUESTED OFF", value: "REQUESTED OFF" },
+                      { label: "CUSTOM LABEL", value: "custom" },
+                    ].map((option) => (
+                      <label
+                        key={option.value}
+                        className="flex items-center gap-2 text-sm text-adaptive"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.employeeLabelType === option.value}
+                          onChange={() =>
+                            handleEmployeeLabelTypeChange(option.value)
+                          }
+                        />
+                        {option.label}
+                      </label>
+                    ))}
+                  </div>
+
+                  {formData.employeeLabelType === "custom" && (
+                    <Input
+                      name="employeeCustomLabel"
+                      value={formData.employeeCustomLabel}
+                      onChange={handleChange}
+                      placeholder="Custom schedule label"
+                    />
+                  )}
+                </div>
+                <div className="mt-4 rounded-md border border-adaptive bg-adaptive p-3">
+                  <p className="text-sm font-medium text-adaptive">
+                    Apply to
+                  </p>
+                  <p className="text-sm text-adaptive-muted">
+                    {getDateSummary(employeeDates)}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="mt-3"
+                    onClick={() => setDatePickerType("employee")}
+                  >
+                    Choose Dates
+                  </Button>
+                </div>
+              </section>
+            </>
+          )}
 
           <section className="rounded-lg border border-adaptive p-4">
             <h3 className="mb-3 font-semibold text-primary">
@@ -439,6 +637,26 @@ export function CalendarDayEditor({
           </section>
         </div>
       </CardContent>
+      <BadgeDatePicker
+        title="Choose Test Type Dates"
+        isOpen={datePickerType === "testFamily"}
+        onClose={() => setDatePickerType(null)}
+        selectedDates={testFamilyDates}
+        onToggleDate={(selectedDate) =>
+          toggleSelectedDate("testFamily", selectedDate)
+        }
+        year={editorYear}
+        month={editorMonth}
+      />
+      <BadgeDatePicker
+        title="Choose Employee Schedule Dates"
+        isOpen={datePickerType === "employee"}
+        onClose={() => setDatePickerType(null)}
+        selectedDates={employeeDates}
+        onToggleDate={(selectedDate) => toggleSelectedDate("employee", selectedDate)}
+        year={editorYear}
+        month={editorMonth}
+      />
     </Card>
   );
 }

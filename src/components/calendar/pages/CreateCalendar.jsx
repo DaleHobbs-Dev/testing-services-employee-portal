@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Alert,
@@ -14,7 +14,10 @@ import {
   Section,
   Select,
 } from "@/components";
-import { createCalendar } from "@/services";
+import { useCurrentUser } from "@/context";
+import { createCalendar, getAllEmployees } from "@/services";
+import { employeeHasRole } from "@/utils/roleUtils";
+import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const currentYear = new Date().getFullYear();
 
@@ -65,13 +68,42 @@ const getCreatedCalendar = (response) => response?.calendar || response;
 
 export function CreateCalendar() {
   const navigate = useNavigate();
+  const { currentUser } = useCurrentUser();
+  const canChooseEmployee = employeeHasRole(currentUser, ["admin", "clerk"]);
   const [rangeType, setRangeType] = useState("janMay");
   const [year, setYear] = useState(String(currentYear));
   const [customStartMonth, setCustomStartMonth] = useState("1");
   const [customEndMonth, setCustomEndMonth] = useState("5");
   const [calendarName, setCalendarName] = useState("");
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+  const [isLoadingEmployees, setIsLoadingEmployees] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!canChooseEmployee) return;
+
+    setIsLoadingEmployees(true);
+    getAllEmployees()
+      .then((employeeData) => {
+        setEmployees(employeeData);
+        const currentEmployee = employeeData.find(
+          (employee) => String(employee.id) === String(currentUser?.id)
+        );
+
+        setSelectedEmployeeId(
+          String(currentEmployee?.id || employeeData[0]?.id || "")
+        );
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Could not load employees for calendar assignment.");
+      })
+      .finally(() => {
+        setIsLoadingEmployees(false);
+      });
+  }, [canChooseEmployee, currentUser?.id]);
 
   const selectedRange = useMemo(() => {
     if (rangeType !== "custom") {
@@ -96,6 +128,16 @@ export function CreateCalendar() {
     return `${rangeLabel} ${year} Calendar`;
   }, [rangeType, selectedRange.endMonth, selectedRange.startMonth, year]);
 
+  const selectedEmployee = useMemo(() => {
+    if (!canChooseEmployee) return currentUser;
+
+    return (
+      employees.find(
+        (employee) => String(employee.id) === String(selectedEmployeeId)
+      ) || null
+    );
+  }, [canChooseEmployee, currentUser, employees, selectedEmployeeId]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
@@ -111,6 +153,11 @@ export function CreateCalendar() {
       return;
     }
 
+    if (canChooseEmployee && !selectedEmployeeId) {
+      setError("Choose an employee for this calendar.");
+      return;
+    }
+
     setIsSaving(true);
 
     try {
@@ -119,6 +166,9 @@ export function CreateCalendar() {
         year: numericYear,
         startMonth: selectedRange.startMonth,
         endMonth: selectedRange.endMonth,
+        ...(canChooseEmployee && selectedEmployeeId
+          ? { employeeId: selectedEmployeeId }
+          : {}),
       });
       const createdCalendar = getCreatedCalendar(response);
 
@@ -173,6 +223,30 @@ export function CreateCalendar() {
                   />
                 </FormField>
               </div>
+
+              {canChooseEmployee && (
+                <FormField label="Choose Employee">
+                  <Select
+                    value={selectedEmployeeId}
+                    onChange={(event) =>
+                      setSelectedEmployeeId(event.target.value)
+                    }
+                    disabled={isLoadingEmployees}
+                    required
+                  >
+                    <option value="">
+                      {isLoadingEmployees
+                        ? "Loading employees..."
+                        : "Select employee"}
+                    </option>
+                    {employees.map((employee) => (
+                      <option key={employee.id} value={employee.id}>
+                        {getEmployeeDisplayName(employee)}
+                      </option>
+                    ))}
+                  </Select>
+                </FormField>
+              )}
 
               <FormField label="Calendar Type">
                 <Select
@@ -230,6 +304,11 @@ export function CreateCalendar() {
                   {getMonthLabel(selectedRange.startMonth)} through{" "}
                   {getMonthLabel(selectedRange.endMonth)} {year}
                 </p>
+                {selectedEmployee && (
+                  <p className="mt-2 text-xs font-medium text-adaptive">
+                    Owner: {getEmployeeDisplayName(selectedEmployee)}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-3">
