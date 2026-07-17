@@ -1,5 +1,13 @@
 // Config for API requests
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "")
+
+export const API_BASE_URL = configuredApiBaseUrl || (
+    import.meta.env.DEV ? "http://localhost:3000" : ""
+)
+
+if (!API_BASE_URL) {
+    throw new Error("VITE_API_BASE_URL must be set for production builds.")
+}
 export const TOKEN_KEY = "testing_services_user"
 
 // Helper AuthHeader function to include the token in the request headers

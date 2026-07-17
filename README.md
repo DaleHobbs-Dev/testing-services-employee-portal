@@ -176,6 +176,23 @@ npm run lint     # Run ESLint
 npm run api      # Start the temporary JSON Server API on port 8088
 ```
 
+## Render Static Site Deployment
+
+Use these settings if you configure the static site manually in Render:
+
+```txt
+Build Command: npm ci && npm run build
+Publish Directory: dist
+```
+
+Set this environment variable on the Render static site:
+
+```txt
+VITE_API_BASE_URL=https://testing-services-server.onrender.com
+```
+
+This repo also includes `render.yaml` for Render Blueprint deployments. It configures the Vite build, publishes `dist`, rewrites all routes to `index.html` for React Router, and adds baseline security headers for the static site.
+
 ---
 
 ## Development Notes
