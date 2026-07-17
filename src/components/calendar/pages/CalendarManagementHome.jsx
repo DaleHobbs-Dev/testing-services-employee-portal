@@ -9,6 +9,31 @@ import {
   PageHeader,
   Section,
 } from "@/components";
+import { Link } from "react-router-dom";
+
+const calendarManagementCards = [
+  {
+    title: "Create Calendar",
+    description:
+      "Start a new calendar from Jan-May, Jun-July, Aug-Dec, or a custom month range.",
+    action: "Create Calendar",
+    to: "/calendar-management/new",
+  },
+  {
+    title: "Edit Calendars",
+    description:
+      "Select a calendar, choose a month, and update closures, labels, badges, and notes by day.",
+    action: "Open Editor",
+    to: "/calendar-management/edit",
+  },
+  {
+    title: "View and Print Calendars",
+    description:
+      "Review calendar months with filters for locations, test types, employees, labels, notes, and hours.",
+    action: "Open Viewer",
+    to: "/calendar-management/view",
+  },
+];
 
 export function CalendarManagementHome() {
   return (
@@ -21,50 +46,29 @@ export function CalendarManagementHome() {
         />
 
         <Grid cols={3}>
-          <Card className="flex h-full flex-col">
-            <CardHeader>
-              <CardTitle>Create Calendar</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <p className="text-sm text-adaptive-muted">
-                Start a new calendar from Jan-May, Jun-July, Aug-Dec, or a
-                custom month range.
-              </p>
-              <Button to="/calendar-management/new" className="mt-auto">
-                Create Calendar
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="flex h-full flex-col">
-            <CardHeader>
-              <CardTitle>Edit Calendars</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <p className="text-sm text-adaptive-muted">
-                Select a calendar, choose a month, and update closures, labels,
-                badges, and notes by day.
-              </p>
-              <Button to="/calendar-management/edit" className="mt-auto">
-                Open Editor
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="flex h-full flex-col">
-            <CardHeader>
-              <CardTitle>View and Print Calendars</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <p className="text-sm text-adaptive-muted">
-                Review calendar months with filters for locations, test
-                types, employees, labels, notes, and hours.
-              </p>
-              <Button to="/calendar-management/view" className="mt-auto">
-                Open Viewer
-              </Button>
-            </CardContent>
-          </Card>
+          {calendarManagementCards.map((card) => (
+            <Card
+              key={card.to}
+              className="
+                flex h-full flex-col
+                transition-transform hover:shadow-lg hover:-translate-y-1
+                focus-within:shadow-lg focus-within:-translate-y-1
+                cursor-pointer
+              "
+            >
+              <Link to={card.to} className="flex h-full flex-col">
+                <CardHeader>
+                  <CardTitle>{card.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <p className="text-sm text-adaptive-muted">
+                    {card.description}
+                  </p>
+                  <Button className="mt-auto">{card.action}</Button>
+                </CardContent>
+              </Link>
+            </Card>
+          ))}
         </Grid>
       </Section>
     </Container>

@@ -23,6 +23,7 @@ import { CalendarSelector } from "@/components/calendar/components/CalendarSelec
 import { CalendarFilterBar } from "@/components/calendar/components/CalendarFilterBar";
 import { CalendarMonthGrid } from "@/components/calendar/components/CalendarMonthGrid";
 import { getMonthName } from "@/components/calendar/utils/dateGrid";
+import { toApiFilterValue } from "@/components/calendar/utils/filterValues";
 
 const normalizeList = (response, key) => {
   if (Array.isArray(response)) return response;
@@ -59,6 +60,7 @@ export function ViewCalendars() {
   const [locations, setLocations] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [testFamilies, setTestFamilies] = useState([]);
+  const [calendarEmployeeFilter, setCalendarEmployeeFilter] = useState("");
   const [filters, setFilters] = useState({
     locationId: "",
     testFamilyId: "",
@@ -67,6 +69,8 @@ export function ViewCalendars() {
     showNotes: false,
     showHoursColumn: false,
     showMySchedule: true,
+    showSunday: false,
+    showSaturday: false,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isMonthLoading, setIsMonthLoading] = useState(false);
@@ -103,8 +107,8 @@ export function ViewCalendars() {
         year: selectedCalendar.year,
         month: selectedMonth,
         locationId: filters.locationId,
-        testFamilyId: filters.testFamilyId,
-        employeeId: filters.employeeId,
+        testFamilyId: toApiFilterValue(filters.testFamilyId),
+        employeeId: toApiFilterValue(filters.employeeId),
       });
       setMonthView(data);
     } catch (err) {
@@ -187,6 +191,10 @@ export function ViewCalendars() {
             onSelect={handleSelectCalendar}
             title={canViewAllCalendars ? "All Calendars" : "My Calendars"}
             emptyMessage="No calendars are available yet."
+            employees={employees}
+            showEmployeeFilter={canViewAllCalendars}
+            employeeFilterValue={calendarEmployeeFilter}
+            onEmployeeFilterChange={setCalendarEmployeeFilter}
           />
 
           <div className="space-y-6">
@@ -212,6 +220,34 @@ export function ViewCalendars() {
                           ))}
                         </Select>
                       </FormField>
+                      <div className="mt-4 space-y-2">
+                        <label className="flex items-center gap-2 text-sm text-adaptive">
+                          <input
+                            type="checkbox"
+                            checked={filters.showSunday}
+                            onChange={() =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                showSunday: !prev.showSunday,
+                              }))
+                            }
+                          />
+                          Show Sunday
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-adaptive">
+                          <input
+                            type="checkbox"
+                            checked={filters.showSaturday}
+                            onChange={() =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                showSaturday: !prev.showSaturday,
+                              }))
+                            }
+                          />
+                          Show Saturday
+                        </label>
+                      </div>
                     </div>
 
                     <div className="lg:border-l lg:border-adaptive lg:pl-5">

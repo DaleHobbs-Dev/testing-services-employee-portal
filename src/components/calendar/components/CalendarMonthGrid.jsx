@@ -4,8 +4,14 @@ import {
   getMonthName,
   WEEKDAY_LABELS,
 } from "@/components/calendar/utils/dateGrid";
-import { sumEmployeeBadgeHours } from "@/components/calendar/utils/hoursSum";
+import { getBadgeHours } from "@/components/calendar/utils/hoursSum";
 import { DEFAULT_DAY_NOTE_COLOR } from "@/components/calendar/components/DayNoteColorPicker";
+import {
+  CLOSURE_TYPES,
+  DEFAULT_CLOSURE_TYPE,
+} from "@/components/calendar/utils/closureTypes";
+import { getReadableTextColor } from "@/components/calendar/utils/colorContrast";
+import { NONE_FILTER_VALUE } from "@/components/calendar/utils/filterValues";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const asString = (value) => (value === undefined || value === null ? "" : String(value));
@@ -13,13 +19,47 @@ const asString = (value) => (value === undefined || value === null ? "" : String
 const getItemsByDate = (items = [], date) =>
   items.filter((item) => item.date === date);
 
+const GRID_COLUMN_CLASSES = {
+  5: "grid-cols-5",
+  6: "grid-cols-6",
+  7: "grid-cols-7",
+  8: "grid-cols-8",
+};
+
+const getVisibleWeekdays = (filters) =>
+  WEEKDAY_LABELS.map((label, index) => ({ label, index })).filter((weekday) => {
+    if (weekday.index === 0) return filters.showSunday === true;
+    if (weekday.index === 6) return filters.showSaturday === true;
+    return true;
+  });
+
 const filterByLocation = (items = [], locationId) =>
   locationId
     ? items.filter((item) => asString(item.locationId) === asString(locationId))
     : items;
 
+const normalizeClosureType = (closureType) =>
+  closureType || DEFAULT_CLOSURE_TYPE;
+
+const filterClosures = (items = [], filters) => {
+  const selectedClosureTypes =
+    filters.closureTypes || CLOSURE_TYPES.map((closureType) => closureType.value);
+
+  return filterByLocation(items, filters.locationId).filter((closure) =>
+    selectedClosureTypes.includes(normalizeClosureType(closure.closureType))
+  );
+};
+
 const filterBadges = (items = [], filters, key) =>
   items.filter((item) => {
+    if (filters[key] === NONE_FILTER_VALUE) {
+      return false;
+    }
+
+    if (Array.isArray(filters[key]) && filters[key].length > 0) {
+      return filters[key].map(String).includes(asString(item[key]));
+    }
+
     if (
       filters.locationId &&
       asString(item.locationId) !== asString(filters.locationId)
@@ -36,6 +76,11 @@ const filterBadges = (items = [], filters, key) =>
 
 const getNoteColor = (note) =>
   note?.colorHex || note?.color || DEFAULT_DAY_NOTE_COLOR;
+
+const getBadgeStyle = (backgroundColor) => ({
+  backgroundColor,
+  color: getReadableTextColor(backgroundColor),
+});
 
 const getTestFamilyName = (badge, testFamilies) => {
   if (badge.testFamily?.name) return badge.testFamily.name;
@@ -73,6 +118,34 @@ const getEmployeeBadgeColor = (badge, employees) => {
   return badge.employee?.badgeColor || employee?.badgeColor || "#E5E7EB";
 };
 
+const getEmployeeHoursSummary = (badges = [], employees = []) => {
+  const summariesByEmployee = new Map();
+
+  badges.forEach((badge) => {
+    const hours = getBadgeHours(badge);
+    if (hours <= 0) return;
+
+    const employeeKey = asString(badge.employeeId || badge.employee?.id);
+    if (!employeeKey) return;
+
+    const currentSummary = summariesByEmployee.get(employeeKey) || {
+      employeeKey,
+      name: getEmployeeName(badge, employees),
+      color: getEmployeeBadgeColor(badge, employees),
+      hours: 0,
+    };
+
+    summariesByEmployee.set(employeeKey, {
+      ...currentSummary,
+      hours: currentSummary.hours + hours,
+    });
+  });
+
+  return Array.from(summariesByEmployee.values()).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+};
+
 export function CalendarMonthGrid({
   year,
   month,
@@ -84,6 +157,10 @@ export function CalendarMonthGrid({
   editable = false,
 }) {
   const weeks = buildMonthGrid(year, month);
+  const visibleWeekdays = getVisibleWeekdays(filters);
+  const visibleWeekdayIndexes = visibleWeekdays.map((weekday) => weekday.index);
+  const columnCount =
+    visibleWeekdays.length + (filters.showHoursColumn ? 1 : 0);
   const closures = monthView.closures || [];
   const labels = monthView.labels || [];
   const testFamilyBadges = monthView.testFamilyBadges || [];
@@ -93,10 +170,13 @@ export function CalendarMonthGrid({
   const testFamilies = monthView.testFamilies || [];
 
   const getDayData = (date) => {
-    const dayClosures = filterByLocation(getItemsByDate(closures, date), filters.locationId);
+    const dayClosures = filterClosures(getItemsByDate(closures, date), filters);
     const isClosed = dayClosures.length > 0;
     const shouldSuppressBadges = !!filters.locationId && isClosed;
     const dayLabels = filterByLocation(getItemsByDate(labels, date), filters.locationId);
+    const hoverLabels = dayLabels
+      .map((label) => label.label)
+      .filter(Boolean);
     const dayTestFamilyBadges = filterBadges(
       getItemsByDate(testFamilyBadges, date),
       filters,
@@ -114,6 +194,7 @@ export function CalendarMonthGrid({
     return {
       dayClosures,
       dayLabels,
+      hoverLabels,
       dayTestFamilyBadges: shouldSuppressBadges ? [] : dayTestFamilyBadges,
       dayEmployeeBadges: shouldSuppressBadges ? [] : dayEmployeeBadges,
       dayNotes: filterByLocation(getItemsByDate(notes, date), filters.locationId),
@@ -130,7 +211,7 @@ export function CalendarMonthGrid({
             {getMonthName(month)} {year}
           </h2>
           {editable && (
-            <p className="mt-1 text-sm text-adaptive-muted">
+            <p className="calendar-print-helper mt-1 text-sm text-adaptive-muted">
               Select a day by clicking the appropriate day on the calendar to
               edit the day.
             </p>
@@ -139,27 +220,28 @@ export function CalendarMonthGrid({
       </div>
 
       <div
-        className={`grid ${
-          filters.showHoursColumn ? "grid-cols-8" : "grid-cols-7"
-        } text-sm`}
+        className={`calendar-print-grid grid ${GRID_COLUMN_CLASSES[columnCount]} text-sm`}
       >
-        {WEEKDAY_LABELS.map((day) => (
+        {visibleWeekdays.map((day) => (
           <div
-            key={day}
-            className="border border-adaptive bg-primary-light/20 p-2 font-semibold text-primary-dark"
+            key={day.label}
+            className="border border-adaptive bg-primary-light/20 p-2 font-semibold text-primary-dark dark:bg-primary-light/30 dark:text-primary-light"
           >
-            {day}
+            {day.label}
           </div>
         ))}
         {filters.showHoursColumn && (
-          <div className="border border-adaptive bg-primary-light/20 p-2 font-semibold text-primary-dark">
-            Total Hours
+          <div className="border border-adaptive bg-primary-light/20 p-2 font-semibold text-primary-dark dark:bg-primary-light/30 dark:text-primary-light">
+            Hours
           </div>
         )}
 
         {weeks.map((week, weekIndex) => {
-          const weekDates = week.map((day) => day.date).filter(Boolean);
-          const weekHours = sumEmployeeBadgeHours(
+          const visibleWeek = week.filter((day, index) =>
+            visibleWeekdayIndexes.includes(index)
+          );
+          const weekDates = visibleWeek.map((day) => day.date).filter(Boolean);
+          const weekEmployeeBadges =
             filterBadges(
               employeeBadges.filter((badge) => weekDates.includes(badge.date)),
               filters,
@@ -167,7 +249,10 @@ export function CalendarMonthGrid({
             ).filter((badge) => {
               if (filters.showMySchedule !== false) return true;
               return asString(badge.employeeId) !== asString(currentUser?.id);
-            })
+            });
+          const weekEmployeeHours = getEmployeeHoursSummary(
+            weekEmployeeBadges,
+            employees
           );
 
           return (
@@ -175,7 +260,7 @@ export function CalendarMonthGrid({
               key={`week-${weekIndex}`}
               className={`contents`}
             >
-              {week.map((day) => {
+              {visibleWeek.map((day) => {
                 const dayData = day.date ? getDayData(day.date) : null;
                 const isSelected = day.date && day.date === selectedDate;
 
@@ -186,7 +271,7 @@ export function CalendarMonthGrid({
                     disabled={!day.isCurrentMonth}
                     onClick={() => day.date && onSelectDate(day.date)}
                     className={`
-                      min-h-36 border border-adaptive p-2 text-left align-top transition
+                      calendar-print-day min-h-36 border border-adaptive p-2 text-left align-top transition
                       ${day.isCurrentMonth ? "bg-adaptive hover:bg-primary-light/10" : "bg-gray-100"}
                       ${isSelected ? "ring-2 ring-primary" : ""}
                     `}
@@ -200,9 +285,24 @@ export function CalendarMonthGrid({
                         </div>
 
                         {dayData.isClosed && (
-                          <Badge variant="danger" size="sm">
-                            Closed
-                          </Badge>
+                          <span className="group relative inline-flex">
+                            <Badge
+                              variant="danger"
+                              size="sm"
+                              className="calendar-print-badge text-md font-semibold"
+                            >
+                              Closed
+                            </Badge>
+                            {dayData.hoverLabels.length > 0 && (
+                              <span className="pointer-events-none absolute left-0 top-full z-20 mt-1 hidden min-w-36 max-w-52 rounded-md border border-adaptive bg-muted px-3 py-2 text-xs font-medium text-adaptive shadow-lg group-hover:block">
+                                {dayData.hoverLabels.map((label) => (
+                                  <span key={label} className="block">
+                                    {label}
+                                  </span>
+                                ))}
+                              </span>
+                            )}
+                          </span>
                         )}
 
                         {filters.showLabels &&
@@ -213,7 +313,12 @@ export function CalendarMonthGrid({
                                 label.showWhenClosed
                             )
                             .map((label) => (
-                              <Badge key={label.id || label.date} variant="primary" size="sm">
+                              <Badge
+                                key={label.id || label.date}
+                                variant="primary"
+                                size="sm"
+                                className="calendar-print-badge text-md font-semibold"
+                              >
                                 {label.label}
                               </Badge>
                             ))}
@@ -221,13 +326,10 @@ export function CalendarMonthGrid({
                         {dayData.dayTestFamilyBadges.map((badge) => (
                           <div
                             key={badge.id}
-                            className="rounded px-2 py-1 text-xs text-gray-900"
-                            style={{
-                              backgroundColor: getTestFamilyColor(
-                                badge,
-                                testFamilies
-                              ),
-                            }}
+                            className="calendar-print-badge rounded px-2 py-1 text-md font-semibold"
+                            style={getBadgeStyle(
+                              getTestFamilyColor(badge, testFamilies)
+                            )}
                           >
                             {getTestFamilyName(badge, testFamilies)}{" "}
                             {badge.startTime}-{badge.endTime}
@@ -237,13 +339,10 @@ export function CalendarMonthGrid({
                         {dayData.dayEmployeeBadges.map((badge) => (
                           <div
                             key={badge.id}
-                            className="rounded px-2 py-1 text-xs text-gray-900"
-                            style={{
-                              backgroundColor: getEmployeeBadgeColor(
-                                badge,
-                                employees
-                              ),
-                            }}
+                            className="calendar-print-badge rounded px-2 py-1 text-md font-semibold"
+                            style={getBadgeStyle(
+                              getEmployeeBadgeColor(badge, employees)
+                            )}
                           >
                             {getEmployeeName(badge, employees)}{" "}
                             {badge.customLabel ||
@@ -255,8 +354,8 @@ export function CalendarMonthGrid({
                           dayData.dayNotes.map((note) => (
                             <div
                               key={note.id}
-                              className="rounded px-2 py-1 text-xs text-gray-900"
-                              style={{ backgroundColor: getNoteColor(note) }}
+                              className="calendar-print-badge rounded px-2 py-1 text-md font-semibold"
+                              style={getBadgeStyle(getNoteColor(note))}
                             >
                               {note.message}
                             </div>
@@ -268,8 +367,24 @@ export function CalendarMonthGrid({
               })}
 
               {filters.showHoursColumn && (
-                <div className="min-h-36 border border-adaptive bg-muted p-3 text-sm font-semibold text-adaptive">
-                  {weekHours.toFixed(1)}
+                <div className="calendar-print-hours-cell min-h-36 border border-adaptive bg-muted p-2 text-sm font-semibold text-adaptive">
+                  <div className="flex flex-col gap-2">
+                    {weekEmployeeHours.length === 0 ? (
+                      <span className="text-xs font-medium text-adaptive-muted">
+                        No hours
+                      </span>
+                    ) : (
+                      weekEmployeeHours.map((summary) => (
+                        <div
+                          key={summary.employeeKey}
+                          className="calendar-print-badge rounded px-2 py-1 text-md font-semibold"
+                          style={getBadgeStyle(summary.color)}
+                        >
+                          {summary.name} {summary.hours.toFixed(1)}
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               )}
             </div>

@@ -92,8 +92,8 @@
      ============================================ */
 
   --font-family-sans: "Inter", "Roboto", ui-sans-serif, system-ui, sans-serif;
-  --font-family-mono: ui-monospace, "Cascadia Code", "Source Code Pro",
-    monospace;
+  --font-family-mono:
+    ui-monospace, "Cascadia Code", "Source Code Pro", monospace;
 }
 
 /* ============================================
@@ -167,7 +167,8 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: radial-gradient(
+    background:
+      radial-gradient(
         ellipse 80% 40% at 20% 10%,
         rgba(168, 117, 224, 0.12),
         transparent 60%
@@ -197,7 +198,8 @@
 
   /* Dark mode background */
   .dark body::before {
-    background: radial-gradient(
+    background:
+      radial-gradient(
         ellipse 80% 40% at 20% 10%,
         rgba(168, 117, 224, 0.08),
         transparent 60%
@@ -434,25 +436,29 @@
 
   /* Shadows */
   .shadow-purple {
-    box-shadow: 0 4px 6px -1px rgba(107, 47, 179, 0.1),
+    box-shadow:
+      0 4px 6px -1px rgba(107, 47, 179, 0.1),
       0 2px 4px -1px rgba(107, 47, 179, 0.06);
   }
 
   .shadow-mint {
-    box-shadow: 0 4px 6px -1px rgba(39, 191, 168, 0.1),
+    box-shadow:
+      0 4px 6px -1px rgba(39, 191, 168, 0.1),
       0 2px 4px -1px rgba(39, 191, 168, 0.06);
   }
 
   /* Gradient Border */
   .gradient-border {
     border: 2px solid transparent;
-    background: linear-gradient(white, white) padding-box,
+    background:
+      linear-gradient(white, white) padding-box,
       linear-gradient(135deg, var(--color-primary), var(--color-accent))
         border-box;
   }
 
   .dark .gradient-border {
-    background: linear-gradient(rgb(31, 41, 55), rgb(31, 41, 55)) padding-box,
+    background:
+      linear-gradient(rgb(31, 41, 55), rgb(31, 41, 55)) padding-box,
       linear-gradient(135deg, var(--color-primary), var(--color-accent))
         border-box;
   }
@@ -521,22 +527,122 @@
 }
 
 @media print {
+  @page {
+    size: landscape;
+    margin: 0in !important;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  body::before,
+  body::after {
+    content: none !important;
+    display: none !important;
+  }
+
   body * {
-    visibility: hidden;
+    visibility: hidden !important;
+  }
+
+  body
+    *:not(:has(.calendar-print-area)):not(.calendar-print-area):not(
+      .calendar-print-area *
+    ) {
+    display: none !important;
+  }
+
+  body *:has(.calendar-print-area) {
+    display: contents !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
   }
 
   .calendar-print-area,
   .calendar-print-area * {
-    visibility: visible;
+    visibility: visible !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
   .calendar-print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
+    position: static !important;
+    width: calc(85% / 0.85) !important;
+    max-width: none !important;
+    zoom: 0.85 !important;
+    transform: none !important;
     box-shadow: none;
     border: 0;
+    background: white !important;
+    color: #111827 !important;
+    font-size: 16px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .calendar-print-grid {
+    width: 95% !important;
+    font-size: 13px !important;
+  }
+
+  .calendar-print-helper {
+    display: none !important;
+  }
+
+  .calendar-print-day,
+  .calendar-print-hours-cell {
+    min-height: 1.3in !important;
+    padding: 4px !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .calendar-print-day > div,
+  .calendar-print-hours-cell > div {
+    gap: 4px !important;
+  }
+
+  .calendar-print-area h2 {
+    font-size: 20px !important;
+    line-height: 1.1 !important;
+  }
+
+  .calendar-print-area button {
+    min-height: 0 !important;
+    padding: 4px !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .calendar-print-area button,
+  .calendar-print-area .bg-adaptive,
+  .calendar-print-area .bg-muted {
+    background: white !important;
+  }
+
+  .calendar-print-area .calendar-print-badge {
+    color: #111827 !important;
+    border: 1px solid rgba(17, 24, 39, 0.18);
+    box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.18);
+    padding: 2px 4px !important;
+    font-size: 16px !important;
+    line-height: 1.1 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
   .calendar-print-controls,

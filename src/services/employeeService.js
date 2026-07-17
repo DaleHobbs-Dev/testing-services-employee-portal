@@ -4,33 +4,33 @@ import { toApiRole } from "@/utils/roleUtils";
 import { normalizeEmployee, normalizeEmployeeList } from "@/utils/employeeUtils";
 
 export const getAllEmployees = async () => {
-    return fetchJson("/employees").then(normalizeEmployeeList);
+    return fetchJson("/employees", { cache: "no-store" }).then(normalizeEmployeeList);
 };
 
 export const getEmployeeDirectory = async () => {
-    return fetchJson("/employees/directory").then(normalizeEmployeeList);
+    return fetchJson("/employees/directory", { cache: "no-store" }).then(normalizeEmployeeList);
 };
 
 export const getEmployeeByEmail = async (email) => {
-    return fetchJson(`/employees?email=${encodeURIComponent(email)}`).then(
+    return fetchJson(`/employees?email=${encodeURIComponent(email)}`, { cache: "no-store" }).then(
         normalizeEmployeeList
     );
 };
 
 export const getEmployeeById = async (employeeId) => {
-    return fetchJson(`/employees/${employeeId}`).then(normalizeEmployee);
+    return fetchJson(`/employees/${employeeId}`, { cache: "no-store" }).then(normalizeEmployee);
 };
 
 export const getAllActiveEmployees = async () => {
-    return fetchJson("/employees?status=ACTIVE").then(normalizeEmployeeList);
+    return fetchJson("/employees?status=ACTIVE", { cache: "no-store" }).then(normalizeEmployeeList);
 };
 
 export const getAllInactiveEmployees = async () => {
-    return fetchJson("/employees?status=INACTIVE").then(normalizeEmployeeList);
+    return fetchJson("/employees?status=INACTIVE", { cache: "no-store" }).then(normalizeEmployeeList);
 };
 
 export const getEmployeeSchedules = async (employeeId) => {
-    return fetchJson(`/employeeSchedules/${employeeId}`);
+    return fetchJson(`/employeeSchedules/${employeeId}`, { cache: "no-store" });
 };
 
 export const createEmployee = async (employeeData) => {

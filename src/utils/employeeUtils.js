@@ -8,6 +8,7 @@ export const normalizeEmployee = (response) => response?.employee || response;
 export const getEmployeeDisplayName = (employee) => {
   if (!employee) return "Employee";
 
+  if (employee.fullName) return employee.fullName;
   if (employee.name) return employee.name;
 
   const fullName = [employee.firstName, employee.lastName]

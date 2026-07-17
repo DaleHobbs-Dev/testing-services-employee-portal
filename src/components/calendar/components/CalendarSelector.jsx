@@ -5,13 +5,59 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  FormField,
+  Select,
 } from "@/components";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
-const getOwnerName = (calendar) =>
-  calendar.employeeName ||
-  (calendar.employee ? getEmployeeDisplayName(calendar.employee) : "") ||
-  (calendar.owner ? getEmployeeDisplayName(calendar.owner) : "");
+const getCalendarEmployeeId = (calendar) =>
+  calendar.employeeId ??
+  calendar.employee?.id ??
+  calendar.ownerId ??
+  calendar.owner?.id;
+
+const getCalendarEmployee = (calendar) =>
+  calendar.employee ||
+  calendar.owner ||
+  (getCalendarEmployeeId(calendar) &&
+  (calendar.employeeName || calendar.employeeFullName)
+    ? {
+        id: getCalendarEmployeeId(calendar),
+        fullName: calendar.employeeFullName || calendar.employeeName,
+      }
+    : null);
+
+const buildEmployeeOptions = (employees, calendars) => {
+  const optionsById = new Map();
+
+  employees.forEach((employee) => {
+    optionsById.set(String(employee.id), employee);
+  });
+
+  calendars.forEach((calendar) => {
+    const employee = getCalendarEmployee(calendar);
+    if (employee?.id && !optionsById.has(String(employee.id))) {
+      optionsById.set(String(employee.id), employee);
+    }
+  });
+
+  return Array.from(optionsById.values());
+};
+
+const getOwnerName = (calendar, employees) => {
+  const employeeId = getCalendarEmployeeId(calendar);
+  const employee = employees.find(
+    (item) => String(item.id) === String(employeeId)
+  );
+
+  return (
+    calendar.employeeName ||
+    calendar.employeeFullName ||
+    (calendar.employee ? getEmployeeDisplayName(calendar.employee) : "") ||
+    (calendar.owner ? getEmployeeDisplayName(calendar.owner) : "") ||
+    (employee ? getEmployeeDisplayName(employee) : "")
+  );
+};
 
 export function CalendarSelector({
   calendars = [],
@@ -26,8 +72,21 @@ export function CalendarSelector({
   onToggleMarkedCalendar,
   onDeleteMarkedCalendars,
   isDeleting = false,
+  employees = [],
+  showEmployeeFilter = false,
+  employeeFilterValue = "",
+  onEmployeeFilterChange,
 }) {
   const markedCount = markedCalendarIds.length;
+  const employeeOptions = buildEmployeeOptions(employees, calendars);
+  const visibleCalendars =
+    showEmployeeFilter && employeeFilterValue
+      ? calendars.filter(
+          (calendar) =>
+            String(getCalendarEmployeeId(calendar)) ===
+            String(employeeFilterValue)
+        )
+      : calendars;
 
   return (
     <Card className="h-full">
@@ -47,15 +106,31 @@ export function CalendarSelector({
         </div>
       </CardHeader>
       <CardContent>
+        {showEmployeeFilter && (
+          <FormField label="Employee">
+            <Select
+              value={employeeFilterValue}
+              onChange={(event) => onEmployeeFilterChange?.(event.target.value)}
+            >
+              <option value="">All employees</option>
+              {employeeOptions.map((employee) => (
+                <option key={employee.id} value={employee.id}>
+                  {getEmployeeDisplayName(employee)}
+                </option>
+              ))}
+            </Select>
+          </FormField>
+        )}
+
         {isDeleteMode && (
-          <div className="mb-4 rounded-lg border border-danger-500/30 bg-red-50 p-3">
-            <p className="text-sm font-medium text-red-800">
+          <div className="mb-4 rounded-lg border border-danger-500/40 bg-red-50 p-3 dark:bg-red-900/30">
+            <p className="text-sm font-medium text-red-800 dark:text-red-100">
               Mark calendars to delete.
             </p>
             <Button
               type="button"
               variant="danger"
-              className="mt-3 w-full"
+              className="mt-3 w-full shadow-sm shadow-red-900/20 dark:shadow-red-500/20"
               onClick={onDeleteMarkedCalendars}
               disabled={markedCount === 0 || isDeleting}
             >
@@ -68,13 +143,14 @@ export function CalendarSelector({
           </div>
         )}
 
-        {calendars.length === 0 ? (
+        {visibleCalendars.length === 0 ? (
           <p className="text-sm text-adaptive-muted">{emptyMessage}</p>
         ) : (
           <div className="space-y-3">
-            {calendars.map((calendar) => {
-              const isSelected = String(calendar.id) === String(selectedCalendarId);
-              const ownerName = getOwnerName(calendar);
+            {visibleCalendars.map((calendar) => {
+              const isSelected =
+                String(calendar.id) === String(selectedCalendarId);
+              const ownerName = getOwnerName(calendar, employees);
               const isMarked = markedCalendarIds
                 .map(String)
                 .includes(String(calendar.id));
@@ -83,7 +159,7 @@ export function CalendarSelector({
                 <div
                   key={calendar.id}
                   className={`
-                    w-full rounded-lg border p-4 transition
+                    w-full rounded-lg border p-2 pb-0 transition
                     ${
                       isSelected
                         ? "border-primary bg-primary-light/20"
@@ -107,23 +183,25 @@ export function CalendarSelector({
                       disabled={isDeleteMode}
                       className="flex-1 text-left disabled:cursor-default"
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-adaptive">
-                            {calendar.name}
-                          </p>
-                          <p className="text-sm text-adaptive-muted">
-                            {calendar.year} - Months {calendar.startMonth}-
-                            {calendar.endMonth}
-                          </p>
-                          {ownerName && (
-                            <p className="text-xs text-adaptive-muted">
-                              Owner: {ownerName}
+                      <div className="flex min-h-20 flex-col gap-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="font-semibold text-adaptive">
+                              {calendar.name}
                             </p>
+                            <p className="text-sm text-adaptive-muted">
+                              {calendar.year} - Months {calendar.startMonth}-
+                              {calendar.endMonth}
+                            </p>
+                          </div>
+                          {isSelected && !isDeleteMode && (
+                            <Badge variant="primary">Selected</Badge>
                           )}
                         </div>
-                        {isSelected && !isDeleteMode && (
-                          <Badge variant="primary">Selected</Badge>
+                        {ownerName && (
+                          <p className="text-xs font-medium text-adaptive">
+                            Owner: {ownerName}
+                          </p>
                         )}
                       </div>
                     </button>
