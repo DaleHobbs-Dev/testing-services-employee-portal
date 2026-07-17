@@ -3,7 +3,10 @@ import { useCurrentUser } from "@/context";
 import { Button, Badge, DarkModeToggle } from "@/components";
 import { logout } from "@/services";
 import { TOKEN_KEY } from "@/services/apiSettings";
-import { getEmployeeDisplayName } from "@/utils/employeeUtils";
+import {
+  getEmployeeDisplayName,
+  getEmployeeInitials,
+} from "@/utils/employeeUtils";
 import { formatRole, getEmployeeRoles } from "@/utils/roleUtils";
 
 export function Navbar() {
@@ -48,6 +51,16 @@ export function Navbar() {
             </Button>
 
             <DarkModeToggle />
+
+            <Button
+              variant="profile"
+              to="/change-password"
+              aria-label="Change password"
+              title="Change password"
+              className="min-w-10 h-10 rounded-lg text-sm font-bold"
+            >
+              {getEmployeeInitials(currentUser)}
+            </Button>
 
             <div className="hidden sm:flex flex-col items-center leading-tight">
               <p className="text-sm font-semibold">

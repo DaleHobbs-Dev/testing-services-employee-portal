@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useCurrentUser } from "@/context";
 import {
   AccessDeniedPage,
+  ChangePasswordPage,
   LoginPage,
   RegisterPage,
   EmployeeDashboardPage,
@@ -44,6 +45,7 @@ export function ApplicationRoutes() {
 
           {/* Access Denied Route */}
           <Route path="access-denied" element={<AccessDeniedPage />} />
+          <Route path="change-password" element={<ChangePasswordPage />} />
 
           {/* Employee Management Routes */}
           <Route

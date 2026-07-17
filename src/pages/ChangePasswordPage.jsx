@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Alert,
   Button,
@@ -11,16 +10,13 @@ import {
   PasswordRequirements,
   RequirementIndicator,
 } from "@/components";
-import { register } from "@/services";
+import { changePassword } from "@/services";
 import { passwordRules } from "@/utils/passwordRules";
 
-export function RegisterPage() {
-  const navigate = useNavigate();
+export function ChangePasswordPage() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
+    currentPassword: "",
+    newPassword: "",
     confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -31,16 +27,16 @@ export function RegisterPage() {
     () =>
       passwordRules.map((rule) => ({
         ...rule,
-        met: rule.test(formData.password),
+        met: rule.test(formData.newPassword),
       })),
-    [formData.password]
+    [formData.newPassword]
   );
 
   const passwordMeetsRules = passwordRuleState.every((rule) => rule.met);
   const passwordsMatch =
-    formData.password.length > 0 &&
+    formData.newPassword.length > 0 &&
     formData.confirmPassword.length > 0 &&
-    formData.password === formData.confirmPassword;
+    formData.newPassword === formData.confirmPassword;
   const allFieldsFilled = Object.values(formData).every(
     (value) => value.trim() !== ""
   );
@@ -64,21 +60,23 @@ export function RegisterPage() {
     setSuccess("");
 
     try {
-      await register({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
+      await changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
       });
 
-      setSuccess("Registration complete. You can log in now.");
-      setTimeout(() => navigate("/login"), 900);
+      setFormData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setSuccess("Password updated successfully.");
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Password change error:", error);
       setError(
-        error.status === 409
-          ? "An employee with this email already exists."
-          : "Registration failed. Please try again."
+        error.status === 401 || error.status === 403
+          ? "Your current password is incorrect."
+          : "Password update failed. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -89,8 +87,8 @@ export function RegisterPage() {
     <Container className="mt-20 max-w-lg">
       <Card className="p-6">
         <PageHeader
-          title="Employee Registration"
-          description="Create your Testing Services employee account."
+          title="Change Password"
+          description="Enter your current password and choose a new one."
           className="center-text"
           center
         />
@@ -108,42 +106,22 @@ export function RegisterPage() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <FormField label="First Name">
+          <FormField label="Current Password">
             <Input
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-              autoComplete="given-name"
-            />
-          </FormField>
-
-          <FormField label="Last Name">
-            <Input
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-              autoComplete="family-name"
-            />
-          </FormField>
-
-          <FormField label="Email Address">
-            <Input
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              autoComplete="email"
-            />
-          </FormField>
-
-          <FormField label="Password">
-            <Input
-              name="password"
+              name="currentPassword"
               type="password"
-              value={formData.password}
+              value={formData.currentPassword}
+              onChange={handleChange}
+              required
+              autoComplete="current-password"
+            />
+          </FormField>
+
+          <FormField label="New Password">
+            <Input
+              name="newPassword"
+              type="password"
+              value={formData.newPassword}
               onChange={handleChange}
               required
               autoComplete="new-password"
@@ -158,7 +136,7 @@ export function RegisterPage() {
             </Alert>
           )}
 
-          <FormField label="Confirm Password">
+          <FormField label="Confirm New Password">
             <Input
               name="confirmPassword"
               type="password"
@@ -185,16 +163,9 @@ export function RegisterPage() {
             className="mt-4 w-full disabled:cursor-not-allowed disabled:opacity-60"
             disabled={!canSubmit || isLoading}
           >
-            {isLoading ? "Registering..." : "Register"}
+            {isLoading ? "Updating..." : "Change Password"}
           </Button>
         </form>
-
-        <div className="mt-4 text-center text-sm text-adaptive-muted">
-          Already have an account?{" "}
-          <Button to="/login" variant="ghost" className="px-1 py-0">
-            Log in
-          </Button>
-        </div>
       </Card>
     </Container>
   );

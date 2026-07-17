@@ -1,4 +1,4 @@
-import { fetchJson, postJson } from "./apiSettings";
+import { fetchJson, patchJson, postJson } from "./apiSettings";
 
 const normalizeAuthResponse = (response) => {
   const employee =
@@ -16,6 +16,10 @@ export const login = async (credentials) => {
 
 export const register = async (employeeData) => {
   return normalizeAuthResponse(await postJson("/auth/register", employeeData));
+};
+
+export const changePassword = async (passwordData) => {
+  return patchJson("/auth/password", passwordData);
 };
 
 export const getCurrentEmployee = async () => {

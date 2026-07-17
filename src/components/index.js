@@ -18,6 +18,7 @@ export { Spinner } from './ui/Spinner';
 export { DeleteConfirmationModal } from './ui/DeleteConfirmationModal';
 export { DarkModeToggle } from './ui/DarkModeToggle';
 export { LoadingPage } from './ui/LoadingPage';
+export { PasswordRequirements, RequirementIndicator } from './ui/PasswordRequirements';
 // export { Tooltip } from './Tooltip';
 // export { Pagination } from './Pagination';
 // export { Tabs, TabList, Tab, TabPanels, TabPanel } from './Tabs';

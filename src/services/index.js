@@ -5,7 +5,7 @@ export { getAllExaminees, getExamineeByEmail, createExaminee, getExamineeById } 
 export { getAllEmployees, getEmployeeDirectory, getAllActiveEmployees, getAllInactiveEmployees, getEmployeeByEmail, getEmployeeById, getEmployeeSchedules, createEmployee, updateEmployee, updateEmployeeRoles } from "./employeeService";
 
 // Auth
-export { login, register, getCurrentEmployee, logout } from "./authService";
+export { login, register, changePassword, getCurrentEmployee, logout } from "./authService";
 
 // Test Families
 export { getAllTestFamilies, getTestFamilyById, updateTestFamily, createTestFamily, deleteTestFamily, deleteTestFamilyWithVariants } from "./testFamilyService";
