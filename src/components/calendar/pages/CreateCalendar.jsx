@@ -15,7 +15,7 @@ import {
   Select,
 } from "@/components";
 import { useCurrentUser } from "@/context";
-import { createCalendar, getAllEmployees } from "@/services";
+import { createCalendar, getAllEmployees, getEmployeeDirectory } from "@/services";
 import { employeeHasRole } from "@/utils/roleUtils";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
@@ -70,6 +70,7 @@ export function CreateCalendar() {
   const navigate = useNavigate();
   const { currentUser } = useCurrentUser();
   const canChooseEmployee = employeeHasRole(currentUser, ["admin", "clerk"]);
+  const shouldUseEmployeeDirectory = employeeHasRole(currentUser, "clerk");
   const [rangeType, setRangeType] = useState("janMay");
   const [year, setYear] = useState(String(currentYear));
   const [customStartMonth, setCustomStartMonth] = useState("1");
@@ -85,7 +86,11 @@ export function CreateCalendar() {
     if (!canChooseEmployee) return;
 
     setIsLoadingEmployees(true);
-    getAllEmployees()
+    const loadEmployees = shouldUseEmployeeDirectory
+      ? getEmployeeDirectory
+      : getAllEmployees;
+
+    loadEmployees()
       .then((employeeData) => {
         setEmployees(employeeData);
         const currentEmployee = employeeData.find(
@@ -103,7 +108,7 @@ export function CreateCalendar() {
       .finally(() => {
         setIsLoadingEmployees(false);
       });
-  }, [canChooseEmployee, currentUser?.id]);
+  }, [canChooseEmployee, currentUser?.id, shouldUseEmployeeDirectory]);
 
   const selectedRange = useMemo(() => {
     if (rangeType !== "custom") {
