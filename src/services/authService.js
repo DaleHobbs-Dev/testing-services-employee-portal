@@ -15,7 +15,7 @@ export const login = async (credentials) => {
 };
 
 export const register = async (employeeData) => {
-  return normalizeAuthResponse(await postJson("/auth/register", employeeData));
+  return postJson("/auth/register", employeeData);
 };
 
 export const changePassword = async (passwordData) => {

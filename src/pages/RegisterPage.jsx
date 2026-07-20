@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Alert,
   Button,
@@ -14,8 +13,29 @@ import {
 import { register } from "@/services";
 import { passwordRules } from "@/utils/passwordRules";
 
+const getRegistrationErrorMessage = (error) => {
+  const body = error?.body;
+  const message =
+    (typeof body?.message === "string" && body.message) ||
+    (typeof body?.detail === "string" && body.detail) ||
+    (typeof body?.error === "string" && body.error) ||
+    (Array.isArray(body?.errors) &&
+      body.errors
+        .map((item) => (typeof item === "string" ? item : item?.message))
+        .filter(Boolean)
+        .join(" "));
+
+  if (message) return message;
+  if (error?.status === 409) {
+    return "An employee with this email already exists.";
+  }
+  if (error?.status === 400 || error?.status === 422) {
+    return "Registration could not be completed with the information provided.";
+  }
+  return "Registration failed. Please try again.";
+};
+
 export function RegisterPage() {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -64,22 +84,27 @@ export function RegisterPage() {
     setSuccess("");
 
     try {
-      await register({
+      const response = await register({
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
       });
 
-      setSuccess("Registration complete. You can log in now.");
-      setTimeout(() => navigate("/login"), 900);
+      setSuccess(
+        response?.message ||
+          "Registration request received. An administrator must approve your account before you can log in."
+      );
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
     } catch (error) {
       console.error("Registration error:", error);
-      setError(
-        error.status === 409
-          ? "An employee with this email already exists."
-          : "Registration failed. Please try again."
-      );
+      setError(getRegistrationErrorMessage(error));
     } finally {
       setIsLoading(false);
     }

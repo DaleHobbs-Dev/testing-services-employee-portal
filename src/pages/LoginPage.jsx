@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../context/CurrentUserContext.js";
 import { login } from "@/services";
-import { TOKEN_KEY } from "@/services/apiSettings";
+import { AUTH_FAILURE_KEY, TOKEN_KEY } from "@/services/apiSettings";
 import {
   Container,
   PageHeader,
@@ -39,6 +39,7 @@ export function LoginPage() {
 
       setCurrentUser(employee);
       localStorage.setItem(TOKEN_KEY, JSON.stringify({ token }));
+      sessionStorage.removeItem(AUTH_FAILURE_KEY);
       navigate("/employee-dashboard");
     } catch (error) {
       console.error("Login error:", error);

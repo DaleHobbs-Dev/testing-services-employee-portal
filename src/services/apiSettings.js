@@ -9,12 +9,16 @@ if (!API_BASE_URL) {
     throw new Error("VITE_API_BASE_URL must be set for production builds.")
 }
 export const TOKEN_KEY = "testing_services_user"
+export const AUTH_UNAUTHORIZED_EVENT = "auth:unauthorized"
+export const AUTH_FAILURE_KEY = "testing_services_auth_failure"
 
-// Helper AuthHeader function to include the token in the request headers
-const getAuthHeader = () => {
-    // Retrieve the stored token from localStorage (set during login) for authenticated requests
-    const token = JSON.parse(localStorage.getItem(TOKEN_KEY))?.token
-    return token ? { "Authorization": `Bearer ${token}` } : {}
+const getStoredToken = () => {
+    try {
+        return JSON.parse(localStorage.getItem(TOKEN_KEY))?.token || null
+    } catch {
+        localStorage.removeItem(TOKEN_KEY)
+        return null
+    }
 }
 
 // Helper function to check for errors in the response and parse JSON
@@ -43,7 +47,8 @@ const checkErrorJson = async (response) => {
 const request = (endpoint, options = {}) => {
 
     // Get the auth token header
-    const authHeader = getAuthHeader()
+    const token = getStoredToken()
+    const authHeader = token ? { "Authorization": `Bearer ${token}` } : {}
 
     // Get any custom headers provided in the options object
     const customHeaders = options.headers || {}
@@ -63,6 +68,17 @@ const request = (endpoint, options = {}) => {
         // The resulting promise is piped through checkErrorJson, which returns parsed JSON on success
         // It could also throw an error (with .status/.body attached) on failure.
         .then(checkErrorJson)
+        .catch((error) => {
+            // Only treat a 401 as an expired/invalid session when this request
+            // actually carried a token. Login and registration errors should
+            // remain on their forms.
+            if (error.status === 401 && token) {
+                localStorage.removeItem(TOKEN_KEY)
+                sessionStorage.setItem(AUTH_FAILURE_KEY, "unauthorized")
+                window.dispatchEvent(new Event(AUTH_UNAUTHORIZED_EVENT))
+            }
+            throw error
+        })
 }
 
 // Exported fetchJson for making API fetch requests
