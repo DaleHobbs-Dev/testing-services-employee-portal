@@ -1,8 +1,13 @@
 export const passwordRules = [
   {
     id: "length",
-    label: "At least 8 characters",
-    test: (value) => value.length >= 8,
+    label: "At least 15 characters",
+    test: (value) => value.length >= 15,
+  },
+  {
+    id: "maxBytes",
+    label: "No more than 72 UTF-8 bytes",
+    test: (value) => new TextEncoder().encode(value).length <= 72,
   },
   {
     id: "uppercase",

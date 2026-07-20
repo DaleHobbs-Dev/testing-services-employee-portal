@@ -7,7 +7,10 @@
 import { CurrentUserContext } from "./CurrentUserContext.js";
 import { useState, useEffect } from "react";
 import { getCurrentEmployee } from "@/services";
-import { TOKEN_KEY } from "@/services/apiSettings";
+import {
+  AUTH_UNAUTHORIZED_EVENT,
+  TOKEN_KEY,
+} from "@/services/apiSettings";
 
 export function CurrentUserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
@@ -18,6 +21,12 @@ export function CurrentUserProvider({ children }) {
   });
 
   useEffect(() => {
+    const handleUnauthorized = () => {
+      setCurrentUser(null);
+      setIsLoading(false);
+    };
+
+    window.addEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
     const localUser = localStorage.getItem(TOKEN_KEY);
 
     if (localUser) {
@@ -34,6 +43,10 @@ export function CurrentUserProvider({ children }) {
           setIsLoading(false);
         });
     }
+
+    return () => {
+      window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, handleUnauthorized);
+    };
   }, []);
 
   return (

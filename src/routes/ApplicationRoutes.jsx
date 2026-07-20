@@ -5,6 +5,7 @@ import {
   ChangePasswordPage,
   LoginPage,
   RegisterPage,
+  UnauthorizedPage,
   EmployeeDashboardPage,
   EmployeeManagementPage,
   CalendarManagementPage,
@@ -33,6 +34,7 @@ export function ApplicationRoutes() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route element={<AuthorizedRoutes />}>
         <Route element={<Layout />}>
           <Route index element={<Navigate to="/employee-dashboard" replace />} />
