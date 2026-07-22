@@ -10,6 +10,7 @@ import {
   EmployeeManagementPage,
   CalendarManagementPage,
   NotificationManagementPage,
+  ExamManagementPage,
 } from "@/pages";
 import { AuthorizedRoutes, RoleRoutes } from "@/routes";
 import {
@@ -23,6 +24,9 @@ import {
   EditCalendars,
   ViewCalendars,
   NotificationManagement,
+  ExamManagementHome,
+  TestTypeManagement,
+  CalendarBadgeColors,
 } from "@/components";
 
 export function ApplicationRoutes() {
@@ -113,6 +117,19 @@ export function ApplicationRoutes() {
               <Route path="new" element={<CreateCalendar />} />
               <Route path="edit" element={<EditCalendars />} />
               <Route path="view" element={<ViewCalendars />} />
+              <Route
+                element={<RoleRoutes currentEmployee={currentUser} roles={["admin", "technician"]} />}
+              >
+                <Route path="badge-colors" element={<CalendarBadgeColors />} />
+              </Route>
+            </Route>
+          </Route>
+
+          {/* Exam Management Routes */}
+          <Route element={<RoleRoutes currentEmployee={currentUser} roles={["admin", "technician"]} />}>
+            <Route path="exam-management" element={<ExamManagementPage />}>
+              <Route index element={<ExamManagementHome />} />
+              <Route path="test-types" element={<TestTypeManagement />} />
             </Route>
           </Route>
         </Route>

@@ -95,6 +95,7 @@ export { CalendarManagementHome } from './calendar/pages/CalendarManagementHome'
 export { CreateCalendar } from './calendar/pages/CreateCalendar';
 export { EditCalendars } from './calendar/pages/EditCalendars';
 export { ViewCalendars } from './calendar/pages/ViewCalendars';
+export { CalendarBadgeColors } from './calendar/pages/CalendarBadgeColors';
 
 // Calendar Components
 export { CalendarSelector } from './calendar/components/CalendarSelector';
@@ -118,6 +119,8 @@ export { ExamForm } from './exams/components/ExamForm';
 export { EditExam } from './exams/pages/EditExam';
 export { NewExam } from './exams/pages/NewExam';
 export { ExamList } from './exams/pages/ExamList';
+export { ExamManagementHome } from './exams/pages/ExamManagementHome';
+export { TestTypeManagement } from './exams/pages/TestTypeManagement';
 
 // Proctoring Components
 export { EmployeeFilter } from './proctoring/components/EmployeeFilter';

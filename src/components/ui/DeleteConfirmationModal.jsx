@@ -16,6 +16,8 @@ export function DeleteConfirmationModal({
   itemName,
   warning,
   isDeleting = false,
+  confirmLabel = "Delete",
+  workingLabel = "Deleting...",
 }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -62,7 +64,7 @@ export function DeleteConfirmationModal({
           disabled={isDeleting}
           className="focus-ring shadow-sm shadow-red-900/20 dark:shadow-red-500/20"
         >
-          {isDeleting ? "Deleting..." : "Delete"}
+          {isDeleting ? workingLabel : confirmLabel}
         </Button>
       </ModalFooter>
     </Modal>

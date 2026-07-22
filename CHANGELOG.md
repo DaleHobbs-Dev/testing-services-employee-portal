@@ -6,13 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+Planned for version 1.1.0.
+
 ### Added
 
 - Frontend-specific Git workflow, versioning, changelog, and release guidance.
 - System-notification management for administrators and technicians, including role targeting, editing, retiring, and deletion.
 - Dashboard release notifications that remain visible to targeted employees until dismissed.
+- Exam Management dashboard and landing area for test-related administration.
+- Test Type Management for administrators, including creating, editing, and soft-deactivating test types.
+- A technician-facing section for reactivating inactive test types.
+- Calendar badge-color management for test types and employees, including hex-color validation, per-category uniqueness feedback, and color clearing.
 
 ### Changed
+
+- Updated test-family mutations to use the backend `/test-families` `PATCH` and `DELETE` API contract.
+- Limited test-type color changes to administrators while allowing administrators and technicians to manage employee calendar colors.
 
 ### Deprecated
 
