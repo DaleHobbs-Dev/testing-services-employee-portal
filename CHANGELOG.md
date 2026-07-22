@@ -17,11 +17,17 @@ Planned for version 1.1.0.
 - Test Type Management for administrators, including creating, editing, and soft-deactivating test types.
 - A technician-facing section for reactivating inactive test types.
 - Calendar badge-color management for test types and employees, including hex-color validation, per-category uniqueness feedback, and color clearing.
+- Calendar-card editing in the Edit Calendars view, including calendar renaming and employee reassignment for administrators and clerks.
+- Granular management of existing calendar-day entries, with edit and delete controls for custom labels, test types, employee schedules, and colored notes.
 
 ### Changed
 
 - Updated test-family mutations to use the backend `/test-families` `PATCH` and `DELETE` API contract.
 - Limited test-type color changes to administrators while allowing administrators and technicians to manage employee calendar colors.
+- Reworked the calendar day editor so existing custom labels, test types, employee schedules, and notes appear together directly below the testing-center closure control.
+- Replaced the Testing Center Closed checkbox with a distinct toggle button and explanatory hover tooltip.
+- Made end times optional for calendar test types and employee schedules; requests now send `null` when no end time is selected, and badges display only their start time without a trailing hyphen.
+- Added frontend support for updating calendars, day labels, test-family badges, employee badges, and day notes through their `PATCH` endpoints, alongside granular delete flows.
 
 ### Deprecated
 
@@ -29,7 +35,12 @@ Planned for version 1.1.0.
 
 ### Fixed
 
+- Prevented granular entry edits from submitting the enclosing day editor, ensuring Save Changes sends the intended `PATCH` request without reloading the calendar page.
+- Marked modal close, cancellation, and deletion controls as non-submit buttons to prevent unintended form submissions.
+
 ### Security
+
+- Limited the Delete Calendars control in the Edit Calendars view to employees with the administrator role.
 
 <!--
 When releasing:
