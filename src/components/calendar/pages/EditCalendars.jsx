@@ -2,9 +2,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Alert,
+  Button,
   Container,
   DeleteConfirmationModal,
   FormField,
+  Input,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
   PageHeader,
   Section,
   Select,
@@ -16,15 +22,23 @@ import {
   getCalendarMonthView,
   getMyCalendars,
   deleteCalendar,
+  updateCalendar,
   createCalendarClosure,
   deleteCalendarClosure,
   upsertCalendarDayLabel,
+  updateCalendarDayLabel,
   deleteCalendarDayLabel,
   createCalendarTestFamilyBadge,
   createBulkCalendarTestFamilyBadges,
+  updateCalendarTestFamilyBadge,
+  deleteCalendarTestFamilyBadge,
   createCalendarEmployeeBadge,
   createBulkCalendarEmployeeBadges,
+  updateCalendarEmployeeBadge,
+  deleteCalendarEmployeeBadge,
   createCalendarDayNote,
+  updateCalendarDayNote,
+  deleteCalendarDayNote,
   getAllEmployees,
   getEmployeeDirectory,
   getAllLocations,
@@ -38,6 +52,7 @@ import { CalendarDayEditor } from "@/components/calendar/components/CalendarDayE
 import { getMonthName } from "@/components/calendar/utils/dateGrid";
 import { DEFAULT_CLOSURE_TYPE } from "@/components/calendar/utils/closureTypes";
 import { toApiFilterValue } from "@/components/calendar/utils/filterValues";
+import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const normalizeList = (response, key) => {
   if (Array.isArray(response)) return response;
@@ -81,6 +96,8 @@ export function EditCalendars() {
   const location = useLocation();
   const { currentUser } = useCurrentUser();
   const canManageAllCalendars = employeeHasRole(currentUser, ["admin", "clerk"]);
+  const canDeleteCalendars = employeeHasRole(currentUser, "admin");
+  const canReassignCalendars = employeeHasRole(currentUser, ["admin", "clerk"]);
   const canUseFullEmployeeList = employeeHasRole(currentUser, [
     "admin",
     "technician",
@@ -115,6 +132,10 @@ export function EditCalendars() {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [markedCalendarIds, setMarkedCalendarIds] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [editingCalendar, setEditingCalendar] = useState(null);
+  const [editCalendarName, setEditCalendarName] = useState("");
+  const [editEmployeeId, setEditEmployeeId] = useState("");
+  const [isUpdatingCalendar, setIsUpdatingCalendar] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -238,6 +259,84 @@ export function EditCalendars() {
         ? prev.filter((id) => String(id) !== String(calendarId))
         : [...prev, calendarId]
     );
+  };
+
+  const handleOpenCalendarEdit = (calendar) => {
+    const employeeId =
+      calendar.employeeId ??
+      calendar.employee?.id ??
+      calendar.ownerId ??
+      calendar.owner?.id ??
+      "";
+
+    setEditingCalendar(calendar);
+    setEditCalendarName(calendar.name || "");
+    setEditEmployeeId(String(employeeId));
+    setError("");
+  };
+
+  const handleCloseCalendarEdit = () => {
+    if (isUpdatingCalendar) return;
+    setEditingCalendar(null);
+  };
+
+  const handleUpdateCalendar = async (event) => {
+    event.preventDefault();
+
+    const name = editCalendarName.trim();
+    if (!editingCalendar || !name) {
+      setError("Enter a calendar name.");
+      return;
+    }
+
+    if (canReassignCalendars && !editEmployeeId) {
+      setError("Choose an employee for this calendar.");
+      return;
+    }
+
+    setIsUpdatingCalendar(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await updateCalendar(editingCalendar.id, {
+        name,
+        ...(canReassignCalendars ? { employeeId: editEmployeeId } : {}),
+      });
+      const assignedEmployee = canReassignCalendars
+        ? employees.find(
+            (employee) => String(employee.id) === String(editEmployeeId)
+          )
+        : editingCalendar.employee || editingCalendar.owner;
+      const updatedCalendar = {
+        ...editingCalendar,
+        ...(response || {}),
+        name,
+        ...(canReassignCalendars
+          ? { employeeId: editEmployeeId, employee: assignedEmployee }
+          : {}),
+      };
+
+      setCalendars((previous) =>
+        previous.map((calendar) =>
+          String(calendar.id) === String(updatedCalendar.id)
+            ? updatedCalendar
+            : calendar
+        )
+      );
+      setSelectedCalendar((previous) =>
+        previous && String(previous.id) === String(updatedCalendar.id)
+          ? updatedCalendar
+          : previous
+      );
+      setEditingCalendar(null);
+      setSuccess(`Updated ${name}.`);
+    } catch (err) {
+      console.error(err);
+      setError("Could not update this calendar.");
+    } finally {
+      setIsUpdatingCalendar(false);
+    }
   };
 
   const handleConfirmDeleteCalendars = async () => {
@@ -391,6 +490,83 @@ export function EditCalendars() {
     }
   };
 
+  const handleUpdateDayEntry = async (entryType, badgeId, entryData) => {
+    if (!selectedCalendar) return;
+
+    setError("");
+    setSuccess("");
+
+    try {
+      if (entryType === "label") {
+        await updateCalendarDayLabel(
+          selectedCalendar.id,
+          selectedDate,
+          filters.locationId,
+          {
+            label: entryData.label.trim(),
+            showWhenClosed: entryData.showWhenClosed,
+          }
+        );
+      } else if (entryType === "testFamily") {
+        await updateCalendarTestFamilyBadge(selectedCalendar.id, badgeId, {
+          testFamilyId: entryData.testFamilyId,
+          startTime: entryData.startTime,
+          endTime: entryData.endTime,
+        });
+      } else if (entryType === "employee") {
+        const customLabel = entryData.customLabel?.trim() || null;
+        await updateCalendarEmployeeBadge(selectedCalendar.id, badgeId, {
+          employeeId: entryData.employeeId,
+          startTime: customLabel ? null : entryData.startTime,
+          endTime: customLabel ? null : entryData.endTime,
+          customLabel,
+        });
+      } else {
+        await updateCalendarDayNote(selectedCalendar.id, badgeId, {
+          message: entryData.message.trim(),
+          color: entryData.color,
+        });
+      }
+
+      await loadMonthView();
+      setSuccess("Updated the calendar entry.");
+    } catch (err) {
+      console.error(err);
+      setError("Could not update this calendar entry.");
+      throw err;
+    }
+  };
+
+  const handleDeleteDayEntry = async (entryType, badgeId) => {
+    if (!selectedCalendar) return;
+
+    setError("");
+    setSuccess("");
+
+    try {
+      if (entryType === "label") {
+        await deleteCalendarDayLabel(
+          selectedCalendar.id,
+          selectedDate,
+          filters.locationId
+        );
+      } else if (entryType === "testFamily") {
+        await deleteCalendarTestFamilyBadge(selectedCalendar.id, badgeId);
+      } else if (entryType === "employee") {
+        await deleteCalendarEmployeeBadge(selectedCalendar.id, badgeId);
+      } else {
+        await deleteCalendarDayNote(selectedCalendar.id, badgeId);
+      }
+
+      await loadMonthView();
+      setSuccess("Deleted the calendar entry.");
+    } catch (err) {
+      console.error(err);
+      setError("Could not delete this calendar entry.");
+      throw err;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="text-center py-20">
@@ -422,7 +598,7 @@ export function EditCalendars() {
             onSelect={handleSelectCalendar}
             title={canManageAllCalendars ? "All Calendars" : "My Calendars"}
             emptyMessage="No calendars are available yet."
-            allowDelete
+            allowDelete={canDeleteCalendars}
             isDeleteMode={isDeleteMode}
             markedCalendarIds={markedCalendarIds}
             onToggleDeleteMode={handleToggleDeleteMode}
@@ -433,6 +609,7 @@ export function EditCalendars() {
             showEmployeeFilter={canManageAllCalendars}
             employeeFilterValue={calendarEmployeeFilter}
             onEmployeeFilterChange={handleCalendarEmployeeFilterChange}
+            onEditCalendar={handleOpenCalendarEdit}
           />
 
           <div className="space-y-6">
@@ -545,6 +722,8 @@ export function EditCalendars() {
                       employees={employees}
                       testFamilies={testFamilies}
                       onSave={handleSaveDay}
+                      onUpdateEntry={handleUpdateDayEntry}
+                      onDeleteEntry={handleDeleteDayEntry}
                       isSaving={isSaving}
                     />
                   </div>
@@ -567,6 +746,53 @@ export function EditCalendars() {
         warning={null}
         isDeleting={isDeletingCalendars}
       />
+      <Modal isOpen={Boolean(editingCalendar)} onClose={handleCloseCalendarEdit}>
+        <form onSubmit={handleUpdateCalendar}>
+          <ModalHeader onClose={handleCloseCalendarEdit}>
+            <h2 className="text-xl font-semibold text-adaptive">Edit Calendar</h2>
+          </ModalHeader>
+          <ModalBody className="space-y-4">
+            <FormField label="Calendar Name">
+              <Input
+                value={editCalendarName}
+                onChange={(event) => setEditCalendarName(event.target.value)}
+                maxLength={255}
+                autoFocus
+                required
+              />
+            </FormField>
+            {canReassignCalendars && (
+              <FormField label="Employee">
+                <Select
+                  value={editEmployeeId}
+                  onChange={(event) => setEditEmployeeId(event.target.value)}
+                  required
+                >
+                  <option value="">Select employee</option>
+                  {employees.map((employee) => (
+                    <option key={employee.id} value={employee.id}>
+                      {getEmployeeDisplayName(employee)}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleCloseCalendarEdit}
+              disabled={isUpdatingCalendar}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isUpdatingCalendar}>
+              {isUpdatingCalendar ? "Saving..." : "Save Changes"}
+            </Button>
+          </ModalFooter>
+        </form>
+      </Modal>
     </Container>
   );
 }

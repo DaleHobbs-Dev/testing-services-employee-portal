@@ -2,7 +2,7 @@
 export { getAllExaminees, getExamineeByEmail, createExaminee, getExamineeById } from "./examineeService";
 
 // Employees
-export { getAllEmployees, getEmployeeDirectory, getAllActiveEmployees, getAllInactiveEmployees, getEmployeeByEmail, getEmployeeById, getEmployeeSchedules, createEmployee, updateEmployee, updateEmployeeRoles } from "./employeeService";
+export { getAllEmployees, getEmployeeDirectory, getAllActiveEmployees, getAllInactiveEmployees, getEmployeeByEmail, getEmployeeById, getEmployeeSchedules, createEmployee, updateEmployee, updateEmployeeRoles, updateEmployeeBadgeColor } from "./employeeService";
 
 // Auth
 export { login, register, changePassword, getCurrentEmployee, logout } from "./authService";
@@ -39,14 +39,17 @@ export {
     getMyCalendars,
     getAllCalendars,
     createCalendar,
+    updateCalendar,
     deleteCalendar,
     getCalendarMonthView,
     createCalendarClosure,
     deleteCalendarClosure,
     upsertCalendarDayLabel,
+    updateCalendarDayLabel,
     deleteCalendarDayLabel,
     createCalendarTestFamilyBadge,
     createBulkCalendarTestFamilyBadges,
+    updateCalendarTestFamilyBadge,
     deleteCalendarTestFamilyBadge,
     createCalendarEmployeeBadge,
     createBulkCalendarEmployeeBadges,
@@ -62,6 +65,9 @@ export { getAllEmployeeCertifications, getEmployeeCertificationsByEmployeeId, up
 
 // Employee Permissions
 export { getAllEmployeePermissions, getEmployeePermissionsByEmployeeId, updateEmployeePermission, createEmployeePermission } from "./employeePermissionService";
+
+// Release Notifications
+export { getAllNotifications, getMyNotifications, createNotification, updateNotification, deleteNotification, dismissNotification } from "./notificationService";
 
 // Exam Schedule Variants
 export { getExamScheduleVariantsByScheduleId, createExamScheduleVariant, updateExamScheduleVariant, deleteExamScheduleVariant, getAllExamScheduleVariants } from "./examScheduleVariantService";

@@ -47,3 +47,7 @@ export const updateEmployeeRoles = async (employeeId, roles) => {
         roles: roles.map(toApiRole),
     });
 };
+
+export const updateEmployeeBadgeColor = async (employeeId, badgeColor) => {
+    return patchJson(`/employees/${employeeId}/badge-color`, { badgeColor });
+};

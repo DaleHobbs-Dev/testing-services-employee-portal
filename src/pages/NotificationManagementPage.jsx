@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-export const ExamManagementPage = () => {
+export function NotificationManagementPage() {
   return (
     <section>
       <Outlet />

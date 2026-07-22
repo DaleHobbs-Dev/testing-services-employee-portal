@@ -86,17 +86,23 @@ export { dashboardCards } from './dashboards/components/dashboardCards';
 // Dashboard Pages
 export { TestingServicesDashboard } from './dashboards/pages/TestingServicesDashboard';
 
+// Release Notification Components
+export { UserNotifications } from './notifications/components/UserNotifications';
+export { NotificationManagement } from './notifications/pages/NotificationManagement';
+
 // Calendar Pages
 export { CalendarManagementHome } from './calendar/pages/CalendarManagementHome';
 export { CreateCalendar } from './calendar/pages/CreateCalendar';
 export { EditCalendars } from './calendar/pages/EditCalendars';
 export { ViewCalendars } from './calendar/pages/ViewCalendars';
+export { CalendarBadgeColors } from './calendar/pages/CalendarBadgeColors';
 
 // Calendar Components
 export { CalendarSelector } from './calendar/components/CalendarSelector';
 export { CalendarFilterBar } from './calendar/components/CalendarFilterBar';
 export { CalendarMonthGrid } from './calendar/components/CalendarMonthGrid';
 export { CalendarDayEditor } from './calendar/components/CalendarDayEditor';
+export { ExistingDayEntries } from './calendar/components/ExistingDayEntries';
 
 // Employee Components
 export { EmployeeForm } from './employees/components/EmployeeForm';
@@ -114,6 +120,8 @@ export { ExamForm } from './exams/components/ExamForm';
 export { EditExam } from './exams/pages/EditExam';
 export { NewExam } from './exams/pages/NewExam';
 export { ExamList } from './exams/pages/ExamList';
+export { ExamManagementHome } from './exams/pages/ExamManagementHome';
+export { TestTypeManagement } from './exams/pages/TestTypeManagement';
 
 // Proctoring Components
 export { EmployeeFilter } from './proctoring/components/EmployeeFilter';
