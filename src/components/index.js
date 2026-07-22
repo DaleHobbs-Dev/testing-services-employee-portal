@@ -102,6 +102,7 @@ export { CalendarSelector } from './calendar/components/CalendarSelector';
 export { CalendarFilterBar } from './calendar/components/CalendarFilterBar';
 export { CalendarMonthGrid } from './calendar/components/CalendarMonthGrid';
 export { CalendarDayEditor } from './calendar/components/CalendarDayEditor';
+export { ExistingDayEntries } from './calendar/components/ExistingDayEntries';
 
 // Employee Components
 export { EmployeeForm } from './employees/components/EmployeeForm';

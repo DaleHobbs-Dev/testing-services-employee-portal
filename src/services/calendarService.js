@@ -33,6 +33,7 @@ const normalizeTestFamilyBadgePayload = (badgeData = {}) => ({
   testFamilyId: toNumberOrValue(badgeData.testFamilyId),
   locationId: toNumberOrValue(badgeData.locationId),
   locationIds: normalizeNumberArray(badgeData.locationIds),
+  endTime: badgeData.endTime || null,
 });
 
 const normalizeEmployeeBadgePayload = (badgeData = {}) => ({
@@ -40,6 +41,7 @@ const normalizeEmployeeBadgePayload = (badgeData = {}) => ({
   employeeId: toNumberOrValue(badgeData.employeeId),
   locationId: toNumberOrValue(badgeData.locationId),
   locationIds: normalizeNumberArray(badgeData.locationIds),
+  endTime: badgeData.endTime || null,
 });
 
 const normalizeDayNotePayload = (noteData = {}) => ({
@@ -139,6 +141,13 @@ export const createCalendar = async (calendarData) => {
   );
 };
 
+export const updateCalendar = async (calendarId, calendarData) => {
+  return patchJson(
+    `/calendars/${calendarId}`,
+    normalizeCalendarPayload(calendarData)
+  ).then(normalizeCalendar);
+};
+
 export const deleteCalendar = async (calendarId) => {
   return deleteJson(`/calendars/${calendarId}`);
 };
@@ -175,6 +184,18 @@ export const upsertCalendarDayLabel = async (
   );
 };
 
+export const updateCalendarDayLabel = async (
+  calendarId,
+  date,
+  locationId,
+  labelData
+) => {
+  return patchJson(
+    `/calendars/${calendarId}/days/${date}/locations/${locationId}/label`,
+    labelData
+  );
+};
+
 export const deleteCalendarDayLabel = async (calendarId, date, locationId) => {
   return deleteJson(
     `/calendars/${calendarId}/days/${date}/locations/${locationId}/label`
@@ -194,6 +215,17 @@ export const createBulkCalendarTestFamilyBadges = async (
 ) => {
   return postJson(
     `/calendars/${calendarId}/test-family-badges/bulk`,
+    normalizeTestFamilyBadgePayload(badgeData)
+  );
+};
+
+export const updateCalendarTestFamilyBadge = async (
+  calendarId,
+  badgeId,
+  badgeData
+) => {
+  return patchJson(
+    `/calendars/${calendarId}/test-family-badges/${badgeId}`,
     normalizeTestFamilyBadgePayload(badgeData)
   );
 };

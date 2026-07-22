@@ -22,6 +22,7 @@ export function ModalHeader({ children, onClose, className = "" }) {
       <div className="flex-1">{children}</div>
       {onClose && (
         <button
+          type="button"
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 text-2xl leading-none ml-4"
         >

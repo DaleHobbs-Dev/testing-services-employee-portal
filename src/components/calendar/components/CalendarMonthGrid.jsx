@@ -13,6 +13,7 @@ import {
 import { getReadableTextColor } from "@/components/calendar/utils/colorContrast";
 import { NONE_FILTER_VALUE } from "@/components/calendar/utils/filterValues";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
+import { formatOptionalTimeRange } from "@/components/calendar/utils/timeRange";
 
 const asString = (value) => (value === undefined || value === null ? "" : String(value));
 
@@ -332,7 +333,10 @@ export function CalendarMonthGrid({
                             )}
                           >
                             {getTestFamilyName(badge, testFamilies)}{" "}
-                            {badge.startTime}-{badge.endTime}
+                            {formatOptionalTimeRange(
+                              badge.startTime,
+                              badge.endTime
+                            )}
                           </div>
                         ))}
 
@@ -346,7 +350,10 @@ export function CalendarMonthGrid({
                           >
                             {getEmployeeName(badge, employees)}{" "}
                             {badge.customLabel ||
-                              `${badge.startTime}-${badge.endTime}`}
+                              formatOptionalTimeRange(
+                                badge.startTime,
+                                badge.endTime
+                              )}
                           </div>
                         ))}
 

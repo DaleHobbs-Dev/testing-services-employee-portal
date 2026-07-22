@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   Alert,
-  Badge,
   Button,
   Card,
   CardContent,
@@ -20,6 +19,7 @@ import {
   DayNoteColorPicker,
   DEFAULT_DAY_NOTE_COLOR,
 } from "@/components/calendar/components/DayNoteColorPicker";
+import { ExistingDayEntries } from "@/components/calendar/components/ExistingDayEntries";
 import {
   CLOSURE_TYPES,
   DEFAULT_CLOSURE_TYPE,
@@ -44,9 +44,6 @@ const listForDayLocation = (items = [], date, locationId) =>
     (item) =>
       item.date === date && asString(item.locationId) === asString(locationId)
   );
-
-const getNoteColor = (note) =>
-  note?.colorHex || note?.color || DEFAULT_DAY_NOTE_COLOR;
 
 const DEFAULT_EMPLOYEE_START_TIME = "07:45";
 const DEFAULT_EMPLOYEE_END_TIME = "16:15";
@@ -143,6 +140,8 @@ export function CalendarDayEditor({
   employees = [],
   testFamilies = [],
   onSave,
+  onUpdateEntry,
+  onDeleteEntry,
   isSaving = false,
 }) {
   const location = locations.find(
@@ -260,20 +259,44 @@ export function CalendarDayEditor({
   const getDateSummary = (dates) =>
     dates.length === 1 ? dates[0] : `${dates.length} dates selected`;
 
-  const getTestFamilyName = (badge) => {
-    const testFamily = testFamilies.find(
-      (item) => asString(item.id) === asString(badge.testFamilyId)
-    );
+  const handleToggleClosed = () => {
+    setFormData((prev) => {
+      if (prev.isClosed) {
+        return { ...prev, isClosed: false };
+      }
 
-    return testFamily?.name || testFamily?.label || "Test Type";
+      return {
+        ...prev,
+        isClosed: true,
+        closureType: prev.closureType || DEFAULT_CLOSURE_TYPE,
+        testFamilyId: "",
+        testFamilyStartTime: "",
+        testFamilyEndTime: "",
+        employeeId: "",
+        employeeStartTime: DEFAULT_EMPLOYEE_START_TIME,
+        employeeEndTime: DEFAULT_EMPLOYEE_END_TIME,
+        employeeLabelType: "",
+        employeeCustomLabel: "",
+      };
+    });
   };
 
-  const getEmployeeName = (badge) => {
-    const employee = employees.find(
-      (item) => asString(item.id) === asString(badge.employeeId)
-    );
+  const handleUpdateExistingEntry = async (entryType, entryId, entryData) => {
+    await onUpdateEntry?.(entryType, entryId, entryData);
+    if (entryType === "label") {
+      setFormData((previous) => ({
+        ...previous,
+        label: entryData.label,
+        showWhenClosed: entryData.showWhenClosed,
+      }));
+    }
+  };
 
-    return getEmployeeDisplayName(employee);
+  const handleDeleteExistingEntry = async (entryType, entryId) => {
+    await onDeleteEntry?.(entryType, entryId);
+    if (entryType === "label") {
+      setFormData((previous) => ({ ...previous, label: "" }));
+    }
   };
 
   const handleSubmit = (event) => {
@@ -287,7 +310,7 @@ export function CalendarDayEditor({
     const newEmployeeBadge =
       formData.employeeId &&
       (employeeCustomLabel ||
-        (formData.employeeStartTime && formData.employeeEndTime))
+        formData.employeeStartTime)
         ? {
             employeeId: formData.employeeId,
             startTime: employeeCustomLabel ? null : formData.employeeStartTime,
@@ -309,8 +332,7 @@ export function CalendarDayEditor({
       testFamilyBadge:
         !formData.isClosed &&
         formData.testFamilyId &&
-        formData.testFamilyStartTime &&
-        formData.testFamilyEndTime
+        formData.testFamilyStartTime
           ? {
               testFamilyId: formData.testFamilyId,
               locationId,
@@ -378,17 +400,32 @@ export function CalendarDayEditor({
         </p>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-6">
           <section>
-            <label className="flex items-center gap-2 text-sm font-medium text-adaptive">
-              <input
-                type="checkbox"
-                name="isClosed"
-                checked={formData.isClosed}
-                onChange={handleChange}
+            <Button
+              type="button"
+              variant={formData.isClosed ? "danger" : "outline"}
+              className="w-full"
+              onClick={handleToggleClosed}
+              aria-pressed={formData.isClosed}
+              title="remove test types and schedules from the day"
+            >
+              {formData.isClosed
+                ? "Testing Center Closed"
+                : "Mark Testing Center Closed"}
+            </Button>
+            <div className="mt-4">
+              <ExistingDayEntries
+                testFamilyBadges={existingTestFamilyBadges}
+                employeeBadges={existingEmployeeBadges}
+                notes={existingNotes}
+                label={existingLabel}
+                testFamilies={testFamilies}
+                employees={employees}
+                onUpdateEntry={handleUpdateExistingEntry}
+                onDeleteEntry={handleDeleteExistingEntry}
               />
-              Testing Center Closed
-            </label>
+            </div>
             {formData.isClosed && (
               <div className="mt-2 space-y-3">
                 <FormField label="Closure Type">
@@ -594,47 +631,9 @@ export function CalendarDayEditor({
             </FormField>
           </section>
 
-          <Button type="submit" disabled={isSaving}>
+          <Button type="button" onClick={handleSubmit} disabled={isSaving}>
             {isSaving ? "Saving..." : "Save Day"}
           </Button>
-        </form>
-
-        <div className="mt-6 space-y-4">
-          <section>
-            <h3 className="font-semibold text-adaptive">Existing Entries</h3>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {existingTestFamilyBadges.map((badge) => (
-                <Badge key={`tf-${badge.id}`} variant="primary">
-                  {getTestFamilyName(badge)} {badge.startTime}-{badge.endTime}
-                </Badge>
-              ))}
-              {existingEmployeeBadges.map((badge) => (
-                <Badge key={`emp-${badge.id}`} variant="accent">
-                  {getEmployeeName(badge)}{" "}
-                  {badge.customLabel || `${badge.startTime}-${badge.endTime}`}
-                </Badge>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h3 className="font-semibold text-adaptive">Notes</h3>
-            <div className="mt-2 space-y-2">
-              {existingNotes.length === 0 ? (
-                <p className="text-sm text-adaptive-muted">No notes yet.</p>
-              ) : (
-                existingNotes.map((note) => (
-                  <p
-                    key={note.id}
-                    className="rounded px-3 py-2 text-sm text-gray-900"
-                    style={{ backgroundColor: getNoteColor(note) }}
-                  >
-                    {note.message}
-                  </p>
-                ))
-              )}
-            </div>
-          </section>
         </div>
       </CardContent>
       <BadgeDatePicker

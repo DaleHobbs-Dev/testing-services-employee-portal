@@ -51,6 +51,7 @@ export function DeleteConfirmationModal({
 
       <ModalFooter className="flex justify-end gap-3">
         <Button
+          type="button"
           variant="secondary"
           onClick={onClose}
           disabled={isDeleting}
@@ -59,6 +60,7 @@ export function DeleteConfirmationModal({
           Cancel
         </Button>
         <Button
+          type="button"
           variant="danger"
           onClick={onConfirm}
           disabled={isDeleting}

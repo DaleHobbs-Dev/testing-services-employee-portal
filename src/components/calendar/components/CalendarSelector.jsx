@@ -8,6 +8,7 @@ import {
   FormField,
   Select,
 } from "@/components";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const getCalendarEmployeeId = (calendar) =>
@@ -76,6 +77,7 @@ export function CalendarSelector({
   showEmployeeFilter = false,
   employeeFilterValue = "",
   onEmployeeFilterChange,
+  onEditCalendar,
 }) {
   const markedCount = markedCalendarIds.length;
   const employeeOptions = buildEmployeeOptions(employees, calendars);
@@ -205,6 +207,17 @@ export function CalendarSelector({
                         )}
                       </div>
                     </button>
+                    {!isDeleteMode && (
+                      <button
+                        type="button"
+                        onClick={() => onEditCalendar?.(calendar)}
+                        className="rounded-md p-1.5 text-adaptive-muted transition hover:bg-muted hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+                        aria-label={`Edit ${calendar.name}`}
+                        title={`Edit ${calendar.name}`}
+                      >
+                        <PencilSquareIcon className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                    )}
                     {!isDeleteMode && isSelected && (
                       <span className="sr-only">Selected</span>
                     )}
