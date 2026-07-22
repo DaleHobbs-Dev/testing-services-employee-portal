@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Frontend-specific Git workflow, versioning, changelog, and release guidance.
+- System-notification management for administrators and technicians, including role targeting, editing, retiring, and deletion.
+- Dashboard release notifications that remain visible to targeted employees until dismissed.
 
 ### Changed
 

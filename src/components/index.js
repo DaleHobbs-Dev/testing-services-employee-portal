@@ -86,6 +86,10 @@ export { dashboardCards } from './dashboards/components/dashboardCards';
 // Dashboard Pages
 export { TestingServicesDashboard } from './dashboards/pages/TestingServicesDashboard';
 
+// Release Notification Components
+export { UserNotifications } from './notifications/components/UserNotifications';
+export { NotificationManagement } from './notifications/pages/NotificationManagement';
+
 // Calendar Pages
 export { CalendarManagementHome } from './calendar/pages/CalendarManagementHome';
 export { CreateCalendar } from './calendar/pages/CreateCalendar';

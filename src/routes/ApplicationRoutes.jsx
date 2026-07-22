@@ -9,6 +9,7 @@ import {
   EmployeeDashboardPage,
   EmployeeManagementPage,
   CalendarManagementPage,
+  NotificationManagementPage,
 } from "@/pages";
 import { AuthorizedRoutes, RoleRoutes } from "@/routes";
 import {
@@ -21,6 +22,7 @@ import {
   CreateCalendar,
   EditCalendars,
   ViewCalendars,
+  NotificationManagement,
 } from "@/components";
 
 export function ApplicationRoutes() {
@@ -66,6 +68,23 @@ export function ApplicationRoutes() {
               <Route path="list" element={<EmployeeList />} />
               <Route path="new" element={<NewEmployee />} />
               <Route path=":employeeId/edit" element={<EditEmployee />} />
+            </Route>
+          </Route>
+
+          {/* System Notification Management Routes */}
+          <Route
+            element={
+              <RoleRoutes
+                currentEmployee={currentUser}
+                roles={["admin", "technician"]}
+              />
+            }
+          >
+            <Route
+              path="notification-management"
+              element={<NotificationManagementPage />}
+            >
+              <Route index element={<NotificationManagement />} />
             </Route>
           </Route>
 
