@@ -2,7 +2,7 @@
 export { getAllExaminees, getExamineeByEmail, createExaminee, getExamineeById } from "./examineeService";
 
 // Employees
-export { getAllEmployees, getEmployeeDirectory, getAllActiveEmployees, getAllInactiveEmployees, getEmployeeByEmail, getEmployeeById, getEmployeeSchedules, createEmployee, updateEmployee, updateEmployeeRoles } from "./employeeService";
+export { getAllEmployees, getEmployeeDirectory, getAllActiveEmployees, getAllInactiveEmployees, getEmployeeByEmail, getEmployeeById, getEmployeeSchedules, createEmployee, updateEmployee, updateEmployeeRoles, updateEmployeeBadgeColor } from "./employeeService";
 
 // Auth
 export { login, register, changePassword, getCurrentEmployee, logout } from "./authService";

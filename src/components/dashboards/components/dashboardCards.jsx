@@ -4,9 +4,18 @@ import {
   UsersIcon,
   CalendarDaysIcon,
   BellAlertIcon,
+  AcademicCapIcon,
 } from "@heroicons/react/24/solid";
 
 export const dashboardCards = [
+  {
+    id: "exam-management",
+    roles: ["admin", "technician"],
+    title: "Exam Management",
+    description: "Manage test types, test variants, and other exam settings.",
+    icon: <AcademicCapIcon className="w-8 h-8 text-primary" />,
+    to: "/exam-management",
+  },
   {
     id: "notification-management",
     roles: ["admin", "technician"],

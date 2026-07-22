@@ -10,6 +10,8 @@ import {
   Section,
 } from "@/components";
 import { Link } from "react-router-dom";
+import { useCurrentUser } from "@/context";
+import { employeeHasRole } from "@/utils/roleUtils";
 
 const calendarManagementCards = [
   {
@@ -36,6 +38,16 @@ const calendarManagementCards = [
 ];
 
 export function CalendarManagementHome() {
+  const { currentUser } = useCurrentUser();
+  const cards = employeeHasRole(currentUser, ["admin", "technician"])
+    ? [...calendarManagementCards, {
+        title: "Calendar Badge Colors",
+        description: "Adjust the colors used for test type and employee badges on calendars.",
+        action: "Manage Colors",
+        to: "/calendar-management/badge-colors",
+      }]
+    : calendarManagementCards;
+
   return (
     <Container>
       <Section className="max-w-5xl mx-auto">
@@ -46,7 +58,7 @@ export function CalendarManagementHome() {
         />
 
         <Grid cols={3}>
-          {calendarManagementCards.map((card) => (
+          {cards.map((card) => (
             <Card
               key={card.to}
               className="
