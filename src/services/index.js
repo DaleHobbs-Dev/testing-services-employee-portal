@@ -63,5 +63,8 @@ export { getAllEmployeeCertifications, getEmployeeCertificationsByEmployeeId, up
 // Employee Permissions
 export { getAllEmployeePermissions, getEmployeePermissionsByEmployeeId, updateEmployeePermission, createEmployeePermission } from "./employeePermissionService";
 
+// Release Notifications
+export { getAllNotifications, getMyNotifications, createNotification, updateNotification, deleteNotification, dismissNotification } from "./notificationService";
+
 // Exam Schedule Variants
 export { getExamScheduleVariantsByScheduleId, createExamScheduleVariant, updateExamScheduleVariant, deleteExamScheduleVariant, getAllExamScheduleVariants } from "./examScheduleVariantService";

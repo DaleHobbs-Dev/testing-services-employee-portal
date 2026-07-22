@@ -3,9 +3,18 @@
 import {
   UsersIcon,
   CalendarDaysIcon,
+  BellAlertIcon,
 } from "@heroicons/react/24/solid";
 
 export const dashboardCards = [
+  {
+    id: "notification-management",
+    roles: ["admin", "technician"],
+    title: "System Notifications",
+    description: "Publish and manage release notifications for employees.",
+    icon: <BellAlertIcon className="w-8 h-8 text-primary" />,
+    to: "/notification-management",
+  },
   {
     id: "employee-management",
     roles: ["admin", "technician"],

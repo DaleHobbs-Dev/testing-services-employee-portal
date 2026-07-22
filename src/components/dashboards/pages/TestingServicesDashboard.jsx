@@ -7,7 +7,8 @@ import {
   Section,
   Container,
   dashboardCards,
-  DashboardCard
+  DashboardCard,
+  UserNotifications,
 } from "@/components";
 import { useCurrentUser } from "@/context";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
@@ -28,6 +29,8 @@ export function TestingServicesDashboard() {
           description="Choose an area to get started."
           center
         />
+
+        <UserNotifications />
 
         <Card className="p-8 shadow-md">
           <CardHeader>
