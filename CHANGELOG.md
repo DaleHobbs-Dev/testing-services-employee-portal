@@ -6,7 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-Planned for version 1.1.0.
+## [1.1.1] - 2026-07-23
+
+### Fixed
+
+- Limited employee selections throughout calendar creation, editing, viewing, filtering, reassignment, and badge-color management to active employees.
+- Limited test-family selections throughout calendar editing, viewing, filtering, and badge-color management to test families with `active` set to `true`.
+- Prevented inactive employees embedded in existing calendar records from being reintroduced into calendar employee-filter options.
+- Preserved the display of historical calendar entries while excluding inactive employees and test families from new list selections.
+
+## [1.1.0] - 2026-07-23
 
 ### Added
 
@@ -29,10 +38,6 @@ Planned for version 1.1.0.
 - Made end times optional for calendar test types and employee schedules; requests now send `null` when no end time is selected, and badges display only their start time without a trailing hyphen.
 - Added frontend support for updating calendars, day labels, test-family badges, employee badges, and day notes through their `PATCH` endpoints, alongside granular delete flows.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Prevented granular entry edits from submitting the enclosing day editor, ensuring Save Changes sends the intended `PATCH` request without reloading the calendar page.
@@ -49,7 +54,8 @@ When releasing:
 2. Remove empty headings from the released section.
 3. Leave a fresh, empty Unreleased section at the top.
 4. Add comparison links at the bottom once the repository has release tags, for example:
-   [Unreleased]: https://github.com/DaleHobbs-Dev/testing-services-employee-portal/compare/v1.1.0...HEAD
+   [Unreleased]: https://github.com/DaleHobbs-Dev/testing-services-employee-portal/compare/v1.1.1...HEAD
+   [1.1.1]: https://github.com/DaleHobbs-Dev/testing-services-employee-portal/compare/v1.1.0...v1.1.1
    [1.1.0]: https://github.com/DaleHobbs-Dev/testing-services-employee-portal/compare/v1.0.0...v1.1.0
 
 Write entries for users and integrators, not as raw commit messages. Call out API contract,

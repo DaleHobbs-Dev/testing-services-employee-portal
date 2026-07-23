@@ -18,6 +18,7 @@ import { useCurrentUser } from "@/context";
 import { createCalendar, getAllEmployees, getEmployeeDirectory } from "@/services";
 import { employeeHasRole } from "@/utils/roleUtils";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
+import { filterActiveEmployees } from "@/components/calendar/utils/activeSelections";
 
 const currentYear = new Date().getFullYear();
 
@@ -92,13 +93,15 @@ export function CreateCalendar() {
 
     loadEmployees()
       .then((employeeData) => {
-        setEmployees(employeeData);
-        const currentEmployee = employeeData.find(
+        const activeEmployees = filterActiveEmployees(employeeData);
+
+        setEmployees(activeEmployees);
+        const currentEmployee = activeEmployees.find(
           (employee) => String(employee.id) === String(currentUser?.id)
         );
 
         setSelectedEmployeeId(
-          String(currentEmployee?.id || employeeData[0]?.id || "")
+          String(currentEmployee?.id || activeEmployees[0]?.id || "")
         );
       })
       .catch((err) => {

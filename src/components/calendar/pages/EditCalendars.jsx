@@ -52,6 +52,10 @@ import { CalendarDayEditor } from "@/components/calendar/components/CalendarDayE
 import { getMonthName } from "@/components/calendar/utils/dateGrid";
 import { DEFAULT_CLOSURE_TYPE } from "@/components/calendar/utils/closureTypes";
 import { toApiFilterValue } from "@/components/calendar/utils/filterValues";
+import {
+  filterActiveEmployees,
+  filterActiveTestFamilies,
+} from "@/components/calendar/utils/activeSelections";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 
 const normalizeList = (response, key) => {
@@ -196,8 +200,14 @@ export function EditCalendars() {
 
         setCalendars(nextCalendars);
         setLocations(nextLocations);
-        setEmployees(normalizeList(employeeData, "employees"));
-        setTestFamilies(normalizeList(testFamilyData, "testFamilies"));
+        setEmployees(
+          filterActiveEmployees(normalizeList(employeeData, "employees"))
+        );
+        setTestFamilies(
+          filterActiveTestFamilies(
+            normalizeList(testFamilyData, "testFamilies")
+          )
+        );
 
         if (nextLocations.length > 0) {
           setFilters((prev) => ({

@@ -24,6 +24,10 @@ import { CalendarFilterBar } from "@/components/calendar/components/CalendarFilt
 import { CalendarMonthGrid } from "@/components/calendar/components/CalendarMonthGrid";
 import { getMonthName } from "@/components/calendar/utils/dateGrid";
 import { toApiFilterValue } from "@/components/calendar/utils/filterValues";
+import {
+  filterActiveEmployees,
+  filterActiveTestFamilies,
+} from "@/components/calendar/utils/activeSelections";
 
 const normalizeList = (response, key) => {
   if (Array.isArray(response)) return response;
@@ -138,8 +142,14 @@ export function ViewCalendars() {
 
         setCalendars(nextCalendars);
         setLocations(normalizeList(locationData, "locations"));
-        setEmployees(normalizeList(employeeData, "employees"));
-        setTestFamilies(normalizeList(testFamilyData, "testFamilies"));
+        setEmployees(
+          filterActiveEmployees(normalizeList(employeeData, "employees"))
+        );
+        setTestFamilies(
+          filterActiveTestFamilies(
+            normalizeList(testFamilyData, "testFamilies")
+          )
+        );
 
         if (nextCalendars.length > 0) {
           const firstCalendar = nextCalendars[0];
