@@ -17,29 +17,11 @@ const getCalendarEmployeeId = (calendar) =>
   calendar.ownerId ??
   calendar.owner?.id;
 
-const getCalendarEmployee = (calendar) =>
-  calendar.employee ||
-  calendar.owner ||
-  (getCalendarEmployeeId(calendar) &&
-  (calendar.employeeName || calendar.employeeFullName)
-    ? {
-        id: getCalendarEmployeeId(calendar),
-        fullName: calendar.employeeFullName || calendar.employeeName,
-      }
-    : null);
-
-const buildEmployeeOptions = (employees, calendars) => {
+const buildEmployeeOptions = (employees) => {
   const optionsById = new Map();
 
   employees.forEach((employee) => {
     optionsById.set(String(employee.id), employee);
-  });
-
-  calendars.forEach((calendar) => {
-    const employee = getCalendarEmployee(calendar);
-    if (employee?.id && !optionsById.has(String(employee.id))) {
-      optionsById.set(String(employee.id), employee);
-    }
   });
 
   return Array.from(optionsById.values());
@@ -80,7 +62,7 @@ export function CalendarSelector({
   onEditCalendar,
 }) {
   const markedCount = markedCalendarIds.length;
-  const employeeOptions = buildEmployeeOptions(employees, calendars);
+  const employeeOptions = buildEmployeeOptions(employees);
   const visibleCalendars =
     showEmployeeFilter && employeeFilterValue
       ? calendars.filter(

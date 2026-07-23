@@ -4,6 +4,10 @@ import { useCurrentUser } from "@/context";
 import { getAllEmployees, getAllTestFamilies, updateEmployeeBadgeColor, updateTestFamily } from "@/services";
 import { getEmployeeDisplayName } from "@/utils/employeeUtils";
 import { employeeHasRole } from "@/utils/roleUtils";
+import {
+  filterActiveEmployees,
+  filterActiveTestFamilies,
+} from "@/components/calendar/utils/activeSelections";
 
 const DEFAULT_COLOR = "#64748B";
 const HEX_COLOR = /^#[0-9A-F]{6}$/i;
@@ -42,8 +46,8 @@ export function CalendarBadgeColors() {
   const load = useCallback(async () => {
     try {
       const [familyData, employeeData] = await Promise.all([getAllTestFamilies(), getAllEmployees()]);
-      setFamilies(familyData.filter((family) => family.active !== false));
-      setEmployees(employeeData);
+      setFamilies(filterActiveTestFamilies(familyData));
+      setEmployees(filterActiveEmployees(employeeData));
     } catch (error) {
       setMessage({ type: "error", text: errorMessage(error, "Unable to load calendar badge colors.") });
     }
