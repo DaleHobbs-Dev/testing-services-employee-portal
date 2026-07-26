@@ -2,7 +2,6 @@ Table employees {
   id int [pk, increment]
   name varchar(100) [not null]
   email varchar(100) [unique, not null]
-  role varchar(50) [not null, note: 'admin, proctor, scheduler, checkin, frontdesk, technician, clerk']
   status varchar(50) [not null, default: 'active', note: 'active, inactive, restricted']
   phone varchar(20)
   notes text
@@ -10,6 +9,28 @@ Table employees {
   locationId int [not null, ref: > locations.id]
   badgeColor varchar(20) [unique, note: 'Hex color used to render this employee\'s schedule badges on the calendar']
   created_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+//////////////////////////////////////////////////////////
+// Authorization (roles bundle permissions; employees may
+// also receive additional permissions directly)
+//////////////////////////////////////////////////////////
+
+Table roles {
+  id int [pk, increment]
+  key varchar(50) [unique, not null, note: 'Stable machine-readable key, e.g. admin, proctor, scheduler, checkin, frontdesk, technician, clerk']
+  label varchar(100) [not null]
+  description text
+  active boolean [not null, default: true]
+}
+
+Table employeeRoles {
+  employeeId int [not null, ref: > employees.id]
+  roleId int [not null, ref: > roles.id]
+
+  indexes {
+    (employeeId, roleId) [pk]
+  }
 }
 
 Table certifications {
@@ -20,8 +41,19 @@ Table certifications {
 
 Table permissions {
   id int [pk, increment]
-  key varchar(50) [unique, not null]
+  key varchar(100) [unique, not null, note: 'Stable action-oriented key, e.g. calendars.view_own or employees.manage_roles']
   label varchar(100) [not null]
+  description text
+  active boolean [not null, default: true]
+}
+
+Table rolePermissions {
+  roleId int [not null, ref: > roles.id]
+  permissionId int [not null, ref: > permissions.id]
+
+  indexes {
+    (roleId, permissionId) [pk]
+  }
 }
 
 Table employeeCertifications {
@@ -40,6 +72,8 @@ Table employeePermissions {
   indexes {
     (employeeId, permissionId) [pk]
   }
+
+  Note: 'Direct additive grants for employee-specific exceptions. Role-derived permissions belong in rolePermissions.'
 }
 
 Table testFamilies {
@@ -283,7 +317,7 @@ Table calendarTestFamilyBadges {
   date date [not null]
   testFamilyId int [not null, ref: > testFamilies.id]
   startTime time [not null]
-  endTime time [not null]
+  endTime time [note: 'Null when no end time is provided (open-ended)']
   createdAt timestamp [default: `CURRENT_TIMESTAMP`]
 }
 
@@ -294,7 +328,7 @@ Table calendarEmployeeBadges {
   date date [not null]
   employeeId int [not null, ref: > employees.id]
   startTime time [note: 'Null when customLabel is set instead of a time block']
-  endTime time [note: 'Null when customLabel is set instead of a time block']
+  endTime time [note: 'Null when customLabel is set, or when no end time is provided (open-ended)']
   customLabel varchar(50) [note: 'OFF, REQUESTED OFF, or custom text -- used instead of a time block; excluded from the 8th-column hours sum']
   createdAt timestamp [default: `CURRENT_TIMESTAMP`]
 }
@@ -305,9 +339,33 @@ Table calendarDayNotes {
   locationId int [not null, ref: > locations.id]
   date date [not null]
   message text [not null]
-  color varchar(7) [not null, default: '#FEF3C7', note: 'Hex color used to render the note on calendar views']
   createdAt timestamp [default: `CURRENT_TIMESTAMP`]
   updatedAt timestamp [default: `CURRENT_TIMESTAMP`]
   createdBy int [ref: > employees.id]
   updatedBy int [ref: > employees.id]
+}
+
+//////////////////////////////////////////////////////////
+// Release Notifications
+//////////////////////////////////////////////////////////
+
+Table releaseNotifications {
+  id int [pk, increment]
+  version varchar(20) [note: 'Ties to CHANGELOG.md semver, e.g. 1.1.0']
+  title varchar(150) [not null]
+  message text [not null]
+  category varchar(20) [note: 'Added, Changed, Deprecated, Removed, Fixed, Security -- mirrors Keep a Changelog headings']
+  targetRoles json [note: 'Array of role keys (see roles.key); null = visible to all roles']
+  isActive boolean [default: true, note: 'Deactivate without deleting history']
+  createdAt timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table notificationDismissals {
+  notificationId int [not null, ref: > releaseNotifications.id]
+  employeeId int [not null, ref: > employees.id]
+  dismissedAt timestamp [not null, default: `CURRENT_TIMESTAMP`, note: 'Row only exists once dismissed -- presence = dismissed, absence = still showing']
+
+  indexes {
+    (notificationId, employeeId) [pk]
+  }
 }
